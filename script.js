@@ -11,11 +11,13 @@ const OPENAI_API_KEY = 'sk-1234abcd1234abcd1234abcd1234abcd1234abcd';
 // ================================================================
 // 2. SUPABASE BAĞLANTISI (Hata Korumalı)
 // ================================================================
-let supabase = null;
+// DEĞİŞİKLİK BURADA: İsmi _supabase yaptık ki kütüphane ile çakışmasın
+let _supabase = null;
 
 try {
   if (SUPABASE_URL && SUPABASE_KEY && window.supabase) {
-    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    // window.supabase kütüphanedir, _supabase bizim değişkenimizdir
+    _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
     console.log("Supabase bağlantısı hazır.");
   } else {
     console.warn("Supabase anahtarları eksik! Site Demo modunda çalışacak.");
@@ -130,7 +132,8 @@ window.showAuth = function(tab) {
 
 window.logout = async function() {
   if (confirm('Çıkış yapmak istiyor musunuz?')) {
-    if (supabase) await supabase.auth.signOut();
+    // DEĞİŞİKLİK: supabase yerine _supabase
+    if (_supabase) await _supabase.auth.signOut();
     currentUser = null;
     currentSessionId = null;
     window.location.reload(); 
@@ -168,7 +171,8 @@ window.sendMessage = async function() {
   components.userInput.value = '';
   
   // Eğer Supabase yoksa Demo modunda çalış (Eski kodun bozulmaması için)
-  if (!supabase || !currentUser) {
+  // DEĞİŞİKLİK: supabase yerine _supabase
+  if (!_supabase || !currentUser) {
     setTimeout(() => {
       addMessage("Demo Mode: AI connection not active (Login required).", 'ai');
     }, 1000);
@@ -178,10 +182,11 @@ window.sendMessage = async function() {
   try {
     // 2. Oturum yoksa veritabanında oluştur
     if (!currentSessionId) {
-      const { data: sessionData, error: sessionError } = await supabase
+      // DEĞİŞİKLİK: supabase yerine _supabase
+      const { data: sessionData, error: sessionError } = await _supabase
         .from('chat_sessions')
         .insert([{ 
-            user_id: (await supabase.auth.getUser()).data.user.id,
+            user_id: (await _supabase.auth.getUser()).data.user.id,
             title: text.substring(0, 30) + "..." 
         }])
         .select()
@@ -192,7 +197,8 @@ window.sendMessage = async function() {
 
     // 3. Kullanıcı mesajını kaydet
     if (currentSessionId) {
-      await supabase.from('chat_messages').insert([{
+      // DEĞİŞİKLİK: supabase yerine _supabase
+      await _supabase.from('chat_messages').insert([{
         session_id: currentSessionId,
         sender_type: 'user',
         content: text
@@ -213,7 +219,8 @@ window.sendMessage = async function() {
 
     // 5. AI cevabını kaydet
     if (currentSessionId) {
-      await supabase.from('chat_messages').insert([{
+      // DEĞİŞİKLİK: supabase yerine _supabase
+      await _supabase.from('chat_messages').insert([{
         session_id: currentSessionId,
         sender_type: 'ai',
         content: aiResponse
@@ -296,8 +303,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // Google Login (Sadece Supabase varsa çalışır)
   if (components.btnGoogle) {
     components.btnGoogle.addEventListener('click', async () => {
-      if (supabase) {
-        await supabase.auth.signInWithOAuth({
+      // DEĞİŞİKLİK: supabase yerine _supabase
+      if (_supabase) {
+        await _supabase.auth.signInWithOAuth({
             provider: 'google',
             options: { redirectTo: window.location.href }
         });
@@ -317,8 +325,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const pass = document.getElementById('login-password').value;
     
     // Supabase varsa oradan dene
-    if (supabase) {
-        const { data, error } = await supabase.auth.signInWithPassword({
+    // DEĞİŞİKLİK: supabase yerine _supabase
+    if (_supabase) {
+        const { data, error } = await _supabase.auth.signInWithPassword({
             email: email,
             password: pass
         });
@@ -355,8 +364,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (pass !== confirm) return showAuthError("Passwords do not match");
 
-    if (supabase) {
-        const { data, error } = await supabase.auth.signUp({
+    // DEĞİŞİKLİK: supabase yerine _supabase
+    if (_supabase) {
+        const { data, error } = await _supabase.auth.signUp({
             email: email,
             password: pass,
             options: { data: { full_name: name, role: role } }
@@ -386,8 +396,9 @@ document.addEventListener('DOMContentLoaded', () => {
 // 7. OTURUM YÖNETİMİ
 // ================================================================
 async function initSession() {
-  if (supabase) {
-    const { data: { session } } = await supabase.auth.getSession();
+  // DEĞİŞİKLİK: supabase yerine _supabase
+  if (_supabase) {
+    const { data: { session } } = await _supabase.auth.getSession();
     if (session) {
       loginSuccess({
         name: session.user.user_metadata.full_name || session.user.email,
