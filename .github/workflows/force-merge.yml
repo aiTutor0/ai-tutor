@@ -15,5 +15,6 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git fetch origin frontend
-          git merge origin/frontend --allow-unrelated-histories -m "Force merge frontend into main"
+          git checkout origin/frontend -- .
+          git commit -m "Brute force merge frontend into main"
           git push origin main
