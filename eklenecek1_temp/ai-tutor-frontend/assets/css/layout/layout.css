@@ -27,7 +27,7 @@ body.no-sidebar .sidebar { display: none; }
 
 .menu { display: flex; flex-direction: column; gap: 5px; flex: 1; }
 
-.menu a, .menu-link {
+.menu a {
   text-decoration: none;
   color: #64748b;
   padding: 12px 15px;
@@ -39,14 +39,13 @@ body.no-sidebar .sidebar { display: none; }
   transition: 0.2s;
 }
 
-.menu a:hover, .menu a.active,
-.menu-link:hover, .menu-link.active {
+.menu a:hover, .menu a.active {
   background-color: #eef2ff;
   color: #4f46e5;
   font-weight: 600;
 }
 
-.menu a.menu-sub, .menu-link.menu-sub{
+.menu a.menu-sub{
   justify-content: space-between;
 }
 

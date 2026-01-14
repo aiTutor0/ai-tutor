@@ -5,8 +5,6 @@
   "type": "module",
   "scripts": {
     "dev": "netlify dev",
-    "dev:local": "node server/index.js",
-    "start": "node server/index.js",
     "deploy": "netlify deploy --prod"
   },
   "keywords": [
@@ -18,11 +16,6 @@
   ],
   "author": "Your Name",
   "license": "MIT",
-  "dependencies": {
-    "cors": "^2.8.5",
-    "dotenv": "^16.3.1",
-    "express": "^4.18.2"
-  },
   "devDependencies": {
     "netlify-cli": "^17.0.0"
   }
