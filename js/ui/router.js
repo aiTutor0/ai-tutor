@@ -115,7 +115,7 @@ export function initRouter() {
 
     try {
       await logoutUser();
-    } catch (_) {}
+    } catch (_) { }
 
     window.showLanding();
   };
@@ -206,7 +206,7 @@ export function initRouter() {
   };
 
   // tool open
-  window.openTool = (tool, e) => {
+  window.openTool = (tool, e, addHistory = true) => {
     e?.preventDefault?.();
 
     document.body.classList.remove("public");
@@ -215,6 +215,8 @@ export function initRouter() {
     showView("workspace-view");
     setTool(tool);
     setActiveMenu(tool);
+
+    if (addHistory) history.pushState({ tool }, "", "#" + tool);
   };
 
   window.logout = async () => {
@@ -305,6 +307,14 @@ export function initRouter() {
 
   $("tab-login")?.addEventListener("click", () => setAuthTab("login"));
   $("tab-register")?.addEventListener("click", () => setAuthTab("register"));
+
+  window.addEventListener("popstate", (e) => {
+    if (e.state && e.state.tool) {
+      window.openTool(e.state.tool, null, false);
+    } else {
+      window.showLanding();
+    }
+  });
 
   window.showLanding();
 }
