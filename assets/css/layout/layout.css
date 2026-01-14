@@ -1,15 +1,20 @@
 /* === LAYOUT.CSS (Skeleton, Sidebar, Main Structure) === */
 
-.app-container { display: flex; height: 100%; }
+.app-container {
+  display: flex;
+  height: 100%;
+}
 
 /* PUBLIC MODE: sidebar hidden */
-body.public .sidebar { display: none; }
+body.public .sidebar {
+  display: none;
+}
 
 /* --- SIDEBAR --- */
 .sidebar {
   width: 260px;
-  background: white;
-  border-right: 1px solid #e2e8f0;
+  background: var(--color-bg-secondary);
+  border-right: 1px solid var(--color-border);
   display: flex;
   flex-direction: column;
   padding: 20px;
@@ -18,18 +23,23 @@ body.public .sidebar { display: none; }
 .brand {
   font-size: 1.5rem;
   font-weight: 800;
-  color: #4f46e5;
+  color: var(--color-accent);
   margin-bottom: 40px;
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
-.menu { display: flex; flex-direction: column; gap: 5px; flex: 1; }
+.menu {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  flex: 1;
+}
 
 .menu a {
   text-decoration: none;
-  color: #64748b;
+  color: var(--color-text-muted);
   padding: 12px 15px;
   border-radius: 8px;
   font-size: 0.95rem;
@@ -39,33 +49,66 @@ body.public .sidebar { display: none; }
   transition: 0.2s;
 }
 
-.menu a:hover, .menu a.active { background-color: #eef2ff; color: #4f46e5; font-weight: 600; }
+.menu a:hover,
+.menu a.active {
+  background-color: var(--color-bg-hover);
+  color: var(--color-accent);
+  font-weight: 600;
+}
 
 .user-profile {
   display: flex;
   align-items: center;
   gap: 10px;
   padding-top: 20px;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid var(--color-border);
   cursor: pointer;
 }
 
-.user-profile:hover { opacity: 0.95; }
+.user-profile:hover {
+  opacity: 0.95;
+}
 
 .avatar {
-  width: 40px; height: 40px;
-  background: #4f46e5;
+  width: 40px;
+  height: 40px;
+  background: var(--color-accent);
   color: white;
   border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-weight: 900;
 }
 
-.user-info { display: flex; flex-direction: column; }
-.user-info .name { font-size: 0.95rem; font-weight: 800; }
-.user-info .role { font-size: 0.75rem; color: #94a3b8; font-weight: 800; }
+.user-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.user-info .name {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--color-text-primary);
+}
+
+.user-info .role {
+  font-size: 0.75rem;
+  color: var(--color-text-hint);
+  font-weight: 800;
+}
 
 /* --- MAIN CONTENT AREA --- */
-.main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; }
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
 
-.view-section { padding: 40px; height: 100%; overflow-y: auto; }
+.view-section {
+  padding: 40px;
+  height: 100%;
+  overflow-y: auto;
+}
