@@ -1,0 +1,29 @@
+{
+  "name": "aitutor",
+  "version": "1.0.0",
+  "description": "AI-Powered English Learning Platform",
+  "type": "module",
+  "scripts": {
+    "dev": "netlify dev",
+    "dev:local": "node server/index.js",
+    "start": "node server/index.js",
+    "deploy": "netlify deploy --prod"
+  },
+  "keywords": [
+    "ai",
+    "education",
+    "english",
+    "language-learning",
+    "tutor"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.6.1",
+    "express": "^4.22.1"
+  },
+  "devDependencies": {
+    "netlify-cli": "^17.0.0"
+  }
+}

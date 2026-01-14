@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AITutor</title>
+
+  <!-- Font Awesome (icons) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+
+  <!-- CSS (split) -->
+  <link rel="stylesheet" href="./assets/css/base/theme.css" />
+  <link rel="stylesheet" href="./assets/css/base/base.css" />
+  <link rel="stylesheet" href="./assets/css/layout/layout.css" />
+  <link rel="stylesheet" href="./assets/css/views/views.css" />
+</head>
+
+<body class="public">
+  <!-- Theme Toggle Button -->
+  <button class="theme-toggle" id="theme-toggle" title="Toggle Dark Mode">
+    <i class="fa-solid fa-moon"></i>
+    <i class="fa-solid fa-sun"></i>
+  </button>
+
+  <div class="app-container">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="brand">
+        <i class="fa-solid fa-brain"></i>
+        <span>AITutor</span>
+      </div>
+
+      <nav class="menu">
+        <a href="#" class="active" onclick="showDashboard()">
+          <i class="fa-solid fa-grid-2"></i> All Tools
+        </a>
+        <a href="#" onclick="alert('History is demo-only for now.')">
+          <i class="fa-solid fa-clock-rotate-left"></i> History
+        </a>
+        <a href="#" onclick="alert('My Library is demo-only for now.')">
+          <i class="fa-solid fa-book-open"></i> My Library
+        </a>
+        <a href="#" onclick="alert('Progress is demo-only for now.')">
+          <i class="fa-solid fa-chart-pie"></i> Progress
+        </a>
+      </nav>
+
+      <!-- Profil -->
+      <div class="user-profile" onclick="logout()" title="Click to logout">
+        <div class="avatar" id="profile-avatar">U</div>
+        <div class="user-info">
+          <span class="name" id="profile-name">User</span>
+          <span class="role" id="profile-role">Student</span>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main-content">
+
+      <!-- LANDING / PUBLIC HOME -->
+      <section id="landing-view" class="view-section landing-view">
+        <header class="landing-topbar">
+          <div class="landing-logo">
+            <i class="fa-solid fa-brain"></i>
+            <span>AITutor</span>
+          </div>
+
+          <div class="landing-actions">
+            <button class="ghost-btn" id="btn-go-login">
+              <i class="fa-solid fa-right-to-bracket"></i> Login
+            </button>
+            <button class="primary-btn small" id="btn-go-register">
+              <i class="fa-solid fa-user-plus"></i> Get Started
+            </button>
+          </div>
+        </header>
+
+        <div class="landing-hero">
+          <div class="hero-left">
+            <div class="hero-badge">
+              <i class="fa-solid fa-sparkles"></i> AI Language Practice Platform
+            </div>
+
+            <h1>Practice English with AI — faster, simpler, and more fun.</h1>
+            <p>
+              Free Conversation, Mock Interview, Grammar Fixer, and Topic Explainer — all in one place.
+              Create an account and start practicing right away.
+            </p>
+
+            <div class="hero-cta">
+              <button class="primary-btn" id="btn-hero-start">
+                <i class="fa-solid fa-rocket"></i> Create Account
+              </button>
+              <button class="outline-btn" id="btn-hero-login">
+                <i class="fa-solid fa-right-to-bracket"></i> I already have an account
+              </button>
+            </div>
+
+            <div class="hero-stats">
+              <div class="stat">
+                <div class="stat-num">4</div>
+                <div class="stat-label">AI Tools</div>
+              </div>
+              <div class="stat">
+                <div class="stat-num">3</div>
+                <div class="stat-label">Roles</div>
+              </div>
+              <div class="stat">
+                <div class="stat-num">∞</div>
+                <div class="stat-label">Practice</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="hero-right">
+            <div class="preview-card">
+              <div class="preview-top">
+                <span class="dot red"></span>
+                <span class="dot yellow"></span>
+                <span class="dot green"></span>
+              </div>
+              <div class="preview-body">
+                <div class="preview-line bold">Free Conversation</div>
+                <div class="preview-line">Hello! I’m ready to chat about anything.</div>
+                <div class="preview-line user">How can I improve my speaking?</div>
+                <div class="preview-line">Try daily practice + corrections.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="landing-section">
+          <h2>Tools</h2>
+          <p class="muted">Choose a tool after you log in.</p>
+
+          <div class="landing-grid">
+            <div class="landing-card">
+              <div class="icon-box blue"><i class="fa-regular fa-comments"></i></div>
+              <h3>Free Conversation</h3>
+              <p>Practice daily speaking and fluency.</p>
+            </div>
+            <div class="landing-card">
+              <div class="icon-box purple"><i class="fa-solid fa-user-tie"></i></div>
+              <h3>Mock Interview</h3>
+              <p>Prepare for job interviews with AI prompts.</p>
+            </div>
+            <div class="landing-card">
+              <div class="icon-box orange"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+              <h3>Grammar Fixer</h3>
+              <p>Paste text and get corrections + hints.</p>
+            </div>
+            <div class="landing-card">
+              <div class="icon-box green"><i class="fa-solid fa-chalkboard-user"></i></div>
+              <h3>Topic Explainer</h3>
+              <p>Learn grammar rules with examples.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="landing-section">
+          <h2>Roles</h2>
+          <p class="muted">Register as Student, Teacher, or Admin.</p>
+
+          <div class="role-cards">
+            <div class="role-card">
+              <div class="role-icon"><i class="fa-solid fa-graduation-cap"></i></div>
+              <h3>Student</h3>
+              <p>Practice and improve your language skills.</p>
+            </div>
+            <div class="role-card">
+              <div class="role-icon"><i class="fa-solid fa-chalkboard-user"></i></div>
+              <h3>Teacher</h3>
+              <p>Support learners and track progress.</p>
+            </div>
+            <div class="role-card">
+              <div class="role-icon"><i class="fa-solid fa-shield-halved"></i></div>
+              <h3>Admin</h3>
+              <p>Manage system settings and users.</p>
+            </div>
+          </div>
+        </div>
+
+        <footer class="landing-footer">
+          <span>© 2025 AITutor</span>
+        </footer>
+      </section>
+
+      <!-- AUTH (LOGIN / REGISTER) -->
+      <section id="auth-view" class="view-section auth-view hidden">
+        <div class="auth-card">
+          <div class="auth-brand">
+            <i class="fa-solid fa-brain"></i>
+            <span>AITutor</span>
+          </div>
+
+          <h1 class="auth-title">Welcome</h1>
+          <p class="auth-subtitle">Login or create an account to continue.</p>
+
+          <div class="auth-tabs">
+            <button type="button" class="auth-tab active" id="tab-login">Login</button>
+            <button type="button" class="auth-tab" id="tab-register">Register</button>
+          </div>
+
+          <div id="auth-error" class="auth-error hidden"></div>
+
+          <!-- LOGIN FORM -->
+          <form id="login-form" class="auth-form">
+            <button type="button" class="google-btn" id="btn-google-login">
+              <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google Logo" />
+              Continue with Google
+            </button>
+
+            <div class="auth-divider"><span>OR</span></div>
+
+            <div class="form-group">
+              <label>Email</label>
+              <input type="email" id="login-email" placeholder="you@example.com" required />
+            </div>
+
+            <div class="form-group">
+              <label>Password</label>
+              <input type="password" id="login-password" placeholder="••••••••" required />
+            </div>
+
+            <button type="submit" class="primary-btn">
+              <i class="fa-solid fa-right-to-bracket"></i> Login
+            </button>
+
+            <p class="auth-hint">Warning: Register first, then login.</p>
+
+            <button type="button" class="back-home-btn" id="btn-back-home">
+              <i class="fa-solid fa-arrow-left"></i>
+              Back to Home
+            </button>
+          </form>
+
+          <!-- REGISTER FORM -->
+          <form id="register-form" class="auth-form hidden">
+            <div class="form-group">
+              <label>Full Name</label>
+              <input type="text" id="reg-name" placeholder="Your name" required />
+            </div>
+
+            <div class="form-group">
+              <label>Email</label>
+              <input type="email" id="reg-email" placeholder="you@example.com" required />
+            </div>
+
+            <div class="form-group">
+              <label>Password</label>
+              <input type="password" id="reg-password" placeholder="Create a password" required />
+            </div>
+
+            <div class="form-group">
+              <label>Confirm Password</label>
+              <input type="password" id="reg-confirm" placeholder="Repeat password" required />
+            </div>
+
+            <div class="form-group">
+              <label>Register as</label>
+              <div class="role-pills" id="role-pills">
+                <input type="radio" name="role" id="role-student" value="student" checked />
+                <label for="role-student">Student</label>
+
+                <input type="radio" name="role" id="role-teacher" value="teacher" />
+                <label for="role-teacher">Teacher</label>
+
+                <input type="radio" name="role" id="role-admin" value="admin" />
+                <label for="role-admin">Admin</label>
+              </div>
+            </div>
+
+            <div id="role-fields"></div>
+
+            <div class="auth-actions">
+              <button type="submit" class="primary-btn">
+                <i class="fa-solid fa-user-plus"></i> Create Account
+              </button>
+
+              <button type="button" class="back-home-btn" id="btn-back-home-2">
+                <i class="fa-solid fa-arrow-left"></i>
+                Back to Home
+              </button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- DASHBOARD VIEW -->
+      <section id="dashboard-view" class="view-section hidden">
+        <header class="top-header">
+          <h1>What do you want to practice today?</h1>
+          <p>Select an AI tool to start learning.</p>
+        </header>
+
+        <div class="tools-grid">
+          <div class="tool-card" onclick="openTool('chat')">
+            <div class="icon-box blue"><i class="fa-regular fa-comments"></i></div>
+            <h3>Free Conversation</h3>
+            <p>Chat freely with AI to improve fluency and daily speaking skills.</p>
+          </div>
+
+          <div class="tool-card" onclick="openTool('interview')">
+            <div class="icon-box purple"><i class="fa-solid fa-user-tie"></i></div>
+            <h3>Mock Interview</h3>
+            <p>Prepare for job interviews with field-specific questions.</p>
+          </div>
+
+          <div class="tool-card" onclick="openTool('grammar')">
+            <div class="icon-box orange"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+            <h3>Grammar Fixer</h3>
+            <p>Paste your text or write, and let AI find and explain your mistakes.</p>
+          </div>
+
+          <div class="tool-card" onclick="openTool('tutor')">
+            <div class="icon-box green"><i class="fa-solid fa-chalkboard-user"></i></div>
+            <h3>Topic Explainer</h3>
+            <p>Ask about any grammar rule or topic and get a simple explanation.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- WORKSPACE VIEW -->
+      <section id="workspace-view" class="view-section hidden">
+        <header class="workspace-header">
+          <button class="back-btn" onclick="showDashboard()">
+            <i class="fa-solid fa-arrow-left"></i> Back to Tools
+          </button>
+
+          <h2 id="tool-title">Tool Name</h2>
+
+          <div class="actions">
+            <button type="button" class="export-btn" onclick="exportChat()">
+              <i class="fa-solid fa-download"></i>
+              <span>Export</span>
+            </button>
+          </div>
+        </header>
+
+        <div class="chat-interface">
+          <div id="chat-window" class="chat-window"></div>
+
+          <div id="correction-box" class="correction-box hidden">
+            <i class="fa-solid fa-lightbulb"></i>
+            <span id="correction-text"></span>
+          </div>
+
+          <div class="input-area">
+            <button class="voice-btn" type="button" onclick="alert('Voice is demo-only for now.')">
+              <i class="fa-solid fa-microphone"></i>
+            </button>
+
+            <input type="text" id="user-input" placeholder="Type your message here..." />
+
+            <button class="send-btn" type="button" onclick="sendMessage()">
+              <i class="fa-solid fa-paper-plane"></i>
+            </button>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- App entry -->
+  <script type="module" src="./js/app.js"></script>
+</body>
+</html>
