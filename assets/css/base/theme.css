@@ -1,5 +1,6 @@
 /* === THEME.CSS (Light / Dark Mode CSS Variables) === */
 
+/* Root theme variables (light mode as default) */
 :root {
   /* Light mode (default) */
   --color-bg-primary: #f8f9fc;
