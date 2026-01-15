@@ -80,7 +80,7 @@ export function initRouter() {
   // İlk render
   renderRooms();
 
-  window.showLanding = () => {
+  window.showLanding = (addHistory = true) => {
     document.body.classList.add("public");
     document.body.classList.remove("no-sidebar");
     showView("landing-view");
@@ -88,11 +88,19 @@ export function initRouter() {
     // dropdown/rooms kapat
     $("user-dropdown")?.classList.add("hidden");
     $("rooms-panel")?.classList.add("hidden");
+
+    if (addHistory) {
+      history.pushState({ view: "landing" }, "", "#landing");
+    }
   };
 
-  window.showAuth = (tab = "login") => {
+  window.showAuth = (tab = "login", addHistory = true) => {
     showView("auth-view");
     setAuthTab(tab);
+
+    if (addHistory) {
+      history.pushState({ view: "auth", tab }, "", "#auth-" + tab);
+    }
   };
 
   window.switchAuthTab = (tab) => setAuthTab(tab);
@@ -183,7 +191,7 @@ export function initRouter() {
   };
 
   // Role aware dashboard (session varsa)
-  window.showDashboard = async () => {
+  window.showDashboard = async (addHistory = true) => {
     document.body.classList.remove("public");
 
     const session = await getSession();
@@ -198,11 +206,13 @@ export function initRouter() {
     if (role === "admin") {
       document.body.classList.add("no-sidebar");
       showView("admin-view");
+      if (addHistory) history.pushState({ view: "admin" }, "", "#admin");
       return;
     }
 
     document.body.classList.remove("no-sidebar");
     showView("dashboard-view");
+    if (addHistory) history.pushState({ view: "dashboard" }, "", "#dashboard");
   };
 
   // tool open
@@ -216,7 +226,9 @@ export function initRouter() {
     setTool(tool);
     setActiveMenu(tool);
 
-    if (addHistory) history.pushState({ tool }, "", "#" + tool);
+    if (addHistory) {
+      history.pushState({ tool }, "", "#" + tool);
+    }
   };
 
   window.logout = async () => {
@@ -309,12 +321,39 @@ export function initRouter() {
   $("tab-register")?.addEventListener("click", () => setAuthTab("register"));
 
   window.addEventListener("popstate", (e) => {
-    if (e.state && e.state.tool) {
-      window.openTool(e.state.tool, null, false);
-    } else {
-      window.showLanding();
+    const state = e.state || {};
+
+    if (state.tool && state.tool !== "landing") {
+      // Araç görünümü arasında geri/ileri
+      window.openTool(state.tool, null, false);
+      return;
     }
+
+    if (state.view === "auth") {
+      window.showAuth(state.tab || "login", false);
+      return;
+    }
+
+    if (state.view === "dashboard") {
+      window.showDashboard(false);
+      return;
+    }
+
+    if (state.view === "admin") {
+      // Admin görünümüne basit dönüş (yeni session almadan)
+      document.body.classList.remove("public");
+      document.body.classList.add("no-sidebar");
+      showView("admin-view");
+      return;
+    }
+
+    // "landing" veya bilinmeyen durumda landing göster
+    window.showLanding(false);
   });
 
-  window.showLanding();
+  // Başlangıç state: landing
+  if (!history.state) {
+    history.replaceState({ view: "landing" }, "", "#landing");
+  }
+  window.showLanding(false);
 }

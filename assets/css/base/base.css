@@ -5,21 +5,25 @@
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Outfit", sans-serif; }
 
 html, body { height: 100%; }
-body { background-color: #f8f9fc; color: #1e293b; overflow: hidden;}
+body {
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  overflow: hidden;
+}
 
 .hidden { display: none !important; }
 
 input, button, select, textarea { font-family: inherit; }
 
-.muted { color: #64748b; }
+.muted { color: var(--color-text-muted); }
 
 /* --- COMMON BUTTONS --- */
 .primary-btn {
   border: none;
   border-radius: 12px;
   padding: 12px 14px;
-  background: #4f46e5;
-  color: white;
+  background: var(--color-accent);
+  color: #ffffff;
   font-weight: 900;
   cursor: pointer;
   display: inline-flex;
@@ -29,13 +33,13 @@ input, button, select, textarea { font-family: inherit; }
   transition: 0.2s;
 }
 
-.primary-btn:hover { background: #4338ca; }
+.primary-btn:hover { background: var(--color-accent-hover); }
 .primary-btn.small { padding: 10px 12px; border-radius: 12px; font-size: 14px; }
 
 .ghost-btn {
-  border: 1px solid #e2e8f0;
-  background: #ffffff;
-  color: #0f172a;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-secondary);
+  color: var(--color-text-primary);
   padding: 10px 12px;
   border-radius: 12px;
   font-weight: 900;
@@ -45,12 +49,12 @@ input, button, select, textarea { font-family: inherit; }
   gap: 8px;
 }
 
-.ghost-btn:hover { background: #f1f5f9; }
+.ghost-btn:hover { background: var(--color-bg-hover); }
 
 .outline-btn {
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--color-border-input);
   background: transparent;
-  color: #0f172a;
+  color: var(--color-text-primary);
   padding: 12px 14px;
   border-radius: 12px;
   font-weight: 900;
@@ -60,12 +64,12 @@ input, button, select, textarea { font-family: inherit; }
   gap: 10px;
 }
 
-.outline-btn:hover { background: #ffffff; }
+.outline-btn:hover { background: var(--color-bg-secondary); }
 
 .link-btn {
   border: none;
   background: transparent;
-  color: #4f46e5;
+  color: var(--color-accent);
   font-weight: 900;
   cursor: pointer;
   padding: 8px 0;
