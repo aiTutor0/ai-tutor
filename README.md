@@ -102,16 +102,57 @@ docker-compose down
 ```
 ai-tutor/
 ├── assets/
-│   └── css/           # Stylesheets (theme, layout, views)
+│   └── css/
+│       ├── base/
+│       │   ├── base.css
+│       │   └── theme.css
+│       ├── layout/
+│       │   └── layout.css
+│       ├── views/
+│       │   └── views.css
+│       └── landingExtras.css
+│
 ├── js/
-│   ├── config/        # Configuration files
-│   ├── services/      # API services (OpenAI, Auth)
-│   └── ui/            # UI components
-├── server/            # Express server for API proxy
-├── netlify/           # Netlify serverless functions
-├── index.html         # Main HTML file
-├── Dockerfile         # Docker configuration
-└── docker-compose.yml # Docker Compose setup
+│   ├── app.js                    # Main entry point
+│   ├── config/
+│   │   ├── env.js                # Environment config
+│   │   └── supabaseClient.js     # Supabase client setup
+│   ├── services/
+│   │   ├── authService.js        # Authentication
+│   │   ├── chatService.js        # Chat operations
+│   │   ├── groupChatService.js   # Group chat operations
+│   │   ├── openaiService.js      # OpenAI API calls
+│   │   ├── roomService.js        # Room management
+│   │   └── userService.js        # User management
+│   └── ui/
+│       ├── adminPanel.js         # Admin panel UI
+│       ├── chatUI.js             # Chat interface
+│       ├── groupChat.js          # Group chat UI
+│       ├── levelTest.js          # English level test
+│       ├── router.js             # Page routing
+│       ├── scheduleManager.js    # Schedule management
+│       ├── themeManager.js       # Dark/light theme
+│       └── voiceRecording.js     # Voice recording
+│
+├── netlify/
+│   └── functions/
+│       ├── openai.js             # OpenAI serverless function
+│       └── transcribe.js         # Speech transcription
+│
+├── server/
+│   └── index.js                  # Express server
+│
+├── .github/                      # GitHub workflows
+├── index.html                    # Main HTML file
+├── Dockerfile                    # Docker configuration
+├── docker-compose.yml            # Docker Compose config
+├── netlify.toml                  # Netlify configuration
+├── package.json                  # Dependencies
+├── .env.example                  # Environment variables template
+├── .gitignore
+├── .dockerignore
+├── LICENSE
+└── README.md
 ```
 
 ---
