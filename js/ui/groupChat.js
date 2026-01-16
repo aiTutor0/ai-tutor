@@ -23,17 +23,20 @@ window.setCurrentUser = function (email, name, role) {
 // SUPABASE HELPERS (Email-based, no Auth required)
 // ============================================
 
-// Get all rooms for current user (by email)
+// Get all rooms for current user (by email) - merges Supabase and localStorage
 async function getMyRooms() {
   const user = getCurrentUser();
 
+  // Always get localStorage rooms first
+  const localRooms = getLocalRooms();
+
   if (!supabase) {
-    console.log('Supabase not connected, using localStorage');
-    return getLocalRooms();
+    console.log('Supabase not connected, using localStorage only');
+    return localRooms;
   }
 
   try {
-    // Get rooms where user is creator OR member
+    // Get rooms where user is creator OR member from Supabase
     const { data: createdRooms, error: e1 } = await supabase
       .from('group_rooms')
       .select('*')
@@ -44,23 +47,32 @@ async function getMyRooms() {
       .select('room_id, group_rooms(*)')
       .eq('member_email', user.email);
 
-    if (e1 || e2) {
-      console.error('Error fetching rooms:', e1 || e2);
-      return getLocalRooms();
+    if (e1 && e2) {
+      console.error('Supabase errors:', e1, e2);
+      return localRooms; // Fall back to localStorage only
     }
 
-    // Combine and dedupe
-    const allRooms = [...(createdRooms || [])];
+    // Combine Supabase rooms
+    const supabaseRooms = [...(createdRooms || [])];
     (memberRooms || []).forEach(m => {
-      if (m.group_rooms && !allRooms.find(r => r.id === m.group_rooms.id)) {
-        allRooms.push(m.group_rooms);
+      if (m.group_rooms && !supabaseRooms.find(r => r.id === m.group_rooms.id)) {
+        supabaseRooms.push(m.group_rooms);
       }
     });
 
+    // Merge with localStorage rooms (dedupe by name)
+    const allRooms = [...supabaseRooms];
+    localRooms.forEach(lr => {
+      if (!allRooms.find(r => r.name === lr.name)) {
+        allRooms.push(lr);
+      }
+    });
+
+    console.log('Rooms loaded:', allRooms.length, '(Supabase:', supabaseRooms.length, ', Local:', localRooms.length, ')');
     return allRooms;
   } catch (err) {
     console.error('Supabase error:', err);
-    return getLocalRooms();
+    return localRooms;
   }
 }
 
