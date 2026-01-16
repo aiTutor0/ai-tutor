@@ -473,7 +473,27 @@ window.renderRooms = async function () {
       return;
     }
 
-    list.innerHTML = rooms.map(room => {
+    // Get member count for display
+    const roomsWithCounts = await Promise.all(rooms.map(async (room) => {
+      const isLocal = room.local === true;
+      let memberCount = 0;
+
+      if (isLocal) {
+        const roomKey = `room_${room.name.replace(/\s+/g, '_')}`;
+        memberCount = JSON.parse(localStorage.getItem(roomKey + '_members') || '[]').length;
+      } else {
+        try {
+          const members = await getRoomMembersFromSupabase(room.id, false);
+          memberCount = members?.length || 0;
+        } catch (e) {
+          memberCount = 0;
+        }
+      }
+
+      return { ...room, memberCount };
+    }));
+
+    list.innerHTML = roomsWithCounts.map(room => {
       const isLocal = room.local === true;
       const isCreator = room.creator_email?.toLowerCase() === user.email.toLowerCase() ||
         (isLocal && localStorage.getItem(`room_${room.name.replace(/\s+/g, '_')}_creator`)?.toLowerCase() === user.email.toLowerCase());
@@ -482,6 +502,7 @@ window.renderRooms = async function () {
         <button class="room-item" onclick="selectGroupRoom('${room.id}', '${encodeURIComponent(room.name)}', ${isLocal})" style="position:relative;">
           <i class="fa-solid fa-hashtag"></i>
           <span>${room.name}</span>
+          <span style="font-size:0.7rem; color:var(--color-text-muted); margin-left:4px;">(${room.memberCount})</span>
           <div style="display:flex; gap:4px; margin-left:auto;">
             <i class="fa-solid fa-users room-members" onclick="event.stopPropagation(); showGroupRoomMembers('${room.id}', '${encodeURIComponent(room.name)}', ${isLocal})" title="Members" style="padding:4px; border-radius:4px;"></i>
             <i class="fa-solid fa-user-plus room-invite" onclick="event.stopPropagation(); inviteToGroupRoom('${room.id}', '${encodeURIComponent(room.name)}', ${isLocal})" title="Invite" style="padding:4px; border-radius:4px;"></i>
@@ -589,6 +610,13 @@ function subscribeToRoomMessages(roomId) {
     }, (payload) => {
       const msg = payload.new;
       const mw = document.getElementById('chat-window');
+
+      // Skip if this message is from current user (already displayed by chatUI)
+      const currentUser = getCurrentUser();
+      if (msg.sender_email?.toLowerCase() === currentUser.email?.toLowerCase()) {
+        return; // Don't duplicate own messages
+      }
+
       if (mw) {
         const sender = msg.sender_name || msg.sender_email || 'Unknown';
         const time = new Date(msg.created_at).toLocaleTimeString();
