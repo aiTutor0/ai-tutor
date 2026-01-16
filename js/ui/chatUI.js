@@ -199,9 +199,12 @@ function addMessage(text, sender, skipSave = false, attachments = [], useTyping 
     attachments.forEach(att => {
       // If it's a file object (text file)
       if (typeof att === 'object' && att.type === 'file') {
-        attachmentHTML += `<div style="background:var(--color-bg-tertiary); padding:8px 12px; border-radius:8px; font-size:0.85rem; display:flex; align-items:center; gap:6px; border:1px solid var(--color-border);">
-          <i class="fa-solid fa-file-lines" style="color:var(--color-accent);"></i>
-          <span>${escapeHtml(att.name || 'File')}</span>
+        const fileContent = att.content || '';
+        const fileId = 'file-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+        attachmentHTML += `<div id="${fileId}" class="file-attachment" style="background:var(--color-bg-tertiary); padding:10px 14px; border-radius:10px; font-size:0.9rem; display:inline-flex; align-items:center; gap:8px; border:1px solid var(--color-border); cursor:pointer;" onclick="downloadTextFile('${escapeHtml(att.name || 'file.txt')}', '${fileId}')" data-file-content="${btoa(unescape(encodeURIComponent(fileContent)))}">
+          <i class="fa-solid fa-file-lines" style="color:var(--color-accent); font-size:1.1rem;"></i>
+          <span style="font-weight:500;">${escapeHtml(att.name || 'File')}</span>
+          <i class="fa-solid fa-download" style="color:var(--color-text-muted); margin-left:4px; font-size:0.8rem;"></i>
         </div>`;
       }
       // If base64 image
@@ -287,6 +290,40 @@ function typeText(element, text, scrollContainer) {
   }
   type();
 }
+
+// Download text file attachment
+window.downloadTextFile = function (filename, fileId) {
+  const element = document.getElementById(fileId);
+  if (!element) {
+    console.error('File element not found:', fileId);
+    return;
+  }
+
+  const base64Content = element.getAttribute('data-file-content');
+  if (!base64Content) {
+    console.error('No file content found');
+    return;
+  }
+
+  try {
+    // Decode base64 to text
+    const textContent = decodeURIComponent(escape(atob(base64Content)));
+
+    // Create and download file
+    const blob = new Blob([textContent], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  } catch (e) {
+    console.error('Error downloading file:', e);
+    alert('Error downloading file');
+  }
+};
 
 // Copy message to clipboard
 window.copyMessage = function (msgId) {
@@ -621,13 +658,14 @@ export async function sendMessage() {
     // Load existing room messages
     const roomMessages = JSON.parse(localStorage.getItem(roomKey) || '[]');
 
-    // Add new message with attachments
+    // Add new message with attachments (images and text files separately)
     const newMessage = {
       role: 'user',
       senderEmail: currentUser.email,
       senderName: currentUser.name || currentUser.email.split('@')[0],
       content: text,
-      attachments: images, // Include images in room message
+      attachments: images, // Images only (base64)
+      textFiles: textFiles.map(f => ({ name: f.name, content: f.content })), // Text files
       timestamp: Date.now()
     };
     roomMessages.push(newMessage);
@@ -640,9 +678,13 @@ export async function sendMessage() {
     if (allAttachments && allAttachments.length > 0) {
       attachmentHTML = allAttachments.map(att => {
         if (typeof att === 'object' && att.type === 'file') {
-          return `<div style="background:var(--color-bg-tertiary); padding:8px 12px; border-radius:8px; font-size:0.85rem; display:inline-flex; align-items:center; gap:6px; border:1px solid var(--color-border); margin-bottom:8px;">
-            <i class="fa-solid fa-file-lines" style="color:var(--color-accent);"></i>
-            <span>${att.name || 'File'}</span>
+          // Store file content as base64 for download
+          const fileContent = att.content || '';
+          const fileId = 'file-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+          return `<div id="${fileId}" class="file-attachment" style="background:var(--color-bg-tertiary); padding:10px 14px; border-radius:10px; font-size:0.9rem; display:inline-flex; align-items:center; gap:8px; border:1px solid var(--color-border); margin-bottom:8px; cursor:pointer;" onclick="downloadTextFile('${escapeHtml(att.name || 'file.txt')}', '${fileId}')" data-file-content="${btoa(unescape(encodeURIComponent(fileContent)))}">
+            <i class="fa-solid fa-file-lines" style="color:var(--color-accent); font-size:1.1rem;"></i>
+            <span style="font-weight:500;">${escapeHtml(att.name || 'File')}</span>
+            <i class="fa-solid fa-download" style="color:var(--color-text-muted); margin-left:4px; font-size:0.8rem;"></i>
           </div>`;
         } else if (typeof att === 'string' && att.startsWith('data:image')) {
           return `<img src="${att}" style="max-width:200px; max-height:150px; border-radius:8px; margin-bottom:8px; display:block;">`;
