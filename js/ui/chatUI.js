@@ -650,35 +650,39 @@ export async function sendMessage() {
     const currentUserStr = localStorage.getItem('aitutor_current_user');
     const currentUser = currentUserStr ? JSON.parse(currentUserStr) : { email: 'user@example.com', name: 'User' };
 
-    // Get current room from tool title
-    const toolTitle = document.getElementById('tool-title');
-    const roomName = toolTitle?.textContent?.replace('🏠 ', '') || 'Room';
+    // Get current room info from global variables (set by selectGroupRoom)
+    const roomId = window.currentGroupRoomId;
+    const roomName = window.currentGroupRoomName || document.getElementById('tool-title')?.textContent?.replace('🏠 ', '') || 'Room';
+    const isLocal = window.currentGroupRoomIsLocal;
     const roomKey = `room_${roomName.replace(/\s+/g, '_')}`;
 
-    // Load existing room messages
-    const roomMessages = JSON.parse(localStorage.getItem(roomKey) || '[]');
-
-    // Add new message with attachments (images and text files separately)
+    // Build message object
     const newMessage = {
       role: 'user',
       senderEmail: currentUser.email,
       senderName: currentUser.name || currentUser.email.split('@')[0],
       content: text,
-      attachments: images, // Images only (base64)
-      textFiles: textFiles.map(f => ({ name: f.name, content: f.content })), // Text files
+      attachments: images,
+      textFiles: textFiles.map(f => ({ name: f.name, content: f.content })),
       timestamp: Date.now()
     };
-    roomMessages.push(newMessage);
 
-    // Save to localStorage
-    localStorage.setItem(roomKey, JSON.stringify(roomMessages));
+    // Save to Supabase if available, otherwise localStorage
+    if (typeof window.sendGroupMessage === 'function' && roomId && !isLocal) {
+      // Use Supabase
+      window.sendGroupMessage(roomId, text);
+    } else {
+      // Fallback to localStorage
+      const roomMessages = JSON.parse(localStorage.getItem(roomKey) || '[]');
+      roomMessages.push(newMessage);
+      localStorage.setItem(roomKey, JSON.stringify(roomMessages));
+    }
 
     // Build attachment HTML for display
     let attachmentHTML = '';
     if (allAttachments && allAttachments.length > 0) {
       attachmentHTML = allAttachments.map(att => {
         if (typeof att === 'object' && att.type === 'file') {
-          // Store file content as base64 for download
           const fileContent = att.content || '';
           const fileId = 'file-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
           return `<div id="${fileId}" class="file-attachment" style="background:var(--color-bg-tertiary); padding:10px 14px; border-radius:10px; font-size:0.9rem; display:inline-flex; align-items:center; gap:8px; border:1px solid var(--color-border); margin-bottom:8px; cursor:pointer;" onclick="downloadTextFile('${escapeHtml(att.name || 'file.txt')}', '${fileId}')" data-file-content="${btoa(unescape(encodeURIComponent(fileContent)))}">

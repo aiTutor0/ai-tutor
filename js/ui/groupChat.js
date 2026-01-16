@@ -505,11 +505,17 @@ window.currentGroupRoomIsLocal = false;
 window.selectGroupRoom = async function (roomId, encodedName, isLocal) {
   const roomName = decodeURIComponent(encodedName);
 
+  // Set global room info
   window.currentGroupRoomId = roomId;
   window.currentGroupRoomName = roomName;
   window.currentGroupRoomIsLocal = isLocal;
 
-  // Update UI
+  // IMPORTANT: Switch to group tool mode first (this sets currentToolMode = 'group')
+  if (typeof window.openTool === 'function') {
+    window.openTool('group', null, false); // Don't add to history
+  }
+
+  // Update UI with room name
   const tt = document.getElementById('tool-title');
   if (tt) tt.textContent = `🏠 ${roomName}`;
 
@@ -522,23 +528,33 @@ window.selectGroupRoom = async function (roomId, encodedName, isLocal) {
       const messages = await getRoomMessagesFromSupabase(roomId, isLocal);
       mw.innerHTML = '';
 
-      messages.forEach(msg => {
-        const sender = msg.sender_name || msg.sender_email || msg.senderName || msg.senderEmail || 'Unknown';
-        const time = new Date(msg.created_at || msg.timestamp).toLocaleTimeString();
-
-        const div = document.createElement('div');
-        div.className = 'message user-msg';
-        div.innerHTML = `
-          <div class="msg-avatar" style="background:var(--color-accent);"><i class="fa-solid fa-user"></i></div>
-          <div class="msg-bubble">
-            <div style="font-size:0.75rem; color:rgba(255,255,255,0.85); margin-bottom:4px;">
-              <strong>${escapeHtml(sender)}</strong> • ${time}
-            </div>
-            ${escapeHtml(msg.content)}
-          </div>
+      if (messages.length === 0) {
+        const welcomeDiv = document.createElement('div');
+        welcomeDiv.className = 'message ai-msg';
+        welcomeDiv.innerHTML = `
+          <div class="msg-avatar"><i class="fa-solid fa-users"></i></div>
+          <div class="msg-bubble">Welcome to ${escapeHtml(roomName)}! Start chatting with your group members.</div>
         `;
-        mw.appendChild(div);
-      });
+        mw.appendChild(welcomeDiv);
+      } else {
+        messages.forEach(msg => {
+          const sender = msg.sender_name || msg.sender_email || msg.senderName || msg.senderEmail || 'Unknown';
+          const time = new Date(msg.created_at || msg.timestamp).toLocaleTimeString();
+
+          const div = document.createElement('div');
+          div.className = 'message user-msg';
+          div.innerHTML = `
+            <div class="msg-avatar" style="background:var(--color-accent);"><i class="fa-solid fa-user"></i></div>
+            <div class="msg-bubble">
+              <div style="font-size:0.75rem; color:rgba(255,255,255,0.85); margin-bottom:4px;">
+                <strong>${escapeHtml(sender)}</strong> • ${time}
+              </div>
+              ${escapeHtml(msg.content)}
+            </div>
+          `;
+          mw.appendChild(div);
+        });
+      }
 
       mw.scrollTop = mw.scrollHeight;
 
@@ -743,6 +759,11 @@ window.declineInvitation = window.handleDeclineInvite;
 // Export createRoom for router.js
 window.createRoom = async function (name) {
   return await createRoomInSupabase(name);
+};
+
+// Export sendGroupMessage for chatUI.js
+window.sendGroupMessage = async function (roomId, content) {
+  return await sendMessageToSupabase(roomId, content, false);
 };
 
 // Helper
