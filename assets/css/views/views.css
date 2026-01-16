@@ -1059,6 +1059,7 @@
   color: var(--color-input-text);
   outline: none;
   transition: 0.2s;
+  color-scheme: light dark;
 }
 
 .schedule-input:focus {

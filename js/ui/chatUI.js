@@ -58,13 +58,39 @@ function renderSentItems() {
   const container = document.getElementById('sent-list');
   if (!container) return;
 
-  const items = getSentItems();
+  const allItems = getSentItems();
+
+  // Get current context (room name or chat mode)
+  const toolTitle = document.getElementById('tool-title');
+  const currentTitle = toolTitle?.textContent || '';
+
+  // Check if we're in a group chat room
+  const isGroupRoom = currentTitle.startsWith('🏠 ');
+  const currentRoomName = isGroupRoom ? currentTitle.replace('🏠 ', '') : null;
+
+  // Filter items based on current context
+  let items;
+  if (isGroupRoom && currentRoomName) {
+    // Show only items from this specific room
+    items = allItems.filter(item => item.mode === 'group' && item.roomName === currentRoomName);
+  } else if (currentToolMode === 'group') {
+    // In group mode but no room selected - show all group items
+    items = allItems.filter(item => item.mode === 'group');
+  } else {
+    // For regular AI chat modes, show items matching current mode or chatId
+    items = allItems.filter(item => {
+      // Don't show group items in non-group modes
+      if (item.mode === 'group') return false;
+      // Show items matching current mode or current chat
+      return item.mode === currentToolMode || item.chatId === currentChatId;
+    });
+  }
 
   if (items.length === 0) {
     container.innerHTML = `
       <div class="empty-state">
         <i class="fa-solid fa-inbox" style="font-size:3rem; color:var(--color-text-muted); margin-bottom:1rem;"></i>
-        <p>No sent items yet</p>
+        <p>No sent items yet${isGroupRoom ? ' in this room' : ''}</p>
       </div>
     `;
     return;
@@ -80,6 +106,11 @@ function renderSentItems() {
       return `<span style="background:var(--color-bg-tertiary); padding:2px 8px; border-radius:4px; font-size:0.75rem;"><i class="fa-solid fa-file"></i> File</span>`;
     }).join('') : '';
 
+    // Show room name for group items
+    const contextLabel = item.mode === 'group' && item.roomName
+      ? `${item.roomName}`
+      : (item.mode || 'chat');
+
     return `
       <div class="sent-item" style="background:var(--color-bg-tertiary); border:1px solid var(--color-border); border-radius:12px; padding:14px; margin-bottom:10px;">
         <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
@@ -87,7 +118,7 @@ function renderSentItems() {
             <i class="fa-solid fa-clock"></i> ${date}
           </span>
           <span style="font-size:0.7rem; background:var(--color-accent); color:white; padding:2px 8px; border-radius:10px;">
-            ${item.mode || 'chat'}
+            ${contextLabel}
           </span>
         </div>
         ${hasAttachments ? `<div style="margin-bottom:8px;">${attachmentPreview}</div>` : ''}
@@ -584,18 +615,27 @@ export async function sendMessage() {
     // Load existing room messages
     const roomMessages = JSON.parse(localStorage.getItem(roomKey) || '[]');
 
-    // Add new message
+    // Add new message with attachments
     const newMessage = {
       role: 'user',
       senderEmail: currentUser.email,
       senderName: currentUser.name || currentUser.email.split('@')[0],
       content: text,
+      attachments: images, // Include images in room message
       timestamp: Date.now()
     };
     roomMessages.push(newMessage);
 
     // Save to localStorage
     localStorage.setItem(roomKey, JSON.stringify(roomMessages));
+
+    // Build attachment HTML for display
+    let attachmentHTML = '';
+    if (images && images.length > 0) {
+      attachmentHTML = images.map(img =>
+        `<img src="${img}" style="max-width:200px; max-height:150px; border-radius:8px; margin-bottom:8px; display:block;">`
+      ).join('');
+    }
 
     // Display the message in chat
     const mw = document.getElementById("chat-window");
@@ -605,9 +645,10 @@ export async function sendMessage() {
       div.innerHTML = `
         <div class="msg-avatar" style="background:var(--color-accent);"><i class="fa-solid fa-user"></i></div>
         <div class="msg-bubble">
-          <div style="font-size:0.75rem; color:var(--color-text-muted); margin-bottom:4px;">
-            <strong>${newMessage.senderName}</strong> • ${new Date().toLocaleTimeString()}
+          <div style="font-size:0.75rem; color:rgba(255,255,255,0.85); margin-bottom:4px; font-weight:500;">
+            <strong style="font-weight:700;">${newMessage.senderName}</strong> • ${new Date().toLocaleTimeString()}
           </div>
+          ${attachmentHTML}
           ${escapeHtml(text)}
         </div>
       `;

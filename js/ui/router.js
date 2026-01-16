@@ -54,7 +54,26 @@ function renderRooms() {
   const list = $("rooms-list");
   if (!list) return;
 
-  list.innerHTML = rooms
+  // Get current user
+  const currentUserStr = localStorage.getItem('aitutor_current_user');
+  const currentUser = currentUserStr ? JSON.parse(currentUserStr) : { email: 'demo@example.com' };
+  const userEmail = currentUser.email.toLowerCase();
+
+  // Filter rooms to only show those the user has access to
+  const accessibleRooms = rooms.filter(roomName => {
+    const roomKey = `room_${roomName.replace(/\\s+/g, '_')}`;
+    const creator = (localStorage.getItem(roomKey + '_creator') || '').toLowerCase();
+    const members = JSON.parse(localStorage.getItem(roomKey + '_members') || '[]');
+
+    return creator === userEmail || members.some(m => m.toLowerCase() === userEmail);
+  });
+
+  if (accessibleRooms.length === 0) {
+    list.innerHTML = `<div style="padding:10px; text-align:center; color:var(--color-text-muted); font-size:0.85rem;">No rooms yet. Add one!</div>`;
+    return;
+  }
+
+  list.innerHTML = accessibleRooms
     .map(
       (r) => `
       <button class="room-item" onclick="selectRoom('${encodeURIComponent(r)}')">
@@ -96,6 +115,26 @@ let currentRoom = null;
 
 window.selectRoom = (encoded) => {
   const room = decodeURIComponent(encoded || "");
+
+  // Access control check - verify user has permission to enter this room
+  const currentUserStr = localStorage.getItem('aitutor_current_user');
+  const currentUser = currentUserStr ? JSON.parse(currentUserStr) : { email: 'user@example.com' };
+  const userEmail = currentUser.email.toLowerCase();
+
+  // Get room creator and members
+  const roomKey = `room_${room.replace(/\s+/g, '_')}`;
+  const roomCreator = (localStorage.getItem(roomKey + '_creator') || '').toLowerCase();
+  const roomMembers = JSON.parse(localStorage.getItem(roomKey + '_members') || '[]');
+
+  // Check if user is creator or member
+  const isCreator = roomCreator === userEmail;
+  const isMember = roomMembers.some(m => m.toLowerCase() === userEmail);
+
+  if (!isCreator && !isMember) {
+    alert('❌ Access denied. You are not a member of this room.');
+    return;
+  }
+
   currentRoom = room;
 
   // Open group chat view
@@ -106,12 +145,7 @@ window.selectRoom = (encoded) => {
   if (toolTitle) toolTitle.textContent = `🏠 ${room}`;
 
   // Load room messages from localStorage
-  const roomKey = `room_${room.replace(/\s+/g, '_')}`;
   const roomMessages = JSON.parse(localStorage.getItem(roomKey) || '[]');
-
-  // Get current user
-  const currentUserStr = localStorage.getItem('aitutor_current_user');
-  const currentUser = currentUserStr ? JSON.parse(currentUserStr) : { email: 'user@example.com' };
 
   // Display room messages
   const chatWindow = document.getElementById('chat-window');
@@ -132,6 +166,14 @@ window.selectRoom = (encoded) => {
         const senderName = msg.senderName || msg.senderEmail?.split('@')[0] || 'User';
         const timestamp = msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString() : '';
 
+        // Build attachment HTML
+        let attachmentHTML = '';
+        if (msg.attachments && msg.attachments.length > 0) {
+          attachmentHTML = msg.attachments.map(img =>
+            `<img src="${img}" style="max-width:200px; max-height:150px; border-radius:8px; margin-bottom:8px; display:block;">`
+          ).join('');
+        }
+
         const div = document.createElement('div');
         div.className = `message ${isCurrentUser ? 'user-msg' : 'ai-msg'}`;
         div.innerHTML = `
@@ -139,9 +181,10 @@ window.selectRoom = (encoded) => {
             <i class="fa-solid fa-user"></i>
           </div>
           <div class="msg-bubble">
-            <div style="font-size:0.75rem; color:var(--color-text-muted); margin-bottom:4px;">
+            <div style="font-size:0.75rem; color:${isCurrentUser ? 'rgba(255,255,255,0.85)' : 'var(--color-text-muted)'}; margin-bottom:4px;">
               <strong>${senderName}${isCurrentUser ? ' (You)' : ''}</strong>${timestamp ? ' • ' + timestamp : ''}
             </div>
+            ${attachmentHTML}
             ${msg.content}
           </div>
         `;
@@ -178,6 +221,11 @@ function showTabPanel(tabName) {
   document.querySelectorAll('.ws-tab[data-tab]').forEach(t => t.classList.remove('active'));
   const activeTab = document.querySelector(`.ws-tab[data-tab="${tabName}"]`);
   if (activeTab) activeTab.classList.add('active');
+
+  // Refresh sent items when switching to sent tab (for room-specific filtering)
+  if (tabName === 'sent' && typeof window.renderSentItems === 'function') {
+    window.renderSentItems();
+  }
 }
 
 // === Mobile Sidebar ===

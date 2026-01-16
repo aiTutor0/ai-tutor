@@ -460,7 +460,6 @@
             <header class="ws-topbar">
               <div class="ws-tabs">
                 <button class="ws-tab active" data-tab="chat">Chat</button>
-                <button class="ws-tab" data-tab="files">Files</button>
                 <button class="ws-tab" data-tab="sent">Sent</button>
                 <button class="ws-tab" data-tab="schedule">Schedule</button>
                 <button class="ws-tab" onclick="exportChat()">Export</button>
@@ -526,25 +525,7 @@
                 </div>
               </div>
 
-              <!-- FILES PANEL -->
-              <div id="panel-files" class="tab-panel hidden">
-                <div class="panel-content">
-                  <div class="panel-header">
-                    <h3><i class="fa-solid fa-folder-open"></i> Your Files</h3>
-                    <p class="muted">Upload and manage your learning materials</p>
-                  </div>
-                  <div id="files-list" class="files-grid">
-                    <div class="empty-state">
-                      <i class="fa-solid fa-cloud-arrow-up"
-                        style="font-size:3rem; color:var(--color-text-muted); margin-bottom:1rem;"></i>
-                      <p>No files uploaded yet</p>
-                      <button class="primary-btn small" onclick="document.getElementById('file-input').click()">
-                        <i class="fa-solid fa-plus"></i> Upload File
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
+
 
               <!-- SENT PANEL -->
               <div id="panel-sent" class="tab-panel hidden">

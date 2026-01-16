@@ -47,7 +47,11 @@ window.toggleVoiceRecording = async function () {
 
                         try {
                             // Send to server for transcription
-                            const response = await fetch('/.netlify/functions/transcribe', {
+                            // Use local API endpoint (works for both local dev and production)
+                            const transcribeUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+                                ? '/api/transcribe'
+                                : '/.netlify/functions/transcribe';
+                            const response = await fetch(transcribeUrl, {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json'

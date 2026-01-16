@@ -71,6 +71,32 @@ function getRoomMembers(roomName) {
   return JSON.parse(localStorage.getItem(roomKey + '_members') || '[]');
 }
 
+// Get room creator
+function getRoomCreator(roomName) {
+  const roomKey = `room_${roomName.replace(/\s+/g, '_')}`;
+  return localStorage.getItem(roomKey + '_creator') || '';
+}
+
+// Check if current user has access to a room
+function userHasAccessToRoom(roomName) {
+  const user = getCurrentUser();
+  const userEmail = user.email.toLowerCase();
+
+  // Check if user is the creator
+  const creator = getRoomCreator(roomName).toLowerCase();
+  if (creator === userEmail) return true;
+
+  // Check if user is a member
+  const members = getRoomMembers(roomName);
+  return members.some(m => m.toLowerCase() === userEmail);
+}
+
+// Get rooms that current user has access to
+function getAccessibleRooms() {
+  const allRooms = JSON.parse(localStorage.getItem('aitutor_rooms') || '[]');
+  return allRooms.filter(roomName => userHasAccessToRoom(roomName));
+}
+
 // Show room members modal
 window.showRoomMembers = function (roomName) {
   const members = getRoomMembers(roomName);
@@ -316,21 +342,25 @@ window.declineInvitation = function (invId) {
   }
 };
 
-// Render rooms with invite button
+// Render rooms with invite button - ONLY shows rooms user has access to
 window.renderRoomsWithInvite = function () {
   const list = document.getElementById('rooms-list');
   if (!list) return;
 
-  // Get rooms from localStorage (empty array if not set)
-  let rooms = JSON.parse(localStorage.getItem('aitutor_rooms') || '[]');
+  // Get only rooms that the current user has access to
+  const accessibleRooms = getAccessibleRooms();
 
-  if (rooms.length === 0) {
+  if (accessibleRooms.length === 0) {
     list.innerHTML = `<div style="padding:10px; text-align:center; color:var(--color-text-muted); font-size:0.85rem;">No rooms yet. Add one!</div>`;
     return;
   }
 
-  list.innerHTML = rooms.map(r => {
+  const currentUser = getCurrentUser();
+
+  list.innerHTML = accessibleRooms.map(r => {
     const memberCount = getRoomMembers(r).length;
+    const isCreator = getRoomCreator(r).toLowerCase() === currentUser.email.toLowerCase();
+
     return `
       <button class="room-item" onclick="selectRoom('${encodeURIComponent(r)}')" style="position:relative;">
         <i class="fa-solid fa-hashtag"></i>
@@ -338,8 +368,8 @@ window.renderRoomsWithInvite = function () {
         <span style="font-size:0.7rem; color:var(--color-text-muted); margin-left:4px;">(${memberCount})</span>
         <div style="display:flex; gap:4px; margin-left:auto;">
           <i class="fa-solid fa-users room-members" onclick="event.stopPropagation(); showRoomMembers('${r}')" title="Manage members" style="padding:4px; border-radius:4px;"></i>
-          <i class="fa-solid fa-user-plus room-invite" onclick="event.stopPropagation(); inviteToRoom('${r}')" title="Invite to room" style="padding:4px; border-radius:4px;"></i>
-          <i class="fa-solid fa-trash room-delete" onclick="event.stopPropagation(); deleteRoom('${encodeURIComponent(r)}')" title="Delete room"></i>
+          ${isCreator ? `<i class="fa-solid fa-user-plus room-invite" onclick="event.stopPropagation(); inviteToRoom('${r}')" title="Invite to room" style="padding:4px; border-radius:4px;"></i>` : ''}
+          ${isCreator ? `<i class="fa-solid fa-trash room-delete" onclick="event.stopPropagation(); deleteRoom('${encodeURIComponent(r)}')" title="Delete room"></i>` : ''}
         </div>
       </button>
     `;

@@ -1,58 +1,58 @@
 // Schedule Session Functionality
 window.scheduleSession = function () {
-    const dateInput = document.getElementById('session-date');
-    const topicInput = document.getElementById('session-topic');
+  const dateInput = document.getElementById('session-date');
+  const topicInput = document.getElementById('session-topic');
 
-    const date = dateInput?.value;
-    const topic = topicInput?.value || 'Learning Session';
+  const date = dateInput?.value;
+  const topic = topicInput?.value || 'Learning Session';
 
-    if (!date) {
-        alert('Please select a date and time.');
-        return;
-    }
+  if (!date) {
+    alert('Please select a date and time.');
+    return;
+  }
 
-    // Create session object
-    const session = {
-        id: Date.now(),
-        date: new Date(date).toLocaleString(),
-        topic: topic,
-        timestamp: date
-    };
+  // Create session object
+  const session = {
+    id: Date.now(),
+    date: new Date(date).toLocaleString(),
+    topic: topic,
+    timestamp: date
+  };
 
-    // Get existing sessions
-    const sessions = JSON.parse(localStorage.getItem('scheduled_sessions') || '[]');
-    sessions.push(session);
-    localStorage.setItem('scheduled_sessions', JSON.stringify(sessions));
+  // Get existing sessions
+  const sessions = JSON.parse(localStorage.getItem('scheduled_sessions') || '[]');
+  sessions.push(session);
+  localStorage.setItem('scheduled_sessions', JSON.stringify(sessions));
 
-    // Send notification to teacher (simulated)
-    console.log('📅 Teacher Notification:', {
-        student: 'Current User',
-        session: session.topic,
-        scheduledFor: session.date
-    });
+  // Send notification to teacher (simulated)
+  console.log('📅 Teacher Notification:', {
+    student: 'Current User',
+    session: session.topic,
+    scheduledFor: session.date
+  });
 
-    alert(`✅ Session scheduled for ${session.date}\n📧 Teacher has been notified!`);
+  alert(`✅ Session scheduled for ${session.date}`);
 
-    // Clear inputs
-    if (dateInput) dateInput.value = '';
-    if (topicInput) topicInput.value = '';
+  // Clear inputs
+  if (dateInput) dateInput.value = '';
+  if (topicInput) topicInput.value = '';
 
-    // Render sessions
-    renderScheduledSessions();
+  // Render sessions
+  renderScheduledSessions();
 };
 
 function renderScheduledSessions() {
-    const list = document.getElementById('schedule-list');
-    if (!list) return;
+  const list = document.getElementById('schedule-list');
+  if (!list) return;
 
-    const sessions = JSON.parse(localStorage.getItem('scheduled_sessions') || '[]');
+  const sessions = JSON.parse(localStorage.getItem('scheduled_sessions') || '[]');
 
-    if (sessions.length === 0) {
-        list.innerHTML = '<div class="empty-state"><p>No scheduled sessions yet</p></div>';
-        return;
-    }
+  if (sessions.length === 0) {
+    list.innerHTML = '<div class="empty-state"><p>No scheduled sessions yet</p></div>';
+    return;
+  }
 
-    list.innerHTML = sessions.map(session => `
+  list.innerHTML = sessions.map(session => `
     <div class="schedule-item">
       <div class="schedule-icon">
         <i class="fa-solid fa-calendar-check"></i>
@@ -69,18 +69,18 @@ function renderScheduledSessions() {
 }
 
 window.deleteSession = function (id) {
-    if (!confirm('Cancel this session?')) return;
+  if (!confirm('Cancel this session?')) return;
 
-    let sessions = JSON.parse(localStorage.getItem('scheduled_sessions') || '[]');
-    sessions = sessions.filter(s => s.id !== id);
-    localStorage.setItem('scheduled_sessions', JSON.stringify(sessions));
+  let sessions = JSON.parse(localStorage.getItem('scheduled_sessions') || '[]');
+  sessions = sessions.filter(s => s.id !== id);
+  localStorage.setItem('scheduled_sessions', JSON.stringify(sessions));
 
-    renderScheduledSessions();
+  renderScheduledSessions();
 };
 
 // Render on load
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', renderScheduledSessions);
+  document.addEventListener('DOMContentLoaded', renderScheduledSessions);
 } else {
-    renderScheduledSessions();
+  renderScheduledSessions();
 }
