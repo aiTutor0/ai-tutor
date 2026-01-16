@@ -21,7 +21,7 @@
 - 👔 **Mock Interview** | Prepare for job interviews with realistic AI simulations
 - ✏️ **Grammar Fixer** | Get instant corrections with explanations
 - 👨‍🏫 **Topic Explainer** | Learn grammar rules with clear examples
-- 📊 **Level Test** | Assess your CEFR level (A1-C2) with 10 questions
+- 📊 **Level Test** | Assess your CEFR level (A1-C1) with 10 questions
 - 🌐 **Translate** | Translate text with context
 - 👥 **Group Chat** | Create rooms and chat with other users
 
