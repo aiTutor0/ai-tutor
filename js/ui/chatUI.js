@@ -197,12 +197,22 @@ function addMessage(text, sender, skipSave = false, attachments = [], useTyping 
   if (attachments && attachments.length > 0) {
     attachmentHTML = `<div class="msg-attachments" style="display:flex; flex-wrap:wrap; gap:5px; margin-bottom:5px;">`;
     attachments.forEach(att => {
+      // If it's a file object (text file)
+      if (typeof att === 'object' && att.type === 'file') {
+        attachmentHTML += `<div style="background:var(--color-bg-tertiary); padding:8px 12px; border-radius:8px; font-size:0.85rem; display:flex; align-items:center; gap:6px; border:1px solid var(--color-border);">
+          <i class="fa-solid fa-file-lines" style="color:var(--color-accent);"></i>
+          <span>${escapeHtml(att.name || 'File')}</span>
+        </div>`;
+      }
       // If base64 image
-      if (att.startsWith("data:image")) {
+      else if (typeof att === 'string' && att.startsWith("data:image")) {
         attachmentHTML += `<img src="${att}" style="max-width:200px; max-height:200px; border-radius:8px; border:1px solid rgba(255,255,255,0.1);">`;
-      } else {
-        // File icon for text/other
-        attachmentHTML += `<div style="background:rgba(255,255,255,0.1); padding:5px 10px; border-radius:5px; font-size:0.8rem;"><i class="fa-solid fa-file"></i> File attached</div>`;
+      } else if (typeof att === 'string') {
+        // Other string attachments
+        attachmentHTML += `<div style="background:var(--color-bg-tertiary); padding:8px 12px; border-radius:8px; font-size:0.85rem; display:flex; align-items:center; gap:6px; border:1px solid var(--color-border);">
+          <i class="fa-solid fa-file"></i>
+          <span>File attached</span>
+        </div>`;
       }
     });
     attachmentHTML += `</div>`;
@@ -592,12 +602,8 @@ export async function sendMessage() {
   const textFiles = currentAttachments.filter(a => a.type === 'file');
   const images = currentAttachments.filter(a => typeof a === 'string'); // Base64 strings
 
-  if (textFiles.length > 0) {
-    text += "\n\n--- Attached Files ---\n";
-    textFiles.forEach(f => {
-      text += `\n[File: ${f.name}]\n${f.content}\n`;
-    });
-  }
+  // Combine all attachments for display (both text files and images)
+  const allAttachments = [...images, ...textFiles];
 
   input.value = "";
 
@@ -631,10 +637,18 @@ export async function sendMessage() {
 
     // Build attachment HTML for display
     let attachmentHTML = '';
-    if (images && images.length > 0) {
-      attachmentHTML = images.map(img =>
-        `<img src="${img}" style="max-width:200px; max-height:150px; border-radius:8px; margin-bottom:8px; display:block;">`
-      ).join('');
+    if (allAttachments && allAttachments.length > 0) {
+      attachmentHTML = allAttachments.map(att => {
+        if (typeof att === 'object' && att.type === 'file') {
+          return `<div style="background:var(--color-bg-tertiary); padding:8px 12px; border-radius:8px; font-size:0.85rem; display:inline-flex; align-items:center; gap:6px; border:1px solid var(--color-border); margin-bottom:8px;">
+            <i class="fa-solid fa-file-lines" style="color:var(--color-accent);"></i>
+            <span>${att.name || 'File'}</span>
+          </div>`;
+        } else if (typeof att === 'string' && att.startsWith('data:image')) {
+          return `<img src="${att}" style="max-width:200px; max-height:150px; border-radius:8px; margin-bottom:8px; display:block;">`;
+        }
+        return '';
+      }).join('');
     }
 
     // Display the message in chat
@@ -659,7 +673,7 @@ export async function sendMessage() {
     // Save to sent items for history tracking
     saveSentItem({
       content: text,
-      attachments: images,
+      attachments: allAttachments,
       mode: 'group',
       roomName: roomName,
       timestamp: Date.now()
@@ -671,13 +685,13 @@ export async function sendMessage() {
   }
 
   // === NORMAL AI CHAT MODE ===
-  // Display images in chat immediately
-  addMessage(text, "user", false, images);
+  // Display all attachments (images and text files) in chat immediately
+  addMessage(text, "user", false, allAttachments);
 
   // Save to sent items for history tracking
   saveSentItem({
     content: text,
-    attachments: images,
+    attachments: allAttachments,
     mode: currentToolMode,
     chatId: currentChatId,
     timestamp: Date.now()
@@ -970,23 +984,47 @@ document.addEventListener("click", (e) => {
 });
 
 export function exportChat() {
-  const history = getHistory();
-  const chat = history.find(c => c.id === currentChatId);
-  if (!chat || !chat.messages || chat.messages.length === 0) {
+  let messages = [];
+  let title = 'Chat Export';
+  let mode = currentToolMode;
+
+  // Check if we're in group chat mode
+  if (currentToolMode === 'group') {
+    // Get current room name from tool title
+    const toolTitle = document.getElementById('tool-title');
+    let roomName = toolTitle?.textContent || 'Room';
+    roomName = roomName.replace(/^🏠\s*/, '').trim();
+    const roomKey = `room_${roomName.replace(/\s+/g, '_')}`;
+
+    // Load room messages from localStorage
+    messages = JSON.parse(localStorage.getItem(roomKey) || '[]');
+    title = `Group Chat - ${roomName}`;
+  } else {
+    // Regular chat export
+    const history = getHistory();
+    const chat = history.find(c => c.id === currentChatId);
+    if (chat && chat.messages) {
+      messages = chat.messages;
+      title = chat.title || 'Chat Export';
+      mode = chat.mode || 'chat';
+    }
+  }
+
+  if (!messages || messages.length === 0) {
     alert('No messages to export.');
     return;
   }
 
   // Build TXT content
-  let txtContent = `=== ${chat.title || 'Chat Export'} ===\n`;
-  txtContent += `Mode: ${chat.mode || 'chat'}\n`;
-  txtContent += `Date: ${new Date(chat.created_at).toLocaleString()}\n`;
+  let txtContent = `=== ${title} ===\n`;
+  txtContent += `Mode: ${mode}\n`;
+  txtContent += `Date: ${new Date().toLocaleString()}\n`;
   txtContent += `${'='.repeat(40)}\n\n`;
 
-  chat.messages.forEach((msg, index) => {
-    const role = msg.role === 'user' ? 'You' : 'AI';
+  messages.forEach((msg) => {
+    const sender = msg.senderName || (msg.role === 'user' ? 'You' : 'AI');
     const time = msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString() : '';
-    txtContent += `[${role}] ${time}\n`;
+    txtContent += `[${sender}] ${time}\n`;
     txtContent += `${msg.content}\n`;
     if (msg.attachments && msg.attachments.length > 0) {
       txtContent += `(${msg.attachments.length} attachment(s))\n`;
@@ -999,12 +1037,15 @@ export function exportChat() {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `chat-${(chat.title || 'export').replace(/[^a-z0-9]/gi, '_').substring(0, 20)}.txt`;
+  a.download = `chat-${title.replace(/[^a-z0-9]/gi, '_').substring(0, 20)}.txt`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
 }
+
+// Make exportChat globally available immediately
+window.exportChat = exportChat;
 
 export function initChatUI() {
   els = {
