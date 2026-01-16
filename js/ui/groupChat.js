@@ -740,6 +740,11 @@ window.showRoomMembers = window.showGroupRoomMembers;
 window.acceptInvitation = window.handleAcceptInvite;
 window.declineInvitation = window.handleDeclineInvite;
 
+// Export createRoom for router.js
+window.createRoom = async function (name) {
+  return await createRoomInSupabase(name);
+};
+
 // Helper
 function escapeHtml(str) {
   if (!str) return '';

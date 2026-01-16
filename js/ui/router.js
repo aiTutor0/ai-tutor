@@ -346,7 +346,7 @@ export async function initRouter() {
   };
 
   // Room ekleme
-  window.addRoom = (e) => {
+  window.addRoom = async (e) => {
     e?.stopPropagation?.();
     const name = prompt("Room name?");
     if (!name) return;
@@ -360,20 +360,34 @@ export async function initRouter() {
       return;
     }
 
-    rooms.unshift(clean);
+    // Try to create room in Supabase (falls back to localStorage)
+    if (typeof window.createRoom === 'function') {
+      await window.createRoom(clean);
+    } else {
+      // Fallback to localStorage only
+      rooms.unshift(clean);
+      localStorage.setItem('aitutor_rooms', JSON.stringify(rooms));
 
-    // Save rooms to localStorage
-    localStorage.setItem('aitutor_rooms', JSON.stringify(rooms));
+      const currentUserStr = localStorage.getItem('aitutor_current_user');
+      const currentUser = currentUserStr ? JSON.parse(currentUserStr) : { email: 'demo@example.com' };
 
-    // Get current user and set as room creator and first member
-    const currentUserStr = localStorage.getItem('aitutor_current_user');
-    const currentUser = currentUserStr ? JSON.parse(currentUserStr) : { email: 'demo@example.com' };
+      const roomKey = `room_${clean.replace(/\s+/g, '_')}`;
+      localStorage.setItem(roomKey + '_creator', currentUser.email);
+      localStorage.setItem(roomKey + '_members', JSON.stringify([currentUser.email]));
+    }
 
-    const roomKey = `room_${clean.replace(/\s+/g, '_')}`;
-    localStorage.setItem(roomKey + '_creator', currentUser.email);
-    localStorage.setItem(roomKey + '_members', JSON.stringify([currentUser.email]));
+    // Also add to local rooms array for immediate display
+    if (!rooms.includes(clean)) {
+      rooms.unshift(clean);
+      localStorage.setItem('aitutor_rooms', JSON.stringify(rooms));
+    }
 
-    renderRooms();
+    // Render updated room list
+    if (typeof window.renderRooms === 'function') {
+      window.renderRooms();
+    } else {
+      renderRooms();
+    }
   };
 
   // Update menu visibility based on role
