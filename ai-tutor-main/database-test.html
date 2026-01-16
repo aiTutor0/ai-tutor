@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supabase Database Test</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .status {
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .test-section h2 {
+            color: #333;
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 6px;
+            border: 1px solid #dee2e6;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .result pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🗄️ Supabase Database Test</h1>
+        <p class="subtitle">AI Tutor - Veritabanı Bağlantı Testi</p>
+
+        <div id="connection-status" class="status info">
+            Bağlantı kontrol ediliyor...
+        </div>
+
+        <!-- User Tests -->
+        <div class="test-section">
+            <h2>👤 Kullanıcı İşlemleri</h2>
+            <div class="grid">
+                <button onclick="testGetCurrentUser()">Mevcut Kullanıcı</button>
+                <button onclick="testGetAllUsers()">Tüm Kullanıcılar</button>
+                <button onclick="testSearchUsers()">Kullanıcı Ara</button>
+            </div>
+            <div id="user-result" class="result" style="display: none;"></div>
+        </div>
+
+        <!-- Chat Session Tests -->
+        <div class="test-section">
+            <h2>💬 Chat Oturumları</h2>
+            <input type="text" id="session-title" placeholder="Oturum başlığı (örn: İngilizce Pratik)">
+            <select id="session-mode" style="width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 6px;">
+                <option value="chat">Sohbet</option>
+                <option value="interview">Mülakat</option>
+                <option value="translate">Çeviri</option>
+                <option value="grammar">Gramer</option>
+                <option value="tutor">Öğretmen</option>
+            </select>
+            <div class="grid">
+                <button onclick="testCreateSession()">Oturum Oluştur</button>
+                <button onclick="testGetSessions()">Oturumları Listele</button>
+            </div>
+            <div id="session-result" class="result" style="display: none;"></div>
+        </div>
+
+        <!-- Message Tests -->
+        <div class="test-section">
+            <h2>📝 Mesajlar</h2>
+            <input type="text" id="message-session-id" placeholder="Oturum ID (yukarıdan kopyalayın)">
+            <textarea id="message-content" placeholder="Mesaj içeriği"></textarea>
+            <select id="message-role" style="width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 6px;">
+                <option value="user">Kullanıcı</option>
+                <option value="ai">AI</option>
+            </select>
+            <div class="grid">
+                <button onclick="testAddMessage()">Mesaj Ekle</button>
+                <button onclick="testGetMessages()">Mesajları Listele</button>
+            </div>
+            <div id="message-result" class="result" style="display: none;"></div>
+        </div>
+
+        <!-- Room Tests -->
+        <div class="test-section">
+            <h2>🏠 Grup Odaları</h2>
+            <input type="text" id="room-name" placeholder="Oda adı (örn: İngilizce Kulübü)">
+            <input type="text" id="room-description" placeholder="Oda açıklaması">
+            <div class="grid">
+                <button onclick="testCreateRoom()">Oda Oluştur</button>
+                <button onclick="testGetRooms()">Odaları Listele</button>
+            </div>
+            <div id="room-result" class="result" style="display: none;"></div>
+        </div>
+
+        <!-- Level Test -->
+        <div class="test-section">
+            <h2>📊 Seviye Testi</h2>
+            <div class="grid">
+                <button onclick="testSaveLevelTest()">Test Sonucu Kaydet</button>
+                <button onclick="testGetLevelTests()">Test Sonuçları</button>
+            </div>
+            <div id="level-result" class="result" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { supabase } from './js/config/supabaseClient.js';
+        import * as chatService from './js/services/chatService.js';
+        import * as userService from './js/services/userService.js';
+        import * as roomService from './js/services/roomService.js';
+
+        // Make services available globally for button onclick handlers
+        window.chatService = chatService;
+        window.userService = userService;
+        window.roomService = roomService;
+
+        // Check connection
+        async function checkConnection() {
+            const statusEl = document.getElementById('connection-status');
+
+            if (!supabase) {
+                statusEl.className = 'status error';
+                statusEl.textContent = '❌ Supabase bağlı değil! env.js dosyasını kontrol edin.';
+                return;
+            }
+
+            try {
+                const { data: { user } } = await supabase.auth.getUser();
+
+                if (user) {
+                    statusEl.className = 'status success';
+                    statusEl.textContent = `✅ Supabase bağlı! Kullanıcı: ${user.email}`;
+                } else {
+                    statusEl.className = 'status info';
+                    statusEl.textContent = '⚠️ Supabase bağlı ama giriş yapılmamış. Lütfen önce giriş yapın.';
+                }
+            } catch (error) {
+                statusEl.className = 'status error';
+                statusEl.textContent = `❌ Bağlantı hatası: ${error.message}`;
+            }
+        }
+
+        checkConnection();
+
+        // Helper function to display results
+        window.showResult = function (elementId, data, error = null) {
+            const resultEl = document.getElementById(elementId);
+            resultEl.style.display = 'block';
+
+            if (error) {
+                resultEl.innerHTML = `<pre style="color: #dc3545;">❌ Hata:\n${JSON.stringify(error, null, 2)}</pre>`;
+            } else {
+                resultEl.innerHTML = `<pre style="color: #28a745;">✅ Başarılı:\n${JSON.stringify(data, null, 2)}</pre>`;
+            }
+        };
+
+        // User Tests
+        window.testGetCurrentUser = async function () {
+            const { data, error } = await userService.getCurrentUserProfile();
+            showResult('user-result', data, error);
+        };
+
+        window.testGetAllUsers = async function () {
+            const { data, error } = await userService.getAllUsers();
+            showResult('user-result', data, error);
+        };
+
+        window.testSearchUsers = async function () {
+            const query = prompt('Aranacak email veya isim:');
+            if (!query) return;
+            const { data, error } = await userService.searchUsers(query);
+            showResult('user-result', data, error);
+        };
+
+        // Chat Session Tests
+        window.testCreateSession = async function () {
+            const title = document.getElementById('session-title').value || 'Test Oturumu';
+            const mode = document.getElementById('session-mode').value;
+            const { data, error } = await chatService.createChatSession(title, mode);
+            showResult('session-result', data, error);
+        };
+
+        window.testGetSessions = async function () {
+            const { data, error } = await chatService.getChatSessions();
+            showResult('session-result', data, error);
+        };
+
+        // Message Tests
+        window.testAddMessage = async function () {
+            const sessionId = document.getElementById('message-session-id').value;
+            const content = document.getElementById('message-content').value;
+            const role = document.getElementById('message-role').value;
+
+            if (!sessionId || !content) {
+                alert('Lütfen oturum ID ve mesaj içeriği girin!');
+                return;
+            }
+
+            const { data, error } = await chatService.addMessage(sessionId, role, content);
+            showResult('message-result', data, error);
+        };
+
+        window.testGetMessages = async function () {
+            const sessionId = document.getElementById('message-session-id').value;
+
+            if (!sessionId) {
+                alert('Lütfen oturum ID girin!');
+                return;
+            }
+
+            const { data, error } = await chatService.getMessages(sessionId);
+            showResult('message-result', data, error);
+        };
+
+        // Room Tests
+        window.testCreateRoom = async function () {
+            const name = document.getElementById('room-name').value || 'Test Odası';
+            const description = document.getElementById('room-description').value || 'Test açıklaması';
+            const { data, error } = await roomService.createRoom(name, description);
+            showResult('room-result', data, error);
+        };
+
+        window.testGetRooms = async function () {
+            const { data, error } = await roomService.getUserRooms();
+            showResult('room-result', data, error);
+        };
+
+        // Level Test
+        window.testSaveLevelTest = async function () {
+            const { data, error } = await chatService.saveLevelTestResult(
+                'B2',
+                'Upper Intermediate - Can understand complex texts',
+                8,
+                [{ question: 1, answer: 'A', correct: true }]
+            );
+            showResult('level-result', data, error);
+        };
+
+        window.testGetLevelTests = async function () {
+            const { data, error } = await chatService.getLevelTestResults();
+            showResult('level-result', data, error);
+        };
+    </script>
+</body>
+
+</html>

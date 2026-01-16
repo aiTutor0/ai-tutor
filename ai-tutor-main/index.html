@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AITutor</title>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path fill='%234f46e5' d='M184 0c30.9 0 56 25.1 56 56l0 400c0 30.9-25.1 56-56 56c-28.9 0-52.7-21.9-55.7-50.1c-5.2 1.4-10.7 2.1-16.3 2.1c-35.3 0-64-28.7-64-64c0-7.4 1.3-14.6 3.6-21.2C21.4 367.4 0 338.2 0 304c0-31.9 18.7-59.5 45.8-72.3C37.1 220.8 32 207 32 192c0-30.7 21.6-56.3 50.4-62.6C80.8 123.9 80 118 80 112c0-29.9 20.6-55.1 48.3-62.1C131.3 21.9 155.1 0 184 0zM328 0c28.9 0 52.6 21.9 55.7 49.9c27.8 7 48.3 32.1 48.3 62.1c0 6-.8 11.9-2.4 17.4c28.8 6.2 50.4 31.9 50.4 62.6c0 15-5.1 28.8-13.8 39.7C493.3 244.5 512 272.1 512 304c0 34.2-21.4 63.4-51.6 74.8c2.3 6.6 3.6 13.8 3.6 21.2c0 35.3-28.7 64-64 64c-5.6 0-11.1-.7-16.3-2.1c-3 28.2-26.8 50.1-55.7 50.1c-30.9 0-56-25.1-56-56l0-400c0-30.9 25.1-56 56-56z'/></svg>">
+
+  <!-- Font Awesome (icons) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+  <!-- CSS (split) -->
+  <link rel="stylesheet" href="./assets/css/base/theme.css" />
+  <link rel="stylesheet" href="./assets/css/base/base.css" />
+  <link rel="stylesheet" href="./assets/css/layout/layout.css" />
+  <link rel="stylesheet" href="./assets/css/views/views.css" />
+  <link rel="stylesheet" href="./assets/css/landingExtras.css" />
+</head>
+
+<body class="public">
+  <!-- Mobile Menu Button -->
+  <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Open navigation menu" title="Menu">
+    <i class="fa-solid fa-bars"></i>
+  </button>
+
+  <!-- Sidebar Overlay (mobile) -->
+  <div class="sidebar-overlay" id="sidebar-overlay" aria-hidden="true"></div>
+
+  <!-- Theme Toggle Button (moved to topbar in workspace view) -->
+
+  <div class="app-container" role="main">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar" role="navigation" aria-label="Main navigation">
+      <div class="brand" onclick="showLanding()" role="button" tabindex="0" aria-label="Go to home page"
+        style="cursor:pointer;">
+        <i class="fa-solid fa-brain"></i>
+        <span>AITutor</span>
+      </div>
+
+      <!-- STUDENT MENU -->
+      <nav class="menu" id="role-menu">
+        <a href="javascript:void(0)" class="menu-link active" data-link="chat" onclick="openTool('chat', event)">
+          <i class="fa-regular fa-comments"></i> New Chat
+        </a>
+
+        <!-- Group Chat with Rooms -->
+        <a href="javascript:void(0)" class="menu-link menu-sub" onclick="toggleGroupChat(event)">
+          <i class="fa-solid fa-users"></i> Group Chat
+          <span class="menu-caret" id="group-caret"><i class="fa-solid fa-chevron-down"></i></span>
+        </a>
+
+        <div class="rooms-panel hidden" id="group-panel">
+          <a href="javascript:void(0)" class="menu-link" onclick="showInvitations(event)"
+            style="padding:8px 12px; font-size:0.9rem;">
+            <i class="fa-solid fa-envelope"></i> Invitations
+            <span id="invitation-badge" class="hidden"
+              style="background:var(--color-accent); color:white; padding:2px 6px; border-radius:10px; font-size:0.7rem; margin-left:auto;">0</span>
+          </a>
+          <div class="rooms-list" id="rooms-list"></div>
+          <button class="rooms-add" type="button" onclick="addRoom(event)">
+            <i class="fa-solid fa-plus"></i> Add Room
+          </button>
+        </div>
+
+        <a href="javascript:void(0)" class="menu-link menu-sub" onclick="toggleHistory(event)">
+          <i class="fa-solid fa-clock-rotate-left"></i> Chat History
+          <span class="menu-caret" id="history-caret"><i class="fa-solid fa-chevron-down"></i></span>
+        </a>
+
+        <div class="rooms-panel hidden" id="history-panel">
+          <div class="rooms-list" id="sidebar-history-list"></div>
+        </div>
+
+        <a href="javascript:void(0)" class="menu-link" data-link="level" onclick="openTool('level', event)">
+          <i class="fa-solid fa-layer-group"></i> Level Test
+        </a>
+
+        <a href="javascript:void(0)" class="menu-link" data-link="interview" onclick="openTool('interview', event)">
+          <i class="fa-solid fa-user-tie"></i> Interview
+        </a>
+
+        <a href="javascript:void(0)" class="menu-link" data-link="translate" onclick="openTool('translate', event)">
+          <i class="fa-solid fa-language"></i> Translate
+        </a>
+
+        <a href="javascript:void(0)" class="menu-link" data-link="grammar" onclick="openTool('grammar', event)">
+          <i class="fa-solid fa-wand-magic-sparkles"></i> Grammar Fixer
+        </a>
+
+        <a href="javascript:void(0)" class="menu-link" data-link="tutor" onclick="openTool('tutor', event)">
+          <i class="fa-solid fa-chalkboard-user"></i> Topic Explainer
+        </a>
+      </nav>
+
+      <!-- Profil (dropdown: Back + Logout) -->
+      <div class="user-profile" onclick="toggleUserMenu()" title="User menu">
+        <div class="avatar" id="profile-avatar">U</div>
+        <div class="user-info">
+          <span class="name" id="profile-name">User</span>
+          <span class="role" id="profile-role">Student</span>
+        </div>
+
+        <div class="user-dropdown hidden" id="user-dropdown">
+          <button type="button" class="user-drop-item" onclick="goBackHome(event)">
+            <i class="fa-solid fa-arrow-left"></i> Back
+          </button>
+
+          <button type="button" class="user-drop-item danger" onclick="logoutFromMenu(event)">
+            <i class="fa-solid fa-right-from-bracket"></i> Logout
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main-content">
+
+      <!-- LANDING -->
+      <section id="landing-view" class="view-section landing-view">
+        <header class="landing-topbar">
+          <div class="landing-logo" onclick="showLanding()">
+            <i class="fa-solid fa-brain"></i>
+            <span>AITutor</span>
+          </div>
+
+          <div class="landing-actions">
+            <button class="theme-toggle-landing" id="theme-toggle-landing" aria-label="Toggle dark mode"
+              title="Toggle Dark Mode">
+              <i class="fa-solid fa-moon"></i>
+              <i class="fa-solid fa-sun"></i>
+            </button>
+            <button class="ghost-btn" id="btn-go-login">
+              <i class="fa-solid fa-right-to-bracket"></i> Login
+            </button>
+            <button class="primary-btn small" id="btn-go-register">
+              <i class="fa-solid fa-user-plus"></i> Get Started
+            </button>
+          </div>
+        </header>
+
+        <div class="landing-hero">
+          <div class="hero-left">
+            <div class="hero-badge">
+              <i class="fa-solid fa-sparkles"></i> AI Language Practice Platform
+            </div>
+
+            <h1>Practice English with AI — faster, simpler, and more fun.</h1>
+            <p>
+              Free Conversation, Mock Interview, Grammar Fixer, and Topic Explainer — all in one place.
+              Create an account and start practicing right away.
+            </p>
+
+            <div class="hero-cta">
+              <button class="primary-btn" id="btn-hero-start">
+                <i class="fa-solid fa-rocket"></i> Create Account
+              </button>
+              <button class="outline-btn" id="btn-hero-login">
+                <i class="fa-solid fa-right-to-bracket"></i> I already have an account
+              </button>
+            </div>
+
+            <div class="hero-stats">
+              <div class="stat">
+                <div class="stat-num">4</div>
+                <div class="stat-label">AI Tools</div>
+              </div>
+              <div class="stat">
+                <div class="stat-num">3</div>
+                <div class="stat-label">Roles</div>
+              </div>
+              <div class="stat">
+                <div class="stat-num">∞</div>
+                <div class="stat-label">Practice</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="hero-right">
+            <div class="preview-card">
+              <div class="preview-top">
+                <span class="dot red"></span>
+                <span class="dot yellow"></span>
+                <span class="dot green"></span>
+              </div>
+              <div class="preview-body">
+                <div class="preview-line bold">Free Conversation</div>
+                <div class="preview-line">Hello! I’m ready to chat about anything.</div>
+                <div class="preview-line user">How can I improve my speaking?</div>
+                <div class="preview-line">Try daily practice + corrections.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI TOOLS SECTION -->
+        <section class="landing-section">
+          <h2 class="section-title">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> AI-Powered Tools
+          </h2>
+          <div class="landing-grid">
+            <div class="tool-card">
+              <div class="tool-icon">💬</div>
+              <h3>Chat</h3>
+              <p>Practice English conversations with AI</p>
+            </div>
+            <div class="tool-card">
+              <div class="tool-icon">👔</div>
+              <h3>Interview</h3>
+              <p>Prepare for job interviews</p>
+            </div>
+            <div class="tool-card">
+              <div class="tool-icon">✏️</div>
+              <h3>Grammar</h3>
+              <p>Get instant corrections</p>
+            </div>
+            <div class="tool-card">
+              <div class="tool-icon">👨‍🏫</div>
+              <h3>Tutor</h3>
+              <p>Learn with AI guidance</p>
+            </div>
+            <div class="tool-card">
+              <div class="tool-icon">📊</div>
+              <h3>Level Test</h3>
+              <p>Assess your proficiency</p>
+            </div>
+            <div class="tool-card">
+              <div class="tool-icon">🌐</div>
+              <h3>Translate</h3>
+              <p>Translate with context</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ROLES SECTION -->
+        <section class="landing-section">
+          <h2 class="section-title">
+            <i class="fa-solid fa-users"></i> Choose Your Role
+          </h2>
+          <div class="roles-grid">
+            <div class="role-card">
+              <div class="role-icon">🎓</div>
+              <h3>Student</h3>
+              <p>Access all AI tools and track your learning progress</p>
+            </div>
+            <div class="role-card">
+              <div class="role-icon">👩‍🏫</div>
+              <h3>Teacher</h3>
+              <p>Monitor students and schedule learning sessions</p>
+            </div>
+            <div class="role-card">
+              <div class="role-icon">⚙️</div>
+              <h3>Admin</h3>
+              <p>Manage users and view platform analytics</p>
+            </div>
+          </div>
+        </section>
+
+        <footer class="landing-footer">
+          <span>© 2025 AITutor</span>
+        </footer>
+      </section>
+
+      <!-- AUTH -->
+      <section id="auth-view" class="view-section auth-view hidden">
+        <!-- Fixed Theme Toggle for Auth Pages -->
+        <button class="theme-toggle-fixed" id="theme-toggle-auth" aria-label="Toggle dark mode"
+          title="Toggle Dark Mode">
+          <i class="fa-solid fa-moon"></i>
+          <i class="fa-solid fa-sun"></i>
+        </button>
+
+        <div class="auth-card">
+          <div class="auth-brand" onclick="showLanding()" style="cursor:pointer;">
+            <i class="fa-solid fa-brain"></i>
+            <span>AITutor</span>
+          </div>
+
+          <h1 class="auth-title">Welcome</h1>
+          <p class="auth-subtitle">Login or create an account to continue.</p>
+
+          <div class="auth-tabs">
+            <button type="button" class="auth-tab active" id="tab-login">Login</button>
+            <button type="button" class="auth-tab" id="tab-register">Register</button>
+          </div>
+
+          <div id="auth-error" class="auth-error hidden"></div>
+
+          <form id="login-form" class="auth-form">
+            <button type="button" class="google-btn" id="btn-google-login">
+              <svg width="20" height="20" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                <path fill="#EA4335"
+                  d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
+                <path fill="#4285F4"
+                  d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" />
+                <path fill="#FBBC05"
+                  d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z" />
+                <path fill="#34A853"
+                  d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" />
+              </svg>
+              Continue with Google
+            </button>
+
+            <div class="auth-divider"><span>OR</span></div>
+
+            <div class="form-group">
+              <label>Email</label>
+              <input type="email" id="login-email" placeholder="you@example.com" required />
+            </div>
+
+            <div class="form-group">
+              <label>Password</label>
+              <input type="password" id="login-password" placeholder="••••••••" required />
+            </div>
+
+            <button type="submit" class="primary-btn">
+              <i class="fa-solid fa-right-to-bracket"></i> Login
+            </button>
+
+            <button type="button" class="back-home-btn" id="btn-back-home">
+              <i class="fa-solid fa-arrow-left"></i>
+              Back to Home
+            </button>
+          </form>
+
+          <form id="register-form" class="auth-form hidden">
+            <div class="form-group">
+              <label>Full Name</label>
+              <input type="text" id="reg-name" placeholder="Your name" required />
+            </div>
+
+            <div class="form-group">
+              <label>Email</label>
+              <input type="email" id="reg-email" placeholder="you@example.com" required />
+            </div>
+
+            <div class="form-group">
+              <label>Password <span style="font-weight:normal; color:var(--color-text-muted); font-size:0.85rem;">(min.
+                  6 characters)</span></label>
+              <input type="password" id="reg-password" placeholder="Create a password" required minlength="6" />
+            </div>
+
+            <div class="form-group">
+              <label>Confirm Password</label>
+              <input type="password" id="reg-confirm" placeholder="Repeat password" required />
+            </div>
+
+            <div class="form-group">
+              <label>Register as</label>
+              <div class="role-pills" id="role-pills">
+                <input type="radio" name="role" id="role-student" value="student" checked />
+                <label for="role-student">Student</label>
+
+                <input type="radio" name="role" id="role-teacher" value="teacher" />
+                <label for="role-teacher">Teacher</label>
+
+                <input type="radio" name="role" id="role-admin" value="admin" />
+                <label for="role-admin">Admin</label>
+              </div>
+            </div>
+
+            <div class="auth-actions">
+              <button type="submit" class="primary-btn">
+                <i class="fa-solid fa-user-plus"></i> Create Account
+              </button>
+
+              <button type="button" class="back-home-btn" id="btn-back-home-2">
+                <i class="fa-solid fa-arrow-left"></i>
+                Back to Home
+              </button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- DASHBOARD -->
+      <section id="dashboard-view" class="view-section hidden">
+        <header class="top-header">
+          <h1>Dashboard</h1>
+          <p>Select a tool from the sidebar.</p>
+        </header>
+      </section>
+
+      <!-- ADMIN VIEW -->
+      <section id="admin-view" class="view-section hidden">
+        <div class="top-header" style="display:flex; justify-content:space-between; align-items:flex-start;">
+          <div>
+            <h1>Admin Panel</h1>
+            <p>Users / Chats</p>
+          </div>
+          <button class="theme-toggle-inline" id="theme-toggle-admin" aria-label="Toggle dark mode"
+            title="Toggle Dark Mode" style="margin-top:5px;">
+            <i class="fa-solid fa-moon"></i>
+            <i class="fa-solid fa-sun"></i>
+          </button>
+        </div>
+
+        <div class="admin-card">
+          <div class="admin-toolbar">
+            <input class="admin-search" id="admin-search-input" placeholder="Search users..."
+              oninput="filterAdminUsers(this.value)" />
+            <button class="ghost-btn" onclick="logout()">Logout</button>
+          </div>
+
+          <div class="admin-tabs">
+            <button class="admin-tab active" onclick="showAdminTab('users', this)">Users</button>
+            <button class="admin-tab" onclick="showAdminTab('chats', this)">User Chats</button>
+          </div>
+
+          <!-- Users Panel -->
+          <div id="admin-users-panel" class="admin-panel">
+            <div class="admin-table">
+              <div class="admin-row admin-head">
+                <div>Name</div>
+                <div>Email</div>
+                <div>Role</div>
+                <div>Last Active</div>
+                <div>Status</div>
+                <div>Actions</div>
+              </div>
+              <div id="admin-users-list">
+                <!-- Users will be populated dynamically -->
+              </div>
+            </div>
+          </div>
+
+          <!-- User Chats Panel -->
+          <div id="admin-chats-panel" class="admin-panel hidden">
+            <div class="admin-chats-container" style="display:flex; gap:16px; flex-wrap:wrap;">
+              <!-- User Selector -->
+              <div class="admin-user-selector" style="min-width:200px; flex:1;">
+                <label style="font-weight:bold; display:block; margin-bottom:8px;">Select User:</label>
+                <select id="admin-user-select" onchange="loadUserChats(this.value)"
+                  style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--color-border); background:var(--color-bg-secondary); color:var(--color-text-primary);">
+                  <option value="">-- Select a user --</option>
+                </select>
+              </div>
+
+              <!-- Chat List -->
+              <div class="admin-chat-list" style="flex:2; min-width:300px;">
+                <div id="admin-chat-viewer"
+                  style="max-height:400px; overflow-y:auto; border:1px solid var(--color-border); border-radius:12px; padding:16px; background:var(--color-bg-tertiary);">
+                  <p style="color:var(--color-text-muted); text-align:center;">Select a user to view their chat history
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- WORKSPACE VIEW (artık ortada Rooms yok) -->
+      <section id="workspace-view" class="view-section hidden workspace-v2">
+        <div class="ws-grid">
+          <!-- CENTER -->
+          <main class="ws-center">
+            <header class="ws-topbar">
+              <div class="ws-tabs">
+                <button class="ws-tab active" data-tab="chat">Chat</button>
+                <button class="ws-tab" data-tab="files">Files</button>
+                <button class="ws-tab" data-tab="sent">Sent</button>
+                <button class="ws-tab" data-tab="schedule">Schedule</button>
+                <button class="ws-tab" onclick="exportChat()">Export</button>
+              </div>
+
+              <div class="ws-topbar-right">
+                <button class="theme-toggle-inline" id="theme-toggle" aria-label="Toggle dark mode"
+                  title="Toggle Dark Mode">
+                  <i class="fa-solid fa-moon"></i>
+                  <i class="fa-solid fa-sun"></i>
+                </button>
+                <div class="ws-tool-title" id="tool-title">Tool Name</div>
+              </div>
+            </header>
+
+            <!-- Tab Panels -->
+            <section class="ws-chatwrap">
+              <!-- CHAT PANEL -->
+              <div id="panel-chat" class="tab-panel">
+                <div class="chat-interface v2">
+                  <!-- Message Search Bar -->
+                  <div class="message-search-bar"
+                    style="padding:8px 14px; border-bottom:1px solid var(--color-border); display:flex; gap:8px; align-items:center;">
+                    <i class="fa-solid fa-search" style="color:var(--color-text-muted);"></i>
+                    <input type="text" id="message-search" placeholder="Search messages..."
+                      onkeyup="searchMessages(this.value)"
+                      style="flex:1; background:var(--color-bg-tertiary); border:1px solid var(--color-border); padding:6px 10px; border-radius:6px; color:var(--color-text-primary); font-size:0.85rem;">
+                    <button onclick="clearMessageSearch()" title="Clear search"
+                      style="background:none; border:none; color:var(--color-text-muted); cursor:pointer; padding:4px;">
+                      <i class="fa-solid fa-times"></i>
+                    </button>
+                  </div>
+
+                  <div id="chat-window" class="chat-window"></div>
+
+                  <div id="correction-box" class="correction-box hidden">
+                    <i class="fa-solid fa-lightbulb"></i>
+                    <span id="correction-text"></span>
+                  </div>
+
+                  <!-- File Preview Container -->
+                  <div id="file-preview-container" class="hidden"
+                    style="display:flex; gap:8px; padding:8px 14px; flex-wrap:wrap; border-top:1px solid var(--color-border);">
+                  </div>
+
+                  <div class="input-area v2">
+                    <button class="voice-btn" type="button" onclick="toggleVoiceRecording()" id="voice-btn">
+                      <i class="fa-solid fa-microphone"></i>
+                    </button>
+
+                    <input type="file" id="file-input" multiple accept="image/*,.txt,.js,.json,.md,.py,.html,.css"
+                      style="display:none;">
+                    <button class="attach-btn" type="button" onclick="document.getElementById('file-input').click()">
+                      <i class="fa-solid fa-paperclip"></i>
+                    </button>
+
+                    <input type="text" id="user-input" placeholder="Type your message..." />
+
+                    <button class="send-btn" type="button" onclick="sendMessage()">
+                      <i class="fa-solid fa-paper-plane"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- FILES PANEL -->
+              <div id="panel-files" class="tab-panel hidden">
+                <div class="panel-content">
+                  <div class="panel-header">
+                    <h3><i class="fa-solid fa-folder-open"></i> Your Files</h3>
+                    <p class="muted">Upload and manage your learning materials</p>
+                  </div>
+                  <div id="files-list" class="files-grid">
+                    <div class="empty-state">
+                      <i class="fa-solid fa-cloud-arrow-up"
+                        style="font-size:3rem; color:var(--color-text-muted); margin-bottom:1rem;"></i>
+                      <p>No files uploaded yet</p>
+                      <button class="primary-btn small" onclick="document.getElementById('file-input').click()">
+                        <i class="fa-solid fa-plus"></i> Upload File
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- SENT PANEL -->
+              <div id="panel-sent" class="tab-panel hidden">
+                <div class="panel-content">
+                  <div class="panel-header">
+                    <h3><i class="fa-solid fa-paper-plane"></i> Sent Items</h3>
+                    <p class="muted">Messages and files you've sent</p>
+                  </div>
+                  <div id="sent-list" class="sent-items">
+                    <div class="empty-state">
+                      <i class="fa-solid fa-inbox"
+                        style="font-size:3rem; color:var(--color-text-muted); margin-bottom:1rem;"></i>
+                      <p>No sent items yet</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- SCHEDULE PANEL -->
+              <div id="panel-schedule" class="tab-panel hidden">
+                <div class="panel-content">
+                  <div class="panel-header">
+                    <h3><i class="fa-solid fa-calendar-days"></i> Schedule</h3>
+                    <p class="muted">Plan your learning sessions</p>
+                  </div>
+
+                  <div class="schedule-calendar">
+                    <div class="calendar-input-group">
+                      <label for="session-date">Select Date &amp; Time:</label>
+                      <input type="datetime-local" id="session-date" class="schedule-input">
+                    </div>
+
+                    <div class="calendar-input-group">
+                      <label for="session-topic">Topic/Notes:</label>
+                      <input type="text" id="session-topic" class="schedule-input" placeholder="e.g., Grammar Practice">
+                    </div>
+
+                    <button class="primary-btn" onclick="scheduleSession()">
+                      <i class="fa-solid fa-calendar-plus"></i> Schedule Session
+                    </button>
+                  </div>
+
+                  <div id="schedule-list" class="schedule-items">
+                    <!-- Scheduled items will appear here -->
+                  </div>
+                </div>
+              </div>
+
+              <!-- LEVEL TEST PANEL -->
+              <div id="panel-level" class="tab-panel hidden">
+                <div class="panel-content level-test-container">
+                  <div class="panel-header">
+                    <h3><i class="fa-solid fa-layer-group"></i> English Level Test</h3>
+                    <p class="muted">10 multiple choice questions to determine your CEFR level</p>
+                  </div>
+
+                  <div id="level-test-area">
+                    <!-- Quiz will be rendered here -->
+                    <div id="level-start-screen">
+                      <div class="level-intro">
+                        <i class="fa-solid fa-clipboard-check"
+                          style="font-size:3rem; color:var(--color-accent); margin-bottom:1rem;"></i>
+                        <h4 style="margin-bottom:12px;">Test Your English Level</h4>
+                        <p style="margin-bottom:24px;">Answer 10 multiple choice questions to find out your CEFR level
+                          (A1-C1).</p>
+                        <button class="primary-btn" onclick="startLevelTest()" style="margin-top:8px;">
+                          <i class="fa-solid fa-play"></i> Start Test
+                        </button>
+                      </div>
+
+                      <div id="previous-results" class="level-results-history">
+                        <!-- Previous test results shown here -->
+                      </div>
+                    </div>
+
+                    <div id="level-quiz-screen" class="hidden">
+                      <div class="quiz-progress">
+                        <span id="quiz-progress-text">Question 1 of 10</span>
+                        <div class="progress-bar">
+                          <div id="quiz-progress-fill" class="progress-fill" style="width:10%"></div>
+                        </div>
+                      </div>
+
+                      <div id="quiz-question-area">
+                        <!-- Question will appear here -->
+                      </div>
+                    </div>
+
+                    <div id="level-result-screen" class="hidden">
+                      <!-- Results will appear here -->
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </main>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script src="./js/ui/voiceRecording.js"></script>
+  <script src="./js/ui/scheduleManager.js"></script>
+  <script src="./js/ui/levelTest.js"></script>
+  <script src="./js/ui/groupChat.js"></script>
+  <script src="./js/ui/adminPanel.js"></script>
+  <script type="module" src="./js/app.js"></script>
+</body>
+
+</html>

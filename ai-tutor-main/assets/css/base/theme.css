@@ -1,0 +1,151 @@
+/* === THEME.CSS (Light / Dark Mode CSS Variables) === */
+
+/* Root theme variables (light mode as default) */
+:root {
+  /* Light mode (default) */
+  --color-bg-primary: #f8f9fc;
+  --color-bg-secondary: #ffffff;
+  --color-bg-tertiary: #f1f5f9;
+  --color-bg-hover: #eef2ff;
+  
+  --color-text-primary: #0f172a;
+  --color-text-secondary: #1e293b;
+  --color-text-muted: #64748b;
+  --color-text-hint: #94a3b8;
+  
+  --color-border: #e2e8f0;
+  --color-border-hover: #c7d2fe;
+  --color-border-input: #cbd5e1;
+  
+  --color-accent: #4f46e5;
+  --color-accent-hover: #4338ca;
+  --color-accent-dark: #3730a3;
+  --color-accent-light: #eef2ff;
+  --color-accent-text: #3730a3;
+  
+  --color-card-bg: #ffffff;
+  --color-card-border: #e2e8f0;
+  --color-card-shadow: rgba(0, 0, 0, 0.06);
+  
+  --color-chat-bg: #fcfcfc;
+  --color-ai-bubble-bg: #ffffff;
+  --color-ai-bubble-text: #334155;
+  
+  --color-preview-top: #f1f5f9;
+  --color-preview-body: #ffffff;
+  --color-preview-line: #334155;
+  --color-preview-user-bg: #eef2ff;
+  --color-preview-user-border: #c7d2fe;
+  
+  --color-error-bg: #fff1f2;
+  --color-error-border: #fecdd3;
+  --color-error-text: #9f1239;
+  
+  --color-correction-bg: #fffbeb;
+  --color-correction-border: #fcd34d;
+  --color-correction-text: #b45309;
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 12px 28px rgba(0, 0, 0, 0.06);
+  --shadow-card-hover: 0 10px 20px rgba(0, 0, 0, 0.05);
+}
+
+/* Dark Mode */
+body.dark-mode {
+  --color-bg-primary: #0f172a;
+  --color-bg-secondary: #1e293b;
+  --color-bg-tertiary: #334155;
+  --color-bg-hover: #1e2a4a;
+  
+  --color-text-primary: #f1f5f9;
+  --color-text-secondary: #e2e8f0;
+  --color-text-muted: #94a3b8;
+  --color-text-hint: #64748b;
+  
+  --color-border: #334155;
+  --color-border-hover: #6366f1;
+  --color-border-input: #475569;
+  
+  --color-accent: #6366f1;
+  --color-accent-hover: #818cf8;
+  --color-accent-dark: #4f46e5;
+  --color-accent-light: #1e2a4a;
+  --color-accent-text: #a5b4fc;
+  
+  --color-card-bg: #1e293b;
+  --color-card-border: #334155;
+  --color-card-shadow: rgba(0, 0, 0, 0.3);
+  
+  --color-chat-bg: #0f172a;
+  --color-ai-bubble-bg: #1e293b;
+  --color-ai-bubble-text: #e2e8f0;
+  
+  --color-preview-top: #334155;
+  --color-preview-body: #1e293b;
+  --color-preview-line: #e2e8f0;
+  --color-preview-user-bg: #1e2a4a;
+  --color-preview-user-border: #6366f1;
+  
+  --color-error-bg: #450a0a;
+  --color-error-border: #991b1b;
+  --color-error-text: #fca5a5;
+  
+  --color-correction-bg: #451a03;
+  --color-correction-border: #b45309;
+  --color-correction-text: #fcd34d;
+  
+  /* Shadows for dark mode */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 12px 28px rgba(0, 0, 0, 0.4);
+  --shadow-card-hover: 0 10px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Theme Toggle Button - Inline version for topbar */
+.theme-toggle-inline {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-tertiary);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+}
+
+.theme-toggle-inline:hover {
+  background: var(--color-accent);
+  color: white;
+  border-color: var(--color-accent);
+}
+
+.theme-toggle-inline i.fa-sun { display: none; }
+.theme-toggle-inline i.fa-moon { display: block; }
+
+body.dark-mode .theme-toggle-inline i.fa-sun { display: block; }
+body.dark-mode .theme-toggle-inline i.fa-moon { display: none; }
+
+/* Smooth transition for theme switch */
+body {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.sidebar,
+.auth-card,
+.tool-card,
+.landing-card,
+.role-card,
+.hero-left,
+.hero-right,
+.preview-card,
+.chat-interface,
+.input-area,
+.stat {
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
