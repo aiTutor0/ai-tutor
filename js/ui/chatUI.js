@@ -834,7 +834,22 @@ function renderSidebarHistory() {
   const list = document.getElementById("sidebar-history-list");
   if (!list) return;
 
-  const history = getHistory();
+  // Get current user email
+  const currentUserStr = localStorage.getItem('aitutor_current_user');
+  const currentUser = currentUserStr ? JSON.parse(currentUserStr) : null;
+  const currentEmail = currentUser?.email?.toLowerCase() || '';
+
+  // Get history and filter by current user
+  const allHistory = getHistory();
+  const history = allHistory.filter(chat => {
+    // If chat has userEmail, filter by it
+    if (chat.userEmail) {
+      return chat.userEmail.toLowerCase() === currentEmail;
+    }
+    // Legacy chats without userEmail - show to everyone (backward compatibility)
+    return true;
+  });
+
   list.innerHTML = "";
 
   const newChatBtn = document.createElement("div");
