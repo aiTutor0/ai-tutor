@@ -1,4 +1,3 @@
-// js/config/env.js
 // Supabase Configuration
 // Get your Supabase URL and anon key from: https://app.supabase.com/project/_/settings/api
 export const SUPABASE_URL = "https://haowbfhlmhgwjgpgbtyn.supabase.co";

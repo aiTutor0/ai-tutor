@@ -28,7 +28,7 @@ export async function loginWithGoogle() {
   return await supabase.auth.signInWithOAuth({
     provider: "google",
     options: {
-      redirectTo: window.location.origin
+      redirectTo: window.location.origin + "/dashboard"
     }
   });
 }
@@ -45,7 +45,7 @@ export async function getSession() {
 }
 
 export function onAuthChange(callback) {
-  if (!supabase) return () => {};
+  if (!supabase) return () => { };
   const { data } = supabase.auth.onAuthStateChange((_event, session) => callback(session));
   return () => data.subscription.unsubscribe();
 }

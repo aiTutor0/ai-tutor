@@ -11,8 +11,8 @@ import { initChatUI, setTool } from "./chatUI.js";
 
 const $ = (id) => document.getElementById(id);
 
-// Basit local room state (frontend demo)
-let rooms = ["Room 1", "Room 2"];
+// Basit local room state (frontend demo) - load from localStorage
+let rooms = JSON.parse(localStorage.getItem('aitutor_rooms') || '["Room 1", "Room 2"]');
 
 function hideAllViews() {
   ["landing-view", "auth-view", "dashboard-view", "workspace-view", "admin-view"].forEach(
@@ -57,32 +57,182 @@ function renderRooms() {
   list.innerHTML = rooms
     .map(
       (r) => `
-      <button class="room-item" type="button" onclick="selectRoom('${encodeURIComponent(r)}')">
+      <button class="room-item" onclick="selectRoom('${encodeURIComponent(r)}')">
         <i class="fa-solid fa-hashtag"></i>
         <span>${r}</span>
+        <i class="fa-solid fa-trash room-delete" onclick="event.stopPropagation(); deleteRoom('${encodeURIComponent(r)}')" title="Delete room"></i>
       </button>
     `
     )
     .join("");
 }
 
-// Global: room seçimi (demo)
-window.selectRoom = (encoded) => {
+// Delete room
+window.deleteRoom = (encoded) => {
   const room = decodeURIComponent(encoded || "");
-  // İstersen burada group chat ekranını açtırabiliriz:
-  // openTool('group');
-  alert("Selected: " + room);
+  if (!confirm(`Delete "${room}"?`)) return;
+
+  // Get current rooms from localStorage
+  let currentRooms = JSON.parse(localStorage.getItem('aitutor_rooms') || '[]');
+  currentRooms = currentRooms.filter(r => r !== room);
+
+  // Save updated rooms to localStorage
+  localStorage.setItem('aitutor_rooms', JSON.stringify(currentRooms));
+
+  // Update local variable too
+  rooms = currentRooms;
+
+  renderRooms();
+
+  // Clear localStorage for this room's data
+  const roomKey = `room_${room.replace(/\s+/g, '_')}`;
+  localStorage.removeItem(roomKey);
+  localStorage.removeItem(roomKey + '_creator');
+  localStorage.removeItem(roomKey + '_members');
 };
 
-export function initRouter() {
+// Global: room seçimi (artık çalışıyor)
+let currentRoom = null;
+
+window.selectRoom = (encoded) => {
+  const room = decodeURIComponent(encoded || "");
+  currentRoom = room;
+
+  // Open group chat view
+  window.openTool('group');
+
+  // Update title
+  const toolTitle = document.getElementById('tool-title');
+  if (toolTitle) toolTitle.textContent = `🏠 ${room}`;
+
+  // Load room messages from localStorage
+  const roomKey = `room_${room.replace(/\s+/g, '_')}`;
+  const roomMessages = JSON.parse(localStorage.getItem(roomKey) || '[]');
+
+  // Get current user
+  const currentUserStr = localStorage.getItem('aitutor_current_user');
+  const currentUser = currentUserStr ? JSON.parse(currentUserStr) : { email: 'user@example.com' };
+
+  // Display room messages
+  const chatWindow = document.getElementById('chat-window');
+  if (chatWindow) {
+    chatWindow.innerHTML = '';
+
+    if (roomMessages.length === 0) {
+      const welcomeDiv = document.createElement('div');
+      welcomeDiv.className = 'message ai-msg';
+      welcomeDiv.innerHTML = `
+        <div class="msg-avatar"><i class="fa-solid fa-users"></i></div>
+        <div class="msg-bubble">Welcome to ${room}! Start chatting with your group members.</div>
+      `;
+      chatWindow.appendChild(welcomeDiv);
+    } else {
+      roomMessages.forEach(msg => {
+        const isCurrentUser = msg.senderEmail?.toLowerCase() === currentUser.email?.toLowerCase();
+        const senderName = msg.senderName || msg.senderEmail?.split('@')[0] || 'User';
+        const timestamp = msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString() : '';
+
+        const div = document.createElement('div');
+        div.className = `message ${isCurrentUser ? 'user-msg' : 'ai-msg'}`;
+        div.innerHTML = `
+          <div class="msg-avatar" style="${!isCurrentUser ? 'background:var(--color-secondary);' : ''}">
+            <i class="fa-solid fa-user"></i>
+          </div>
+          <div class="msg-bubble">
+            <div style="font-size:0.75rem; color:var(--color-text-muted); margin-bottom:4px;">
+              <strong>${senderName}${isCurrentUser ? ' (You)' : ''}</strong>${timestamp ? ' • ' + timestamp : ''}
+            </div>
+            ${msg.content}
+          </div>
+        `;
+        chatWindow.appendChild(div);
+      });
+    }
+
+    // Scroll to bottom
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+  }
+};
+
+// === Workspace Tabs ===
+function initWorkspaceTabs() {
+  const tabs = document.querySelectorAll('.ws-tab[data-tab]');
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      const tabName = tab.dataset.tab;
+      showTabPanel(tabName);
+    });
+  });
+}
+
+function showTabPanel(tabName) {
+  // Hide all tab panels
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
+
+  // Show selected panel
+  const panel = document.getElementById(`panel-${tabName}`);
+  if (panel) panel.classList.remove('hidden');
+
+  // Update active tab state
+  document.querySelectorAll('.ws-tab[data-tab]').forEach(t => t.classList.remove('active'));
+  const activeTab = document.querySelector(`.ws-tab[data-tab="${tabName}"]`);
+  if (activeTab) activeTab.classList.add('active');
+}
+
+// === Mobile Sidebar ===
+function initMobileSidebar() {
+  const menuBtn = $('mobile-menu-btn');
+  const overlay = $('sidebar-overlay');
+
+  if (menuBtn) {
+    menuBtn.addEventListener('click', toggleMobileSidebar);
+  }
+
+  if (overlay) {
+    overlay.addEventListener('click', closeMobileSidebar);
+  }
+
+  // Close on ESC key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeMobileSidebar();
+  });
+}
+
+function toggleMobileSidebar() {
+  const sidebar = $('sidebar');
+  const overlay = $('sidebar-overlay');
+
+  sidebar?.classList.toggle('open');
+  overlay?.classList.toggle('open');
+  overlay?.setAttribute('aria-hidden', !sidebar?.classList.contains('open'));
+}
+
+function closeMobileSidebar() {
+  $('sidebar')?.classList.remove('open');
+  $('sidebar-overlay')?.classList.remove('open');
+  $('sidebar-overlay')?.setAttribute('aria-hidden', 'true');
+}
+
+export async function initRouter() {
+  // Hide all views initially to avoid flicker
+  hideAllViews();
+
   initChatUI();
 
   // İlk render
   renderRooms();
 
+  // === Workspace Tabs ===
+  initWorkspaceTabs();
+
+  // === Mobile Sidebar Toggle ===
+  initMobileSidebar();
+
   window.showLanding = (addHistory = true) => {
     document.body.classList.add("public");
     document.body.classList.remove("no-sidebar");
+    closeMobileSidebar(); // Close mobile sidebar when navigating
     showView("landing-view");
 
     // dropdown/rooms kapat
@@ -95,6 +245,9 @@ export function initRouter() {
   };
 
   window.showAuth = (tab = "login", addHistory = true) => {
+    document.body.classList.add("public");
+    document.body.classList.remove("no-sidebar");
+    closeMobileSidebar();
     showView("auth-view");
     setAuthTab(tab);
 
@@ -160,11 +313,53 @@ export function initRouter() {
     }
 
     rooms.unshift(clean);
+
+    // Save rooms to localStorage
+    localStorage.setItem('aitutor_rooms', JSON.stringify(rooms));
+
+    // Get current user and set as room creator and first member
+    const currentUserStr = localStorage.getItem('aitutor_current_user');
+    const currentUser = currentUserStr ? JSON.parse(currentUserStr) : { email: 'demo@example.com' };
+
+    const roomKey = `room_${clean.replace(/\s+/g, '_')}`;
+    localStorage.setItem(roomKey + '_creator', currentUser.email);
+    localStorage.setItem(roomKey + '_members', JSON.stringify([currentUser.email]));
+
     renderRooms();
   };
 
+  // Update menu visibility based on role
+  function updateMenuForRole(role) {
+    const studentOnlyTools = ['interview', 'translate', 'grammar', 'tutor'];
+
+    studentOnlyTools.forEach(tool => {
+      const link = document.querySelector(`.menu-link[data-link="${tool}"]`);
+      if (link) {
+        if (role === 'teacher') {
+          link.style.display = 'none';
+        } else {
+          link.style.display = '';
+        }
+      }
+    });
+
+    // Update level test for teachers
+    if (role === 'teacher') {
+      updateLevelTestForTeacher();
+    }
+  }
+
+  // Make level test view-only for teachers
+  function updateLevelTestForTeacher() {
+    window.isTeacher = true;
+    // Render teacher view when they navigate to level test
+    if (typeof window.renderTeacherLevelView === 'function') {
+      window.renderTeacherLevelView();
+    }
+  }
+
   // Preview: backend olmadan UI görmek için
-  window.previewUI = (role) => {
+  window.previewUI = (role, addHistory = true) => {
     document.body.classList.remove("public");
 
     if (role === "admin") document.body.classList.add("no-sidebar");
@@ -178,6 +373,12 @@ export function initRouter() {
     $("profile-role") && ($("profile-role").textContent = role);
     $("profile-avatar") && ($("profile-avatar").textContent = avatar);
 
+    // Update current user for group chat
+    localStorage.setItem('aitutor_current_user', JSON.stringify({ email: `${role}@example.com`, name, role }));
+
+    // Update menu based on role
+    updateMenuForRole(role);
+
     if (role === "admin") {
       showView("admin-view");
     } else {
@@ -186,8 +387,9 @@ export function initRouter() {
       setActiveMenu("chat");
     }
 
-    const rightPanel = $("ws-right-panel");
-    if (rightPanel) rightPanel.style.display = role === "teacher" ? "block" : "none";
+    if (addHistory) {
+      history.pushState({ view: "preview", role }, "", "#preview-" + role);
+    }
   };
 
   // Role aware dashboard (session varsa)
@@ -197,11 +399,18 @@ export function initRouter() {
     const session = await getSession();
     const role = session?.user?.user_metadata?.role || "student";
     const name = session?.user?.user_metadata?.full_name || "User";
+    const email = session?.user?.email || "user@example.com";
 
     const avatar = (name?.[0] || "U").toUpperCase();
     $("profile-name") && ($("profile-name").textContent = name);
     $("profile-role") && ($("profile-role").textContent = role);
     $("profile-avatar") && ($("profile-avatar").textContent = avatar);
+
+    // Save current user for group chat functionality
+    localStorage.setItem('aitutor_current_user', JSON.stringify({ email, name, role }));
+
+    // Update menu based on role
+    updateMenuForRole(role);
 
     if (role === "admin") {
       document.body.classList.add("no-sidebar");
@@ -225,6 +434,13 @@ export function initRouter() {
     showView("workspace-view");
     setTool(tool);
     setActiveMenu(tool);
+
+    // Special handling for level test
+    if (tool === 'level') {
+      showTabPanel('level');
+    } else {
+      showTabPanel('chat');
+    }
 
     if (addHistory) {
       history.pushState({ tool }, "", "#" + tool);
@@ -278,6 +494,12 @@ export function initRouter() {
     const errorEl = $("auth-error");
     errorEl?.classList.add("hidden");
 
+    if (pass.length < 6) {
+      errorEl.textContent = "Password must be at least 6 characters.";
+      errorEl?.classList.remove("hidden");
+      return;
+    }
+
     if (pass !== confirm) {
       errorEl.textContent = "Passwords do not match.";
       errorEl?.classList.remove("hidden");
@@ -323,6 +545,14 @@ export function initRouter() {
   window.addEventListener("popstate", (e) => {
     const state = e.state || {};
 
+    // Kök landing state'ine geri dönüldüyse, tekrar landing'e al ve
+    // kullanıcıyı tarayıcı geçmişindeki önceki siteye çıkarmadan içeride tut.
+    if (state.view === "landing-root") {
+      window.showLanding(false);
+      history.pushState({ view: "landing" }, "", "#landing");
+      return;
+    }
+
     if (state.tool && state.tool !== "landing") {
       // Araç görünümü arasında geri/ileri
       window.openTool(state.tool, null, false);
@@ -339,6 +569,12 @@ export function initRouter() {
       return;
     }
 
+    if (state.view === "preview") {
+      // Preview Teacher/Student/Admin geri dönüşü
+      window.previewUI(state.role || "student", false);
+      return;
+    }
+
     if (state.view === "admin") {
       // Admin görünümüne basit dönüş (yeni session almadan)
       document.body.classList.remove("public");
@@ -351,9 +587,27 @@ export function initRouter() {
     window.showLanding(false);
   });
 
-  // Başlangıç state: landing
+  // Başlangıç state: landing-root + landing
+  // Amaç: back tuşuyla tarayıcı geçmişindeki önceki siteye çıkmayı engellemek
   if (!history.state) {
-    history.replaceState({ view: "landing" }, "", "#landing");
+    // Kök state (asla uygulama dışına çıkmayalım)
+    history.replaceState({ view: "landing-root" }, "", "#landing");
+    // Gerçek landing görünümü
+    history.pushState({ view: "landing" }, "", "#landing");
   }
-  window.showLanding(false);
+
+  // Check if user is already logged in
+  try {
+    const session = await getSession();
+    if (session?.user) {
+      // User is logged in, show dashboard
+      await window.showDashboard(false);
+    } else {
+      // No session, show landing
+      window.showLanding(false);
+    }
+  } catch (err) {
+    console.error('Session check error:', err);
+    window.showLanding(false);
+  }
 }

@@ -14,9 +14,9 @@ export default async (request, context) => {
   }
 
   if (request.method !== "POST") {
-    return new Response(JSON.stringify({ error: "Method Not Allowed" }), { 
-      status: 405, 
-      headers 
+    return new Response(JSON.stringify({ error: "Method Not Allowed" }), {
+      status: 405,
+      headers
     });
   }
 
@@ -39,7 +39,9 @@ export default async (request, context) => {
       chat: "You are a friendly English conversation partner. Keep replies concise and encouraging. Help improve fluency naturally.",
       interview: "You are a professional interviewer. Ask one relevant question at a time based on the candidate's field. Give constructive feedback.",
       grammar: "You are a grammar expert. Correct the user's text, explain mistakes clearly, and provide the corrected version.",
-      tutor: "You are an English language tutor. Explain grammar rules, vocabulary, and concepts clearly with practical examples."
+      tutor: "You are an English language tutor. Explain grammar rules, vocabulary, and concepts clearly with practical examples.",
+      translate: "You are a professional translator. Translate the user's text between Turkish and English. If the input is in Turkish, translate to English. If the input is in English, translate to Turkish. Provide ONLY the translation, nothing else. After the translation, briefly explain any idioms or cultural nuances if relevant.",
+      level: "You are an English proficiency assessor. Help evaluate the user's English level based on their responses."
     };
 
     const systemPrompt = systemPrompts[toolMode] || systemPrompts.chat;
@@ -66,7 +68,7 @@ export default async (request, context) => {
 
     if (!openaiResponse.ok) {
       console.error("OpenAI Error:", data);
-      return new Response(JSON.stringify({ 
+      return new Response(JSON.stringify({
         error: data.error?.message || "OpenAI API error",
         details: data
       }), {
@@ -77,7 +79,7 @@ export default async (request, context) => {
 
     // Extract response text
     const text = data.choices?.[0]?.message?.content || "Sorry, I couldn't generate a response.";
-    
+
     return new Response(JSON.stringify({ text }), {
       status: 200,
       headers
@@ -85,7 +87,7 @@ export default async (request, context) => {
 
   } catch (error) {
     console.error("Function Error:", error);
-    return new Response(JSON.stringify({ 
+    return new Response(JSON.stringify({
       error: "Internal server error",
       message: error.message
     }), {

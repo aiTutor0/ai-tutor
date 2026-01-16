@@ -11,10 +11,28 @@ export function initTheme() {
   const savedTheme = localStorage.getItem(THEME_KEY) || 'light';
   applyTheme(savedTheme);
 
-  // Set up theme toggle button
+  // Set up theme toggle button (workspace view)
   const toggleBtn = document.getElementById('theme-toggle');
   if (toggleBtn) {
     toggleBtn.addEventListener('click', toggleTheme);
+  }
+
+  // Set up theme toggle button (landing page)
+  const toggleBtnLanding = document.getElementById('theme-toggle-landing');
+  if (toggleBtnLanding) {
+    toggleBtnLanding.addEventListener('click', toggleTheme);
+  }
+
+  // Set up theme toggle button (auth page)
+  const toggleBtnAuth = document.getElementById('theme-toggle-auth');
+  if (toggleBtnAuth) {
+    toggleBtnAuth.addEventListener('click', toggleTheme);
+  }
+
+  // Set up theme toggle button (admin panel)
+  const toggleBtnAdmin = document.getElementById('theme-toggle-admin');
+  if (toggleBtnAdmin) {
+    toggleBtnAdmin.addEventListener('click', toggleTheme);
   }
 }
 

@@ -3,7 +3,7 @@ services:
   aitutor:
     build: .
     ports:
-      - "3001:3000"
+      - "3000:3000"
     environment:
       - OPENAI_API_KEY=${OPENAI_API_KEY:-}
       - OPENAI_MODEL=${OPENAI_MODEL:-gpt-4o-mini}

@@ -4,10 +4,12 @@ import { OPENAI_PROXY_URL, OPENAI_MODEL } from "../config/env.js";
 // Suggested usage: Call via OPENAI_PROXY_URL (Netlify Function).
 // Because it is not safe to put the OpenAI API key in the browser.
 // (OpenAI docs: API key secret, don't put it on client-side.)
-export async function callOpenAI({ toolMode, userText }) {
+export async function callOpenAI({ toolMode, userText, images = [], messages = [] }) {
   const payload = {
     toolMode,
     userText,
+    images, // Pass images to backend
+    messages, // Pass conversation history to backend
     model: OPENAI_MODEL
   };
 
