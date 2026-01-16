@@ -17,7 +17,7 @@
 
 ### 🎓 For Students
 
-- 💬 **Free Conversation** | Practice daily speaking and fluency with AI
+- 💬 **Free Conversation** | Practice daily speaking and be fluent with AI
 - 👔 **Mock Interview** | Prepare for job interviews with realistic AI simulations
 - ✏️ **Grammar Fixer** | Get instant corrections with explanations
 - 👨‍🏫 **Topic Explainer** | Learn grammar rules with clear examples
