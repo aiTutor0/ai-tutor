@@ -176,7 +176,7 @@ Full dark theme support across all pages with smooth transitions.
 
 ### 📊 Level Test
 - 10 multiple-choice questions
-- CEFR level assessment (A1-C2)
+- CEFR level assessment (A1-C1)
 - Progress tracking
 
 ---
