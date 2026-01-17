@@ -284,9 +284,13 @@ export async function getAllLevelTestResults() {
         console.log('🏠 [Level Test] Teacher is in rooms:', teacherRooms.map(r => r.room_id));
 
         if (teacherRooms.length === 0) {
-            console.log('⚠️ [Level Test] Teacher not in any rooms');
+            // Debug: show all unique emails in room_members so we can see what's there
+            const allEmails = [...new Set(allRoomMembers?.map(m => m.member_email) || [])];
+            console.log('⚠️ [Level Test] Teacher not in any rooms. Looking for:', currentEmail);
+            console.log('📧 [Level Test] All emails in room_members table:', allEmails);
             return { data: [], error: null };
         }
+
 
         const roomIds = teacherRooms.map(r => r.room_id);
 
