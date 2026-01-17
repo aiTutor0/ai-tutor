@@ -80,25 +80,24 @@ async function renderAllUsers() {
     // Show loading
     list.innerHTML = `<div class="admin-row"><div style="grid-column:1/-1; text-align:center; padding:20px; color:var(--color-text-muted);"><i class="fa-solid fa-spinner fa-spin"></i> Loading users...</div></div>`;
 
-    // Try to fetch from Supabase
+    // Try to fetch from Supabase using local client
     let users = [];
     try {
-        const { createClient } = await import('https://esm.sh/@supabase/supabase-js@2');
-        const SUPABASE_URL = 'https://ywnfcilnpgmqjpjxoxxb.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl3bmZjaWxucGdtcWpwanhveHhiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzM4NTE4NDIsImV4cCI6MjA0OTQyNzg0Mn0.r7oSPBl55O7w0aoMdA76O5Mw_W1gch-_acdUq8kNyL0';
-        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const { supabase } = await import('../config/supabaseClient.js');
 
-        const { data, error } = await supabase
-            .from('profiles')
-            .select('id, email, full_name, role, updated_at');
+        if (supabase) {
+            const { data, error } = await supabase
+                .from('profiles')
+                .select('id, email, full_name, role, updated_at');
 
-        if (!error && data) {
-            users = data.map(p => ({
-                email: p.email,
-                name: p.full_name || p.email?.split('@')[0] || 'Unknown',
-                role: p.role || 'student',
-                lastActive: p.updated_at ? new Date(p.updated_at).getTime() : null
-            }));
+            if (!error && data) {
+                users = data.map(p => ({
+                    email: p.email,
+                    name: p.full_name || p.email?.split('@')[0] || 'Unknown',
+                    role: p.role || 'student',
+                    lastActive: p.updated_at ? new Date(p.updated_at).getTime() : null
+                }));
+            }
         }
     } catch (err) {
         console.log('Supabase fetch failed, falling back to localStorage:', err);
@@ -169,24 +168,23 @@ async function populateUserSelect() {
 
     select.innerHTML = '<option value="">Loading users...</option>';
 
-    // Try to fetch from Supabase
+    // Try to fetch from Supabase using local client
     let users = [];
     try {
-        const { createClient } = await import('https://esm.sh/@supabase/supabase-js@2');
-        const SUPABASE_URL = 'https://ywnfcilnpgmqjpjxoxxb.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl3bmZjaWxucGdtcWpwanhveHhiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzM4NTE4NDIsImV4cCI6MjA0OTQyNzg0Mn0.r7oSPBl55O7w0aoMdA76O5Mw_W1gch-_acdUq8kNyL0';
-        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const { supabase } = await import('../config/supabaseClient.js');
 
-        const { data, error } = await supabase
-            .from('profiles')
-            .select('email, full_name, role');
+        if (supabase) {
+            const { data, error } = await supabase
+                .from('profiles')
+                .select('email, full_name, role');
 
-        if (!error && data) {
-            users = data.map(p => ({
-                email: p.email,
-                name: p.full_name || p.email?.split('@')[0] || 'Unknown',
-                role: p.role || 'student'
-            }));
+            if (!error && data) {
+                users = data.map(p => ({
+                    email: p.email,
+                    name: p.full_name || p.email?.split('@')[0] || 'Unknown',
+                    role: p.role || 'student'
+                }));
+            }
         }
     } catch (err) {
         console.log('Supabase fetch failed, falling back to localStorage:', err);
@@ -206,6 +204,7 @@ async function populateUserSelect() {
         select.appendChild(option);
     });
 }
+
 
 
 // Load and display user's chat history
