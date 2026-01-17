@@ -317,7 +317,7 @@ function showResults() {
   const score = correctAnswers.length;
   const result = calculateLevel(correctAnswers);
 
-  // Save result
+  // Save result to localStorage
   const resultData = {
     id: Date.now(),
     level: result.level,
@@ -327,6 +327,22 @@ function showResults() {
     answers: currentQuizState.answers
   };
   saveLevelResult(resultData);
+
+  // Save to Supabase for teacher visibility
+  try {
+    import('../services/chatService.js').then(({ saveLevelTestResult }) => {
+      saveLevelTestResult(result.level, result.description, score, currentQuizState.answers)
+        .then(response => {
+          if (response.error) {
+            console.log('Supabase save failed:', response.error);
+          } else {
+            console.log('✅ Level test saved to Supabase');
+          }
+        });
+    });
+  } catch (err) {
+    console.log('Could not save to Supabase:', err);
+  }
 
   // Notify teacher (simulated)
   console.log('📊 Teacher Notification - Level Test Result:', resultData);

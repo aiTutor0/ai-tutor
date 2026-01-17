@@ -680,21 +680,24 @@ export async function sendMessage() {
     const isLocal = window.currentGroupRoomIsLocal;
     const roomKey = `room_${roomName.replace(/\s+/g, '_')}`;
 
-    // Build message object
+    // Build message object with all attachments
     const newMessage = {
       role: 'user',
       senderEmail: currentUser.email,
       senderName: currentUser.name || currentUser.email.split('@')[0],
       content: text,
-      attachments: images,
-      textFiles: textFiles.map(f => ({ name: f.name, content: f.content })),
+      attachments: allAttachments, // Include both images and text files
+      sender_email: currentUser.email,
+      sender_name: currentUser.name || currentUser.email.split('@')[0],
+      created_at: new Date().toISOString(),
+      id: Date.now(),
       timestamp: Date.now()
     };
 
     // Save to Supabase if available, otherwise localStorage
     if (typeof window.sendGroupMessage === 'function' && roomId && !isLocal) {
-      // Use Supabase - pass images as attachments
-      window.sendGroupMessage(roomId, text, images);
+      // Use Supabase - pass all attachments (images + text files)
+      window.sendGroupMessage(roomId, text, allAttachments);
     } else {
       // Fallback to localStorage
       const roomMessages = JSON.parse(localStorage.getItem(roomKey) || '[]');
