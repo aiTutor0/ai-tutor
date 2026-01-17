@@ -262,34 +262,49 @@ export async function getAllLevelTestResults() {
         const currentEmail = user.email?.toLowerCase();
         if (!currentEmail) return { data: [], error: { message: "No email found" } };
 
-        // Step 1: Find all rooms where the teacher is a member (case-insensitive)
-        const { data: teacherRooms, error: roomError } = await supabase
-            .from('room_members')
-            .select('room_id')
-            .ilike('member_email', currentEmail);
+        console.log('🔍 [Level Test] Fetching results for teacher:', currentEmail);
 
-        if (roomError || !teacherRooms || teacherRooms.length === 0) {
-            // Teacher is not in any rooms, return empty
+        // Step 1: Get ALL room members and filter manually for case-insensitive matching
+        const { data: allRoomMembers, error: roomError } = await supabase
+            .from('room_members')
+            .select('room_id, member_email');
+
+        if (roomError) {
+            console.error('❌ [Level Test] room_members error:', roomError);
+            return { data: [], error: roomError };
+        }
+
+        console.log('📋 [Level Test] All room_members:', allRoomMembers?.length || 0);
+
+        // Find rooms where teacher is a member (case-insensitive)
+        const teacherRooms = allRoomMembers?.filter(m =>
+            m.member_email?.toLowerCase() === currentEmail
+        ) || [];
+
+        console.log('🏠 [Level Test] Teacher is in rooms:', teacherRooms.map(r => r.room_id));
+
+        if (teacherRooms.length === 0) {
+            console.log('⚠️ [Level Test] Teacher not in any rooms');
             return { data: [], error: null };
         }
 
         const roomIds = teacherRooms.map(r => r.room_id);
 
-        // Step 2: Get all members of those rooms
-        const { data: roomMembers, error: membersError } = await supabase
-            .from('room_members')
-            .select('member_email')
-            .in('room_id', roomIds)
-            .neq('member_email', currentEmail); // Exclude the teacher themselves
+        // Step 2: Get all members of those rooms (excluding teacher)
+        const roomMembers = allRoomMembers?.filter(m =>
+            roomIds.includes(m.room_id) &&
+            m.member_email?.toLowerCase() !== currentEmail
+        ) || [];
 
-        if (membersError || !roomMembers) {
-            return { data: [], error: null };
-        }
+        console.log('👥 [Level Test] Other members in teacher rooms:', roomMembers.map(m => m.member_email));
 
         // Get unique student emails
-        const studentEmails = [...new Set(roomMembers.map(m => m.member_email.toLowerCase()))];
+        const studentEmails = [...new Set(roomMembers.map(m => m.member_email?.toLowerCase()).filter(Boolean))];
+
+        console.log('📧 [Level Test] Unique student emails:', studentEmails);
 
         if (studentEmails.length === 0) {
+            console.log('⚠️ [Level Test] No other members in teacher rooms');
             return { data: [], error: null };
         }
 
@@ -298,16 +313,22 @@ export async function getAllLevelTestResults() {
             .from('profiles')
             .select('id, email, full_name');
 
-        if (profilesError || !allProfiles) {
-            return { data: [], error: null };
+        if (profilesError) {
+            console.error('❌ [Level Test] profiles error:', profilesError);
+            return { data: [], error: profilesError };
         }
 
+        console.log('👤 [Level Test] All profiles:', allProfiles?.length || 0);
+
         // Filter profiles by matching emails (case-insensitive)
-        const profiles = allProfiles.filter(p =>
+        const profiles = allProfiles?.filter(p =>
             p.email && studentEmails.includes(p.email.toLowerCase())
-        );
+        ) || [];
+
+        console.log('✅ [Level Test] Matching student profiles:', profiles.map(p => ({ email: p.email, id: p.id })));
 
         if (profiles.length === 0) {
+            console.log('⚠️ [Level Test] No matching profiles found for student emails');
             return { data: [], error: null };
         }
 
@@ -327,8 +348,11 @@ export async function getAllLevelTestResults() {
             .order('created_at', { ascending: false });
 
         if (error) {
+            console.error('❌ [Level Test] level_test_results error:', error);
             return { data: [], error };
         }
+
+        console.log('📊 [Level Test] Level test results found:', data?.length || 0);
 
         // Add profile info to results
         const resultsWithProfiles = (data || []).map(r => ({
@@ -336,12 +360,15 @@ export async function getAllLevelTestResults() {
             profiles: profileMap[r.user_id] || { email: 'Unknown', full_name: 'Student' }
         }));
 
+        console.log('✅ [Level Test] Final results with profiles:', resultsWithProfiles.length);
+
         return { data: resultsWithProfiles, error: null };
     } catch (err) {
-        console.error('Error fetching level test results:', err);
+        console.error('❌ [Level Test] Error fetching level test results:', err);
         return { data: [], error: { message: err.message } };
     }
 }
+
 
 
 // ======================================
