@@ -75,12 +75,18 @@ function renderSentItems() {
   const currentUserEmail = currentUserStr ? JSON.parse(currentUserStr)?.email?.toLowerCase() : null;
 
   if (isGroupRoom && currentRoomName) {
-    // For group chat: Get messages from the room data (shared across all users)
+    // For group chat: Get messages from the room data - only show files (with attachments)
     const roomKey = `room_${currentRoomName.replace(/\s+/g, '_')}`;
     const roomMessages = JSON.parse(localStorage.getItem(roomKey) || '[]');
 
+    // Filter to only show messages that have attachments (photos or text files)
+    const messagesWithFiles = roomMessages.filter(msg => {
+      const attachments = msg.attachments || [];
+      return attachments.length > 0;
+    });
+
     // Convert room messages to sent item format
-    items = roomMessages.map(msg => ({
+    items = messagesWithFiles.map(msg => ({
       content: msg.content || '',
       attachments: msg.attachments || [],
       mode: 'group',
