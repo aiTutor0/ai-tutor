@@ -160,12 +160,42 @@ window.startLevelTest = function () {
   renderQuestion();
 };
 
-// Render teacher view - shows all student results
-function renderTeacherLevelView() {
+// Render teacher view - shows all student results from Supabase
+async function renderTeacherLevelView() {
   const container = document.getElementById('level-test-area');
   if (!container) return;
 
-  const results = getLevelResults();
+  // Show loading state
+  container.innerHTML = `
+    <div style="background:var(--color-card-bg); border:1px solid var(--color-border); border-radius:16px; padding:24px;">
+      <div style="text-align:center; padding:40px; color:var(--color-text-muted);">
+        <i class="fa-solid fa-spinner fa-spin" style="font-size:2rem; margin-bottom:12px;"></i>
+        <p>Loading student results...</p>
+      </div>
+    </div>
+  `;
+
+  // Try to get results from Supabase
+  let results = [];
+  try {
+    const { getAllLevelTestResults } = await import('../services/chatService.js');
+    const { data, error } = await getAllLevelTestResults();
+    if (!error && data && data.length > 0) {
+      results = data.map(r => ({
+        ...r,
+        studentEmail: r.profiles?.email || 'Unknown',
+        studentName: r.profiles?.full_name || r.profiles?.email?.split('@')[0] || 'Student',
+        date: r.created_at
+      }));
+    }
+  } catch (err) {
+    console.log('Supabase fetch failed, falling back to localStorage:', err);
+  }
+
+  // Fallback to localStorage if no Supabase results
+  if (results.length === 0) {
+    results = getLevelResults();
+  }
 
   container.innerHTML = `
     <div style="background:var(--color-card-bg); border:1px solid var(--color-border); border-radius:16px; padding:24px;">
@@ -191,9 +221,10 @@ function renderTeacherLevelView() {
                   ${r.level}
                 </div>
                 <div>
-                  <div style="font-weight:600;">${r.description}</div>
+                  <div style="font-weight:600;">${r.studentName || r.description || 'Student'}</div>
                   <div style="font-size:0.85rem; color:var(--color-text-muted);">
-                    Score: ${r.score}/10 • ${new Date(r.date).toLocaleDateString()} ${new Date(r.date).toLocaleTimeString()}
+                    ${r.studentEmail ? `<i class="fa-solid fa-envelope"></i> ${r.studentEmail} • ` : ''}
+                    Score: ${r.score}/10 • ${new Date(r.date || r.created_at).toLocaleDateString()} ${new Date(r.date || r.created_at).toLocaleTimeString()}
                   </div>
                 </div>
               </div>

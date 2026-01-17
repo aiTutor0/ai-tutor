@@ -248,6 +248,36 @@ export async function getLevelTestResults() {
     return { data: data || [], error };
 }
 
+/**
+ * Get all level test results (for teachers) - includes student info
+ */
+export async function getAllLevelTestResults() {
+    if (!supabase) return { data: [], error: null };
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return { data: [], error: { message: "Not authenticated" } };
+
+    // Check if user is teacher
+    const role = user.user_metadata?.role;
+    if (role !== 'teacher') {
+        return { data: [], error: { message: "Only teachers can view all results" } };
+    }
+
+    // Get all level test results with user info
+    const { data, error } = await supabase
+        .from('level_test_results')
+        .select(`
+            *,
+            profiles:user_id (
+                email,
+                full_name
+            )
+        `)
+        .order('created_at', { ascending: false });
+
+    return { data: data || [], error };
+}
+
 // ======================================
 // SCHEDULED SESSIONS
 // ======================================

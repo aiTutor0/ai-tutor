@@ -1,4 +1,4 @@
-// Group Chat System - Email-based Supabase Integration
+﻿// Group Chat System - Email-based Supabase Integration
 // Works with localStorage auth, stores data in Supabase for cross-user sharing
 import { supabase } from "../config/supabaseClient.js";
 
@@ -214,7 +214,7 @@ async function getRoomMessagesFromSupabase(roomId, isLocal) {
 }
 
 // Send message
-async function sendMessageToSupabase(roomId, content, isLocal) {
+async function sendMessageToSupabase(roomId, content, isLocal, attachments = []) {
   const user = getCurrentUser();
 
   if (isLocal || !supabase) {
@@ -225,6 +225,7 @@ async function sendMessageToSupabase(roomId, content, isLocal) {
       sender_email: user.email,
       sender_name: user.name,
       content: content,
+      attachments: attachments,
       created_at: new Date().toISOString()
     };
     messages.push(msg);
@@ -239,7 +240,8 @@ async function sendMessageToSupabase(roomId, content, isLocal) {
         room_id: roomId,
         sender_email: user.email,
         sender_name: user.name,
-        content: content
+        content: content,
+        attachments: attachments
       }])
       .select()
       .single();
@@ -564,18 +566,60 @@ window.selectGroupRoom = async function (roomId, encodedName, isLocal) {
           const senderEmail = msg.sender_email || msg.senderEmail || '';
           const time = new Date(msg.created_at || msg.timestamp).toLocaleTimeString();
           const isOwnMessage = senderEmail.toLowerCase() === user.email.toLowerCase();
+          const msgId = msg.id;
+
+          // Build attachment HTML
+          let attachmentHTML = '';
+          const attachments = msg.attachments || [];
+          if (attachments.length > 0) {
+            attachmentHTML = attachments.map(att => {
+              if (typeof att === 'string' && att.startsWith('data:image')) {
+                return `<img src="${att}" style="max-width:200px; max-height:150px; border-radius:8px; margin-bottom:8px; display:block;">`;
+              }
+              return '';
+            }).join('');
+          }
+
+          // Edit/Delete buttons for own messages
+          const actionButtons = isOwnMessage ? `
+            <div class="msg-actions" style="display:none; position:absolute; top:4px; right:4px; gap:4px;">
+              <button onclick="editGroupMessage(${msgId}, ${isLocal})" title="Edit" style="background:var(--color-bg-tertiary); border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:0.75rem; color:var(--color-text-primary);">
+                <i class="fa-solid fa-pen"></i>
+              </button>
+              <button onclick="deleteGroupMessage(${msgId}, ${isLocal})" title="Delete" style="background:var(--color-bg-tertiary); border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:0.75rem; color:var(--color-error-text);">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </div>
+          ` : '';
 
           const div = document.createElement('div');
           div.className = isOwnMessage ? 'message user-msg' : 'message ai-msg';
+          div.setAttribute('data-msg-id', msgId);
+          div.style.position = 'relative';
           div.innerHTML = `
             <div class="msg-avatar" style="background:${isOwnMessage ? 'var(--color-accent)' : 'var(--color-secondary)'};"><i class="fa-solid fa-user"></i></div>
             <div class="msg-bubble">
               <div style="font-size:0.75rem; color:${isOwnMessage ? 'rgba(255,255,255,0.85)' : 'var(--color-text-muted)'}; margin-bottom:4px;">
                 <strong>${escapeHtml(sender)}</strong> • ${time}
               </div>
-              ${escapeHtml(msg.content)}
+              ${attachmentHTML}
+              <span class="msg-text">${escapeHtml(msg.content)}</span>
             </div>
+            ${actionButtons}
           `;
+
+          // Show actions on hover for own messages
+          if (isOwnMessage) {
+            div.addEventListener('mouseenter', () => {
+              const actions = div.querySelector('.msg-actions');
+              if (actions) actions.style.display = 'flex';
+            });
+            div.addEventListener('mouseleave', () => {
+              const actions = div.querySelector('.msg-actions');
+              if (actions) actions.style.display = 'none';
+            });
+          }
+
           mw.appendChild(div);
         });
       }
@@ -633,10 +677,25 @@ function subscribeToRoomMessages(roomId) {
             <div style="font-size:0.75rem; color:var(--color-text-muted); margin-bottom:4px;">
               <strong>${escapeHtml(sender)}</strong> • ${time}
             </div>
-            ${escapeHtml(msg.content)}
-          </div>
-        `;
-        mw.appendChild(div);
+            ${attachmentHTML}
+              <span class="msg-text">${escapeHtml(msg.content)}</span>
+            </div>
+            ${actionButtons}
+          `;
+
+          // Show actions on hover for own messages
+          if (isOwnMessage) {
+            div.addEventListener('mouseenter', () => {
+              const actions = div.querySelector('.msg-actions');
+              if (actions) actions.style.display = 'flex';
+            });
+            div.addEventListener('mouseleave', () => {
+              const actions = div.querySelector('.msg-actions');
+              if (actions) actions.style.display = 'none';
+            });
+          }
+
+          mw.appendChild(div);
         mw.scrollTop = mw.scrollHeight;
       }
     })
@@ -794,8 +853,98 @@ window.createRoom = async function (name) {
 };
 
 // Export sendGroupMessage for chatUI.js
-window.sendGroupMessage = async function (roomId, content) {
-  return await sendMessageToSupabase(roomId, content, false);
+window.sendGroupMessage = async function (roomId, content, attachments = []) {
+  return await sendMessageToSupabase(roomId, content, false, attachments);
+};
+
+// Update message in Supabase
+async function updateMessageInSupabase(messageId, newContent, isLocal) {
+  if (isLocal || !supabase) {
+    // For localStorage, update in room messages
+    const roomId = window.currentGroupRoomId;
+    const roomKey = `room_${roomId?.replace(/\s+/g, '_')}`;
+    const messages = JSON.parse(localStorage.getItem(roomKey) || '[]');
+    const msg = messages.find(m => m.id === messageId);
+    if (msg) {
+      msg.content = newContent;
+      msg.edited = true;
+      localStorage.setItem(roomKey, JSON.stringify(messages));
+    }
+    return msg;
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from('room_messages')
+      .update({ content: newContent, edited: true })
+      .eq('id', messageId)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  } catch (err) {
+    console.error('Update message error:', err);
+    return null;
+  }
+}
+
+// Delete message from Supabase
+async function deleteMessageFromSupabase(messageId, isLocal) {
+  if (isLocal || !supabase) {
+    // For localStorage, remove from room messages
+    const roomId = window.currentGroupRoomId;
+    const roomKey = `room_${roomId?.replace(/\s+/g, '_')}`;
+    let messages = JSON.parse(localStorage.getItem(roomKey) || '[]');
+    messages = messages.filter(m => m.id !== messageId);
+    localStorage.setItem(roomKey, JSON.stringify(messages));
+    return true;
+  }
+
+  try {
+    const { error } = await supabase
+      .from('room_messages')
+      .delete()
+      .eq('id', messageId);
+
+    if (error) throw error;
+    return true;
+  } catch (err) {
+    console.error('Delete message error:', err);
+    return false;
+  }
+}
+
+// Edit group message
+window.editGroupMessage = async function (messageId, isLocal) {
+  const msgDiv = document.querySelector(`[data-msg-id="${messageId}"]`);
+  if (!msgDiv) return;
+
+  const textSpan = msgDiv.querySelector('.msg-text');
+  const originalText = textSpan?.textContent || '';
+
+  const newText = prompt('Edit message:', originalText);
+  if (newText === null || newText === originalText) return;
+
+  const result = await updateMessageInSupabase(messageId, newText, isLocal);
+  if (result) {
+    if (textSpan) textSpan.textContent = newText;
+  } else {
+    alert('Failed to update message');
+  }
+};
+
+// Delete group message
+window.deleteGroupMessage = async function (messageId, isLocal) {
+  if (!confirm('Delete this message?')) return;
+
+  const result = await deleteMessageFromSupabase(messageId, isLocal);
+  if (result) {
+    const msgDiv = document.querySelector(`[data-msg-id="${messageId}"]`);
+    if (msgDiv) msgDiv.remove();
+  } else {
+    alert('Failed to delete message');
+  }
 };
 
 // Helper

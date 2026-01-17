@@ -70,17 +70,24 @@ function renderSentItems() {
 
   // Filter items based on current context
   let items;
+  // Get current user email for filtering
+  const currentUserStr = localStorage.getItem('aitutor_current_user');
+  const currentUserEmail = currentUserStr ? JSON.parse(currentUserStr)?.email?.toLowerCase() : null;
+
   if (isGroupRoom && currentRoomName) {
-    // Show only items from this specific room
+    // Show ALL items from this specific room (from all users in the group)
     items = allItems.filter(item => item.mode === 'group' && item.roomName === currentRoomName);
   } else if (currentToolMode === 'group') {
-    // In group mode but no room selected - show all group items
+    // In group mode but no room selected - show all group items for this room
     items = allItems.filter(item => item.mode === 'group');
   } else {
-    // For regular AI chat modes, show items matching current mode or chatId
+    // For regular AI chat modes, show ONLY the current user's messages
     items = allItems.filter(item => {
       // Don't show group items in non-group modes
       if (item.mode === 'group') return false;
+      // For AI chats, only show items from current user
+      const itemUserEmail = item.userEmail?.toLowerCase();
+      if (itemUserEmail && currentUserEmail && itemUserEmail !== currentUserEmail) return false;
       // Show items matching current mode or current chat
       return item.mode === currentToolMode || item.chatId === currentChatId;
     });
@@ -669,8 +676,8 @@ export async function sendMessage() {
 
     // Save to Supabase if available, otherwise localStorage
     if (typeof window.sendGroupMessage === 'function' && roomId && !isLocal) {
-      // Use Supabase
-      window.sendGroupMessage(roomId, text);
+      // Use Supabase - pass images as attachments
+      window.sendGroupMessage(roomId, text, images);
     } else {
       // Fallback to localStorage
       const roomMessages = JSON.parse(localStorage.getItem(roomKey) || '[]');
@@ -734,12 +741,15 @@ export async function sendMessage() {
   // Display all attachments (images and text files) in chat immediately
   addMessage(text, "user", false, allAttachments);
 
-  // Save to sent items for history tracking
+  // Save to sent items for history tracking - include userEmail for filtering
+  const currentUserStr = localStorage.getItem('aitutor_current_user');
+  const currentUser = currentUserStr ? JSON.parse(currentUserStr) : null;
   saveSentItem({
     content: text,
     attachments: allAttachments,
     mode: currentToolMode,
     chatId: currentChatId,
+    userEmail: currentUser?.email || 'unknown',
     timestamp: Date.now()
   });
 
