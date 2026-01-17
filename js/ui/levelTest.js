@@ -1,5 +1,13 @@
 // Level Test - Multiple Choice Quiz System
-const LEVEL_TEST_KEY = 'aitutor_level_results';
+const LEVEL_TEST_KEY_PREFIX = 'aitutor_level_results_';
+
+// Get user-specific storage key
+function getLevelTestKey() {
+  const currentUserStr = localStorage.getItem('aitutor_current_user');
+  const currentUser = currentUserStr ? JSON.parse(currentUserStr) : null;
+  const email = currentUser?.email || 'anonymous';
+  return LEVEL_TEST_KEY_PREFIX + email.toLowerCase().replace(/[^a-z0-9]/g, '_');
+}
 
 const levelQuestions = [
   // A1 Level (2 questions)
@@ -75,27 +83,30 @@ let currentQuizState = {
   inProgress: false
 };
 
-// Get saved results
+// Get saved results for current user only
 function getLevelResults() {
-  const json = localStorage.getItem(LEVEL_TEST_KEY);
+  const key = getLevelTestKey();
+  const json = localStorage.getItem(key);
   return json ? JSON.parse(json) : [];
 }
 
-// Save result
+// Save result for current user
 function saveLevelResult(result) {
+  const key = getLevelTestKey();
   const results = getLevelResults();
   results.unshift(result);
   // Keep only last 10 results
   if (results.length > 10) results.pop();
-  localStorage.setItem(LEVEL_TEST_KEY, JSON.stringify(results));
+  localStorage.setItem(key, JSON.stringify(results));
 }
 
-// Delete result
+// Delete result for current user
 window.deleteLevelResult = function (id) {
   if (!confirm('Delete this result?')) return;
+  const key = getLevelTestKey();
   let results = getLevelResults();
   results = results.filter(r => r.id !== id);
-  localStorage.setItem(LEVEL_TEST_KEY, JSON.stringify(results));
+  localStorage.setItem(key, JSON.stringify(results));
   renderPreviousResults();
 };
 
@@ -160,7 +171,7 @@ window.startLevelTest = function () {
   renderQuestion();
 };
 
-// Render teacher view - shows all student results from Supabase
+// Render teacher view - shows student results from Supabase (only from students in same group rooms)
 async function renderTeacherLevelView() {
   const container = document.getElementById('level-test-area');
   if (!container) return;
@@ -175,12 +186,17 @@ async function renderTeacherLevelView() {
     </div>
   `;
 
-  // Try to get results from Supabase
+  // Get results from Supabase only (filtered by group room membership)
   let results = [];
+  let errorMessage = null;
+
   try {
     const { getAllLevelTestResults } = await import('../services/chatService.js');
     const { data, error } = await getAllLevelTestResults();
-    if (!error && data && data.length > 0) {
+
+    if (error) {
+      errorMessage = error.message;
+    } else if (data && data.length > 0) {
       results = data.map(r => ({
         ...r,
         studentEmail: r.profiles?.email || 'Unknown',
@@ -189,13 +205,11 @@ async function renderTeacherLevelView() {
       }));
     }
   } catch (err) {
-    console.log('Supabase fetch failed, falling back to localStorage:', err);
+    console.log('Supabase fetch failed:', err);
+    errorMessage = 'Could not connect to database';
   }
 
-  // Fallback to localStorage if no Supabase results
-  if (results.length === 0) {
-    results = getLevelResults();
-  }
+  // NOTE: No localStorage fallback - teachers should only see results from their group room students
 
   container.innerHTML = `
     <div style="background:var(--color-card-bg); border:1px solid var(--color-border); border-radius:16px; padding:24px;">
@@ -203,14 +217,20 @@ async function renderTeacherLevelView() {
         <i class="fa-solid fa-chart-bar" style="font-size:2rem; color:var(--color-accent);"></i>
         <div>
           <h3 style="margin:0;">Student Level Results</h3>
-          <p class="muted" style="margin:0; font-size:0.9rem;">View all student test results</p>
+          <p class="muted" style="margin:0; font-size:0.9rem;">View test results from students in your group rooms</p>
         </div>
       </div>
       
-      ${results.length === 0 ? `
+      ${errorMessage ? `
+        <div style="text-align:center; padding:40px; color:var(--color-text-muted);">
+          <i class="fa-solid fa-exclamation-triangle" style="font-size:3rem; margin-bottom:12px; color:var(--color-error-text);"></i>
+          <p>${errorMessage}</p>
+        </div>
+      ` : results.length === 0 ? `
         <div style="text-align:center; padding:40px; color:var(--color-text-muted);">
           <i class="fa-solid fa-inbox" style="font-size:3rem; margin-bottom:12px;"></i>
           <p>No student results yet</p>
+          <p style="font-size:0.85rem; margin-top:8px;">You'll see results from students who are in the same group chat rooms as you.</p>
         </div>
       ` : `
         <div style="display:flex; flex-direction:column; gap:12px;">
@@ -240,6 +260,7 @@ async function renderTeacherLevelView() {
     </div>
   `;
 }
+
 
 // Render current question
 function renderQuestion() {

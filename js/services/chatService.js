@@ -249,7 +249,7 @@ export async function getLevelTestResults() {
 }
 
 /**
- * Get all level test results (for teachers) - includes student info
+ * Get all level test results (for teachers) - only from students in same group rooms
  */
 export async function getAllLevelTestResults() {
     if (!supabase) return { data: [], error: null };
@@ -257,21 +257,84 @@ export async function getAllLevelTestResults() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return { data: [], error: { message: "Not authenticated" } };
 
-    // Get all level test results with user info
-    // Note: The teacher check is done in the UI (renderTeacherLevelView)
-    const { data, error } = await supabase
-        .from('level_test_results')
-        .select(`
-            *,
-            profiles:user_id (
-                email,
-                full_name
-            )
-        `)
-        .order('created_at', { ascending: false });
+    try {
+        // Get current user's email
+        const currentEmail = user.email?.toLowerCase();
+        if (!currentEmail) return { data: [], error: { message: "No email found" } };
 
-    return { data: data || [], error };
+        // Step 1: Find all rooms where the teacher is a member
+        const { data: teacherRooms, error: roomError } = await supabase
+            .from('room_members')
+            .select('room_id')
+            .eq('member_email', currentEmail);
+
+        if (roomError || !teacherRooms || teacherRooms.length === 0) {
+            // Teacher is not in any rooms, return empty
+            return { data: [], error: null };
+        }
+
+        const roomIds = teacherRooms.map(r => r.room_id);
+
+        // Step 2: Get all members of those rooms
+        const { data: roomMembers, error: membersError } = await supabase
+            .from('room_members')
+            .select('member_email')
+            .in('room_id', roomIds)
+            .neq('member_email', currentEmail); // Exclude the teacher themselves
+
+        if (membersError || !roomMembers) {
+            return { data: [], error: null };
+        }
+
+        // Get unique student emails
+        const studentEmails = [...new Set(roomMembers.map(m => m.member_email.toLowerCase()))];
+
+        if (studentEmails.length === 0) {
+            return { data: [], error: null };
+        }
+
+        // Step 3: Get profiles for these students to find their user_ids
+        const { data: profiles, error: profilesError } = await supabase
+            .from('profiles')
+            .select('id, email, full_name')
+            .in('email', studentEmails);
+
+        if (profilesError || !profiles || profiles.length === 0) {
+            return { data: [], error: null };
+        }
+
+        const studentUserIds = profiles.map(p => p.id);
+
+        // Create a map for quick lookup
+        const profileMap = {};
+        profiles.forEach(p => {
+            profileMap[p.id] = { email: p.email, full_name: p.full_name };
+        });
+
+        // Step 4: Get level test results only for students in shared rooms
+        const { data, error } = await supabase
+            .from('level_test_results')
+            .select('*')
+            .in('user_id', studentUserIds)
+            .order('created_at', { ascending: false });
+
+        if (error) {
+            return { data: [], error };
+        }
+
+        // Add profile info to results
+        const resultsWithProfiles = (data || []).map(r => ({
+            ...r,
+            profiles: profileMap[r.user_id] || { email: 'Unknown', full_name: 'Student' }
+        }));
+
+        return { data: resultsWithProfiles, error: null };
+    } catch (err) {
+        console.error('Error fetching level test results:', err);
+        return { data: [], error: { message: err.message } };
+    }
 }
+
 
 // ======================================
 // SCHEDULED SESSIONS
