@@ -75,18 +75,12 @@ function renderSentItems() {
   const currentUserEmail = currentUserStr ? JSON.parse(currentUserStr)?.email?.toLowerCase() : null;
 
   if (isGroupRoom && currentRoomName) {
-    // For group chat: Get messages from the room data - only show files (with attachments)
+    // For group chat: Get ALL messages from the room data (not just files)
     const roomKey = `room_${currentRoomName.replace(/\s+/g, '_')}`;
     const roomMessages = JSON.parse(localStorage.getItem(roomKey) || '[]');
 
-    // Filter to only show messages that have attachments (photos or text files)
-    const messagesWithFiles = roomMessages.filter(msg => {
-      const attachments = msg.attachments || [];
-      return attachments.length > 0;
-    });
-
-    // Convert room messages to sent item format
-    items = messagesWithFiles.map(msg => ({
+    // Convert ALL room messages to sent item format
+    items = roomMessages.map(msg => ({
       content: msg.content || '',
       attachments: msg.attachments || [],
       mode: 'group',
@@ -99,15 +93,15 @@ function renderSentItems() {
     // In group mode but no room selected - show user's own group items only
     items = allItems.filter(item => item.mode === 'group' && item.userEmail?.toLowerCase() === currentUserEmail);
   } else {
-    // For regular AI chat modes, show ONLY the current user's messages
+    // For regular AI chat modes, show ONLY messages from the CURRENT CHAT
     items = allItems.filter(item => {
       // Don't show group items in non-group modes
       if (item.mode === 'group') return false;
       // For AI chats, only show items from current user
       const itemUserEmail = item.userEmail?.toLowerCase();
       if (itemUserEmail && currentUserEmail && itemUserEmail !== currentUserEmail) return false;
-      // Show items matching current mode or current chat
-      return item.mode === currentToolMode || item.chatId === currentChatId;
+      // STRICT: Only show items from current chatId
+      return item.chatId === currentChatId;
     });
   }
 
@@ -121,6 +115,9 @@ function renderSentItems() {
     return;
   }
 
+  // Get chat history for looking up chat titles
+  const chatHistory = getHistory();
+
   container.innerHTML = items.map(item => {
     const date = new Date(item.timestamp).toLocaleString();
     const hasAttachments = item.attachments && item.attachments.length > 0;
@@ -131,10 +128,17 @@ function renderSentItems() {
       return `<span style="background:var(--color-bg-tertiary); padding:2px 8px; border-radius:4px; font-size:0.75rem;"><i class="fa-solid fa-file"></i> File</span>`;
     }).join('') : '';
 
-    // Show room name for group items
-    const contextLabel = item.mode === 'group' && item.roomName
-      ? `${item.roomName}`
-      : (item.mode || 'chat');
+    // Show room name for group items, or chat title for AI chats
+    let contextLabel;
+    if (item.mode === 'group' && item.roomName) {
+      contextLabel = item.roomName;
+    } else if (item.chatId) {
+      // Look up the actual chat title from history
+      const chat = chatHistory.find(c => c.id === item.chatId);
+      contextLabel = chat?.title || item.mode || 'chat';
+    } else {
+      contextLabel = item.mode || 'chat';
+    }
 
     // For group chat rooms, show sender name
     const senderInfo = isGroupRoom && item.senderName
@@ -159,6 +163,7 @@ function renderSentItems() {
     `;
   }).join('');
 }
+
 
 // Make renderSentItems globally available
 window.renderSentItems = renderSentItems;

@@ -573,12 +573,24 @@ window.selectGroupRoom = async function (roomId, encodedName, isLocal) {
           const attachments = msg.attachments || [];
           if (attachments.length > 0) {
             attachmentHTML = attachments.map(att => {
+              // Handle text file objects
+              if (typeof att === 'object' && att.type === 'file') {
+                const fileContent = att.content || '';
+                const fileId = 'file-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+                return `<div id="${fileId}" class="file-attachment" style="background:var(--color-bg-tertiary); padding:10px 14px; border-radius:10px; font-size:0.9rem; display:inline-flex; align-items:center; gap:8px; border:1px solid var(--color-border); margin-bottom:8px; cursor:pointer;" onclick="downloadTextFile('${escapeHtml(att.name || 'file.txt')}', '${fileId}')" data-file-content="${btoa(unescape(encodeURIComponent(fileContent)))}">
+                  <i class="fa-solid fa-file-lines" style="color:var(--color-accent); font-size:1.1rem;"></i>
+                  <span style="font-weight:500;">${escapeHtml(att.name || 'File')}</span>
+                  <i class="fa-solid fa-download" style="color:var(--color-text-muted); margin-left:4px; font-size:0.8rem;"></i>
+                </div>`;
+              }
+              // Handle base64 images
               if (typeof att === 'string' && att.startsWith('data:image')) {
                 return `<img src="${att}" style="max-width:200px; max-height:150px; border-radius:8px; margin-bottom:8px; display:block;">`;
               }
               return '';
             }).join('');
           }
+
 
           // Edit/Delete buttons for own messages
           const actionButtons = isOwnMessage ? `
@@ -668,9 +680,33 @@ function subscribeToRoomMessages(roomId) {
         const sender = msg.sender_name || msg.sender_email || 'Unknown';
         const time = new Date(msg.created_at).toLocaleTimeString();
 
+        // Build attachment HTML for both images and text files
+        let attachmentHTML = '';
+        const attachments = msg.attachments || [];
+        if (attachments.length > 0) {
+          attachmentHTML = attachments.map(att => {
+            // Handle text file objects
+            if (typeof att === 'object' && att.type === 'file') {
+              const fileContent = att.content || '';
+              const fileId = 'file-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+              return `<div id="${fileId}" class="file-attachment" style="background:var(--color-bg-tertiary); padding:10px 14px; border-radius:10px; font-size:0.9rem; display:inline-flex; align-items:center; gap:8px; border:1px solid var(--color-border); margin-bottom:8px; cursor:pointer;" onclick="downloadTextFile('${escapeHtml(att.name || 'file.txt')}', '${fileId}')" data-file-content="${btoa(unescape(encodeURIComponent(fileContent)))}">
+                <i class="fa-solid fa-file-lines" style="color:var(--color-accent); font-size:1.1rem;"></i>
+                <span style="font-weight:500;">${escapeHtml(att.name || 'File')}</span>
+                <i class="fa-solid fa-download" style="color:var(--color-text-muted); margin-left:4px; font-size:0.8rem;"></i>
+              </div>`;
+            }
+            // Handle base64 images
+            if (typeof att === 'string' && att.startsWith('data:image')) {
+              return `<img src="${att}" style="max-width:200px; max-height:150px; border-radius:8px; margin-bottom:8px; display:block;">`;
+            }
+            return '';
+          }).join('');
+        }
+
         // Other users' messages appear on the left (ai-msg style)
         const div = document.createElement('div');
         div.className = 'message ai-msg';
+        div.setAttribute('data-msg-id', msg.id);
         div.innerHTML = `
           <div class="msg-avatar" style="background:var(--color-secondary);"><i class="fa-solid fa-user"></i></div>
           <div class="msg-bubble">
@@ -678,29 +714,17 @@ function subscribeToRoomMessages(roomId) {
               <strong>${escapeHtml(sender)}</strong> • ${time}
             </div>
             ${attachmentHTML}
-              <span class="msg-text">${escapeHtml(msg.content)}</span>
-            </div>
-            ${actionButtons}
-          `;
+            <span class="msg-text">${escapeHtml(msg.content)}</span>
+          </div>
+        `;
 
-          // Show actions on hover for own messages
-          if (isOwnMessage) {
-            div.addEventListener('mouseenter', () => {
-              const actions = div.querySelector('.msg-actions');
-              if (actions) actions.style.display = 'flex';
-            });
-            div.addEventListener('mouseleave', () => {
-              const actions = div.querySelector('.msg-actions');
-              if (actions) actions.style.display = 'none';
-            });
-          }
-
-          mw.appendChild(div);
+        mw.appendChild(div);
         mw.scrollTop = mw.scrollHeight;
       }
     })
     .subscribe();
 }
+
 
 // Show room members
 window.showGroupRoomMembers = async function (roomId, encodedName, isLocal) {
