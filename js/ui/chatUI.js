@@ -75,11 +75,23 @@ function renderSentItems() {
   const currentUserEmail = currentUserStr ? JSON.parse(currentUserStr)?.email?.toLowerCase() : null;
 
   if (isGroupRoom && currentRoomName) {
-    // Show ALL items from this specific room (from all users in the group)
-    items = allItems.filter(item => item.mode === 'group' && item.roomName === currentRoomName);
+    // For group chat: Get messages from the room data (shared across all users)
+    const roomKey = `room_${currentRoomName.replace(/\s+/g, '_')}`;
+    const roomMessages = JSON.parse(localStorage.getItem(roomKey) || '[]');
+
+    // Convert room messages to sent item format
+    items = roomMessages.map(msg => ({
+      content: msg.content || '',
+      attachments: msg.attachments || [],
+      mode: 'group',
+      roomName: currentRoomName,
+      userEmail: msg.sender_email || msg.senderEmail,
+      senderName: msg.sender_name || msg.senderName || (msg.sender_email || msg.senderEmail || '').split('@')[0] || 'User',
+      timestamp: msg.created_at || msg.timestamp
+    })).reverse(); // newest first
   } else if (currentToolMode === 'group') {
-    // In group mode but no room selected - show all group items for this room
-    items = allItems.filter(item => item.mode === 'group');
+    // In group mode but no room selected - show user's own group items only
+    items = allItems.filter(item => item.mode === 'group' && item.userEmail?.toLowerCase() === currentUserEmail);
   } else {
     // For regular AI chat modes, show ONLY the current user's messages
     items = allItems.filter(item => {
@@ -118,11 +130,16 @@ function renderSentItems() {
       ? `${item.roomName}`
       : (item.mode || 'chat');
 
+    // For group chat rooms, show sender name
+    const senderInfo = isGroupRoom && item.senderName
+      ? `<span style="font-weight:600; color:var(--color-text-primary);">${escapeHtml(item.senderName)}</span> • `
+      : '';
+
     return `
       <div class="sent-item" style="background:var(--color-bg-tertiary); border:1px solid var(--color-border); border-radius:12px; padding:14px; margin-bottom:10px;">
         <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
           <span style="font-size:0.75rem; color:var(--color-text-muted);">
-            <i class="fa-solid fa-clock"></i> ${date}
+            ${senderInfo}<i class="fa-solid fa-clock"></i> ${date}
           </span>
           <span style="font-size:0.7rem; background:var(--color-accent); color:white; padding:2px 8px; border-radius:10px;">
             ${contextLabel}

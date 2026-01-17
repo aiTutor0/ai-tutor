@@ -257,13 +257,8 @@ export async function getAllLevelTestResults() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return { data: [], error: { message: "Not authenticated" } };
 
-    // Check if user is teacher
-    const role = user.user_metadata?.role;
-    if (role !== 'teacher') {
-        return { data: [], error: { message: "Only teachers can view all results" } };
-    }
-
     // Get all level test results with user info
+    // Note: The teacher check is done in the UI (renderTeacherLevelView)
     const { data, error } = await supabase
         .from('level_test_results')
         .select(`
