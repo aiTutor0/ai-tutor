@@ -264,35 +264,46 @@ export async function getAllLevelTestResults() {
 
         console.log('🔍 [Level Test] Fetching results for teacher:', currentEmail);
 
-        // Step 1: Get ALL room members and filter manually for case-insensitive matching
+        // Step 1a: Get rooms where teacher is a MEMBER
         const { data: allRoomMembers, error: roomError } = await supabase
             .from('room_members')
             .select('room_id, member_email');
 
         if (roomError) {
             console.error('❌ [Level Test] room_members error:', roomError);
-            return { data: [], error: roomError };
         }
 
-        console.log('📋 [Level Test] All room_members:', allRoomMembers?.length || 0);
+        // Step 1b: ALSO get rooms where teacher is the CREATOR
+        const { data: createdRooms, error: creatorError } = await supabase
+            .from('group_rooms')
+            .select('id, creator_email');
+
+        if (creatorError) {
+            console.error('❌ [Level Test] group_rooms error:', creatorError);
+        }
 
         // Find rooms where teacher is a member (case-insensitive)
-        const teacherRooms = allRoomMembers?.filter(m =>
-            m.member_email?.toLowerCase() === currentEmail
-        ) || [];
+        const memberRoomIds = (allRoomMembers || [])
+            .filter(m => m.member_email?.toLowerCase() === currentEmail)
+            .map(r => r.room_id);
 
-        console.log('🏠 [Level Test] Teacher is in rooms:', teacherRooms.map(r => r.room_id));
+        // Find rooms where teacher is the creator (case-insensitive)
+        const creatorRoomIds = (createdRooms || [])
+            .filter(r => r.creator_email?.toLowerCase() === currentEmail)
+            .map(r => r.id);
 
-        if (teacherRooms.length === 0) {
-            // Debug: show all unique emails in room_members so we can see what's there
-            const allEmails = [...new Set(allRoomMembers?.map(m => m.member_email) || [])];
-            console.log('⚠️ [Level Test] Teacher not in any rooms. Looking for:', currentEmail);
-            console.log('📧 [Level Test] All emails in room_members table:', allEmails);
+        // Combine both: teacher's rooms = rooms they created OR are member of
+        const allTeacherRoomIds = [...new Set([...memberRoomIds, ...creatorRoomIds])];
+
+        console.log('🏠 [Level Test] Teacher rooms (member):', memberRoomIds.length, '(creator):', creatorRoomIds.length, '(total unique):', allTeacherRoomIds.length);
+
+        if (allTeacherRoomIds.length === 0) {
+            console.log('⚠️ [Level Test] Teacher not in any rooms');
             return { data: [], error: null };
         }
 
+        const roomIds = allTeacherRoomIds;
 
-        const roomIds = teacherRooms.map(r => r.room_id);
 
         // Step 2: Get all members of those rooms (excluding teacher)
         const roomMembers = allRoomMembers?.filter(m =>
