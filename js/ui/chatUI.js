@@ -54,7 +54,7 @@ function saveSentItem(item) {
   renderSentItems();
 }
 
-function renderSentItems() {
+async function renderSentItems() {
   const container = document.getElementById('sent-list');
   if (!container) return;
 
@@ -75,12 +75,47 @@ function renderSentItems() {
   const currentUserEmail = currentUserStr ? JSON.parse(currentUserStr)?.email?.toLowerCase() : null;
 
   if (isGroupRoom && currentRoomName) {
-    // For group chat: Get ALL messages from the room data (not just files)
-    const roomKey = `room_${currentRoomName.replace(/\s+/g, '_')}`;
-    const roomMessages = JSON.parse(localStorage.getItem(roomKey) || '[]');
+    // For group chat: Fetch messages from Supabase or localStorage
+    let roomMessages = [];
 
-    // Convert ALL room messages to sent item format
-    items = roomMessages.map(msg => ({
+    // Try Supabase first using global roomId
+    const roomId = window.currentGroupRoomId;
+    const isLocal = window.currentGroupRoomIsLocal;
+
+    if (!isLocal && roomId && typeof window.sendGroupMessage === 'function') {
+      // Supabase mode - fetch messages via global function if available
+      try {
+        const { supabase } = await import('../config/supabaseClient.js');
+        if (supabase) {
+          const { data, error } = await supabase
+            .from('room_messages')
+            .select('*')
+            .eq('room_id', roomId)
+            .order('created_at', { ascending: true });
+
+          if (!error && data) {
+            roomMessages = data;
+          }
+        }
+      } catch (e) {
+        console.log('Supabase fetch failed, falling back to localStorage');
+      }
+    }
+
+    // Fallback to localStorage
+    if (roomMessages.length === 0) {
+      const roomKey = `room_${currentRoomName.replace(/\s+/g, '_')}`;
+      roomMessages = JSON.parse(localStorage.getItem(roomKey) || '[]');
+    }
+
+    // Filter to only show messages that have attachments (photos or text files)
+    const messagesWithFiles = roomMessages.filter(msg => {
+      const attachments = msg.attachments || [];
+      return attachments.length > 0;
+    });
+
+    // Convert room messages to sent item format
+    items = messagesWithFiles.map(msg => ({
       content: msg.content || '',
       attachments: msg.attachments || [],
       mode: 'group',
@@ -105,25 +140,62 @@ function renderSentItems() {
     });
   }
 
+  // Build file upload section for group chat rooms
+  const groupFileUploadSection = isGroupRoom ? `
+    <div class="group-file-upload" style="background:var(--color-bg-tertiary); border:1px solid var(--color-border); border-radius:12px; padding:16px; margin-bottom:16px;">
+      <h4 style="margin:0 0 12px 0; font-size:0.9rem; color:var(--color-text-primary);">
+        <i class="fa-solid fa-cloud-upload-alt"></i> Send Files to Room
+      </h4>
+      <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:flex-end;">
+        <div style="flex:1; min-width:200px;">
+          <input type="file" id="sent-file-input" multiple accept="image/*,.txt,.js,.json,.md,.py,.html,.css" 
+            style="display:none;">
+          <div id="sent-file-preview" style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px;"></div>
+          <button type="button" onclick="document.getElementById('sent-file-input').click()" 
+            style="background:var(--color-bg-secondary); border:1px solid var(--color-border); padding:10px 16px; border-radius:8px; cursor:pointer; color:var(--color-text-primary); width:100%;">
+            <i class="fa-solid fa-paperclip"></i> Choose Files
+          </button>
+        </div>
+        <div style="flex:2; min-width:200px;">
+          <input type="text" id="sent-file-comment" placeholder="Add a comment (optional)..." 
+            style="width:100%; padding:10px 14px; border:1px solid var(--color-border); border-radius:8px; background:var(--color-bg-secondary); color:var(--color-text-primary);">
+        </div>
+        <button type="button" onclick="sendFilesFromSentPanel()" 
+          style="background:var(--color-accent); color:white; border:none; padding:10px 20px; border-radius:8px; cursor:pointer; font-weight:500;">
+          <i class="fa-solid fa-paper-plane"></i> Send
+        </button>
+      </div>
+    </div>
+  ` : '';
+
   if (items.length === 0) {
     container.innerHTML = `
+      ${groupFileUploadSection}
       <div class="empty-state">
         <i class="fa-solid fa-inbox" style="font-size:3rem; color:var(--color-text-muted); margin-bottom:1rem;"></i>
-        <p>No sent items yet${isGroupRoom ? ' in this room' : ''}</p>
+        <p>No ${isGroupRoom ? 'files sent in this room' : 'sent items'} yet</p>
       </div>
     `;
+
+    // Setup file input listener for group chat
+    if (isGroupRoom) {
+      setupSentFileInput();
+    }
     return;
   }
 
   // Get chat history for looking up chat titles
   const chatHistory = getHistory();
 
-  container.innerHTML = items.map(item => {
+  container.innerHTML = groupFileUploadSection + items.map(item => {
     const date = new Date(item.timestamp).toLocaleString();
     const hasAttachments = item.attachments && item.attachments.length > 0;
     const attachmentPreview = hasAttachments ? item.attachments.map(att => {
       if (typeof att === 'string' && att.startsWith('data:image')) {
         return `<img src="${att}" style="max-width:60px; max-height:60px; border-radius:6px; margin-right:4px;">`;
+      }
+      if (typeof att === 'object' && att.type === 'file') {
+        return `<span style="background:var(--color-bg-tertiary); padding:2px 8px; border-radius:4px; font-size:0.75rem;"><i class="fa-solid fa-file-lines"></i> ${escapeHtml(att.name || 'File')}</span>`;
       }
       return `<span style="background:var(--color-bg-tertiary); padding:2px 8px; border-radius:4px; font-size:0.75rem;"><i class="fa-solid fa-file"></i> File</span>`;
     }).join('') : '';
@@ -162,7 +234,175 @@ function renderSentItems() {
       </div>
     `;
   }).join('');
+
+  // Setup file input listener for group chat
+  if (isGroupRoom) {
+    setupSentFileInput();
+  }
 }
+
+// File upload handling for sent panel
+let sentPanelAttachments = [];
+
+function setupSentFileInput() {
+  const fileInput = document.getElementById('sent-file-input');
+  if (fileInput) {
+    fileInput.onchange = handleSentFileSelect;
+  }
+}
+
+function handleSentFileSelect(event) {
+  const files = event.target.files;
+  if (!files || files.length === 0) return;
+
+  const previewContainer = document.getElementById('sent-file-preview');
+
+  Array.from(files).forEach(file => {
+    const reader = new FileReader();
+
+    reader.onload = (e) => {
+      const content = e.target.result;
+
+      if (file.type.startsWith("image/")) {
+        sentPanelAttachments.push(content);
+        renderSentPreview(content, "image", file.name, previewContainer);
+      } else if (file.type.startsWith("text/") || file.name.endsWith(".txt") || file.name.endsWith(".js") || file.name.endsWith(".json")) {
+        const textReader = new FileReader();
+        textReader.onload = (te) => {
+          const textContent = te.target.result;
+          sentPanelAttachments.push({ type: 'file', name: file.name, content: textContent });
+          renderSentPreview(null, "file", file.name, previewContainer);
+        };
+        textReader.readAsText(file);
+      } else {
+        alert("Only images and text files supported.");
+      }
+    };
+
+    if (file.type.startsWith("image/")) {
+      reader.readAsDataURL(file);
+    } else {
+      reader.readAsDataURL(file);
+    }
+  });
+
+  event.target.value = "";
+}
+
+function renderSentPreview(src, type, name, container) {
+  if (!container) return;
+
+  const div = document.createElement("div");
+  div.style.cssText = "position:relative; width:50px; height:50px; border-radius:6px; overflow:hidden; border:1px solid var(--color-border);";
+
+  if (type === "image") {
+    div.innerHTML = `<img src="${src}" style="width:100%; height:100%; object-fit:cover;">`;
+  } else {
+    div.innerHTML = `<div style="width:100%; height:100%; background:var(--color-bg-secondary); display:flex; align-items:center; justify-content:center; font-size:1rem;"><i class="fa-solid fa-file-lines"></i></div>`;
+  }
+
+  const removeBtn = document.createElement("button");
+  removeBtn.innerHTML = "&times;";
+  removeBtn.style.cssText = "position:absolute; top:0; right:0; background:rgba(0,0,0,0.6); color:white; border:none; width:16px; height:16px; cursor:pointer; font-size:10px; line-height:1;";
+  removeBtn.onclick = () => {
+    if (type === "image") {
+      const idx = sentPanelAttachments.indexOf(src);
+      if (idx > -1) sentPanelAttachments.splice(idx, 1);
+    } else {
+      const idx = sentPanelAttachments.findIndex(a => a.name === name);
+      if (idx > -1) sentPanelAttachments.splice(idx, 1);
+    }
+    div.remove();
+  };
+
+  div.appendChild(removeBtn);
+  container.appendChild(div);
+}
+
+window.sendFilesFromSentPanel = async function () {
+  if (sentPanelAttachments.length === 0) {
+    alert('Please select at least one file to send.');
+    return;
+  }
+
+  const comment = document.getElementById('sent-file-comment')?.value?.trim() || '';
+  const roomId = window.currentGroupRoomId;
+  const roomName = window.currentGroupRoomName;
+  const isLocal = window.currentGroupRoomIsLocal;
+
+  if (!roomId && !roomName) {
+    alert('No room selected.');
+    return;
+  }
+
+  // Get current user
+  const currentUserStr = localStorage.getItem('aitutor_current_user');
+  const currentUser = currentUserStr ? JSON.parse(currentUserStr) : { email: 'user@example.com', name: 'User' };
+
+  const newMessage = {
+    id: Date.now(),
+    sender_email: currentUser.email,
+    sender_name: currentUser.name || currentUser.email.split('@')[0],
+    content: comment,
+    attachments: [...sentPanelAttachments],
+    created_at: new Date().toISOString()
+  };
+
+  // Save to Supabase if available
+  if (!isLocal && roomId && typeof window.sendGroupMessage === 'function') {
+    await window.sendGroupMessage(roomId, comment, sentPanelAttachments);
+  } else {
+    // Fallback to localStorage
+    const roomKey = `room_${roomName.replace(/\s+/g, '_')}`;
+    const roomMessages = JSON.parse(localStorage.getItem(roomKey) || '[]');
+    roomMessages.push(newMessage);
+    localStorage.setItem(roomKey, JSON.stringify(roomMessages));
+  }
+
+  // Display in chat window too
+  const mw = document.getElementById("chat-window");
+  if (mw) {
+    let attachmentHTML = sentPanelAttachments.map(att => {
+      if (typeof att === 'object' && att.type === 'file') {
+        const fileId = 'file-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+        return `<div id="${fileId}" class="file-attachment" style="background:var(--color-bg-tertiary); padding:10px 14px; border-radius:10px; font-size:0.9rem; display:inline-flex; align-items:center; gap:8px; border:1px solid var(--color-border); margin-bottom:8px; cursor:pointer;" onclick="downloadTextFile('${escapeHtml(att.name || 'file.txt')}', '${fileId}')" data-file-content="${btoa(unescape(encodeURIComponent(att.content || '')))}">
+          <i class="fa-solid fa-file-lines" style="color:var(--color-accent); font-size:1.1rem;"></i>
+          <span style="font-weight:500;">${escapeHtml(att.name || 'File')}</span>
+          <i class="fa-solid fa-download" style="color:var(--color-text-muted); margin-left:4px; font-size:0.8rem;"></i>
+        </div>`;
+      } else if (typeof att === 'string' && att.startsWith('data:image')) {
+        return `<img src="${att}" style="max-width:200px; max-height:150px; border-radius:8px; margin-bottom:8px; display:block;">`;
+      }
+      return '';
+    }).join('');
+
+    const div = document.createElement("div");
+    div.className = "message user-msg";
+    div.innerHTML = `
+      <div class="msg-avatar" style="background:var(--color-accent);"><i class="fa-solid fa-user"></i></div>
+      <div class="msg-bubble">
+        <div style="font-size:0.75rem; color:rgba(255,255,255,0.85); margin-bottom:4px; font-weight:500;">
+          <strong style="font-weight:700;">${currentUser.name || currentUser.email.split('@')[0]}</strong> • ${new Date().toLocaleTimeString()}
+        </div>
+        ${attachmentHTML}
+        ${escapeHtml(comment)}
+      </div>
+    `;
+    mw.appendChild(div);
+    mw.scrollTop = mw.scrollHeight;
+  }
+
+  // Clear form
+  sentPanelAttachments = [];
+  const previewContainer = document.getElementById('sent-file-preview');
+  if (previewContainer) previewContainer.innerHTML = '';
+  const commentInput = document.getElementById('sent-file-comment');
+  if (commentInput) commentInput.value = '';
+
+  // Refresh sent items
+  renderSentItems();
+};
+
 
 
 // Make renderSentItems globally available
@@ -1038,7 +1278,11 @@ function loadChat(chat) {
     }
     setTimeout(() => mw.scrollTop = mw.scrollHeight, 10);
   }
+
+  // Update sent items when switching chats
+  renderSentItems();
 }
+
 
 function renameChat(id, newTitle) {
   const history = getHistory();
