@@ -558,16 +558,19 @@ window.selectGroupRoom = async function (roomId, encodedName, isLocal) {
         `;
         mw.appendChild(welcomeDiv);
       } else {
+        const user = getCurrentUser();
         messages.forEach(msg => {
           const sender = msg.sender_name || msg.sender_email || msg.senderName || msg.senderEmail || 'Unknown';
+          const senderEmail = msg.sender_email || msg.senderEmail || '';
           const time = new Date(msg.created_at || msg.timestamp).toLocaleTimeString();
+          const isOwnMessage = senderEmail.toLowerCase() === user.email.toLowerCase();
 
           const div = document.createElement('div');
-          div.className = 'message user-msg';
+          div.className = isOwnMessage ? 'message user-msg' : 'message ai-msg';
           div.innerHTML = `
-            <div class="msg-avatar" style="background:var(--color-accent);"><i class="fa-solid fa-user"></i></div>
+            <div class="msg-avatar" style="background:${isOwnMessage ? 'var(--color-accent)' : 'var(--color-secondary)'};"><i class="fa-solid fa-user"></i></div>
             <div class="msg-bubble">
-              <div style="font-size:0.75rem; color:rgba(255,255,255,0.85); margin-bottom:4px;">
+              <div style="font-size:0.75rem; color:${isOwnMessage ? 'rgba(255,255,255,0.85)' : 'var(--color-text-muted)'}; margin-bottom:4px;">
                 <strong>${escapeHtml(sender)}</strong> • ${time}
               </div>
               ${escapeHtml(msg.content)}
@@ -621,12 +624,13 @@ function subscribeToRoomMessages(roomId) {
         const sender = msg.sender_name || msg.sender_email || 'Unknown';
         const time = new Date(msg.created_at).toLocaleTimeString();
 
+        // Other users' messages appear on the left (ai-msg style)
         const div = document.createElement('div');
-        div.className = 'message user-msg';
+        div.className = 'message ai-msg';
         div.innerHTML = `
-          <div class="msg-avatar" style="background:var(--color-accent);"><i class="fa-solid fa-user"></i></div>
+          <div class="msg-avatar" style="background:var(--color-secondary);"><i class="fa-solid fa-user"></i></div>
           <div class="msg-bubble">
-            <div style="font-size:0.75rem; color:rgba(255,255,255,0.85); margin-bottom:4px;">
+            <div style="font-size:0.75rem; color:var(--color-text-muted); margin-bottom:4px;">
               <strong>${escapeHtml(sender)}</strong> • ${time}
             </div>
             ${escapeHtml(msg.content)}
