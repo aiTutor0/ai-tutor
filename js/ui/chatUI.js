@@ -224,7 +224,7 @@ function addMessage(text, sender, skipSave = false, attachments = [], useTyping 
   // Message action buttons (edit/delete for user, copy for AI)
   const actionButtons = sender === "user" ? `
     <div class="msg-actions" style="display:none; position:absolute; top:4px; right:4px; gap:4px;">
-      <button onclick="editMessage('${msgId}')" title="Edit" style="background:var(--color-bg-tertiary); border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:0.75rem;">
+      <button onclick="editMessage('${msgId}')" title="Edit" style="background:var(--color-bg-tertiary); border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:0.75rem; color:var(--color-text-primary);">
         <i class="fa-solid fa-pen"></i>
       </button>
       <button onclick="deleteMessage('${msgId}')" title="Delete" style="background:var(--color-bg-tertiary); border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:0.75rem; color:var(--color-error-text);">
@@ -233,7 +233,7 @@ function addMessage(text, sender, skipSave = false, attachments = [], useTyping 
     </div>
   ` : `
     <div class="msg-actions" style="display:none; position:absolute; top:4px; right:4px; gap:4px;">
-      <button onclick="copyMessage('${msgId}')" title="Copy" style="background:var(--color-bg-tertiary); border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:0.75rem;">
+      <button onclick="copyMessage('${msgId}')" title="Copy" style="background:var(--color-bg-tertiary); border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:0.75rem; color:var(--color-text-primary);">
         <i class="fa-solid fa-copy"></i>
       </button>
     </div>
