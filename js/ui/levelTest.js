@@ -350,20 +350,28 @@ function showResults() {
   saveLevelResult(resultData);
 
   // Save to Supabase for teacher visibility
+  console.log('📝 [Level Test] Attempting to save to Supabase...');
   try {
     import('../services/chatService.js').then(({ saveLevelTestResult }) => {
+      console.log('📝 [Level Test] Calling saveLevelTestResult with:', { level: result.level, description: result.description, score: score });
       saveLevelTestResult(result.level, result.description, score, currentQuizState.answers)
         .then(response => {
           if (response.error) {
-            console.log('Supabase save failed:', response.error);
+            console.error('❌ [Level Test] Supabase save FAILED:', response.error);
           } else {
-            console.log('✅ Level test saved to Supabase');
+            console.log('✅ [Level Test] Saved to Supabase successfully! Response:', response.data);
           }
+        })
+        .catch(err => {
+          console.error('❌ [Level Test] Supabase save caught error:', err);
         });
+    }).catch(err => {
+      console.error('❌ [Level Test] Failed to import chatService:', err);
     });
   } catch (err) {
-    console.log('Could not save to Supabase:', err);
+    console.error('❌ [Level Test] Could not save to Supabase:', err);
   }
+
 
   // Notify teacher (simulated)
   console.log('📊 Teacher Notification - Level Test Result:', resultData);
