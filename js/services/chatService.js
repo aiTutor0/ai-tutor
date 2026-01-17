@@ -262,11 +262,11 @@ export async function getAllLevelTestResults() {
         const currentEmail = user.email?.toLowerCase();
         if (!currentEmail) return { data: [], error: { message: "No email found" } };
 
-        // Step 1: Find all rooms where the teacher is a member
+        // Step 1: Find all rooms where the teacher is a member (case-insensitive)
         const { data: teacherRooms, error: roomError } = await supabase
             .from('room_members')
             .select('room_id')
-            .eq('member_email', currentEmail);
+            .ilike('member_email', currentEmail);
 
         if (roomError || !teacherRooms || teacherRooms.length === 0) {
             // Teacher is not in any rooms, return empty
@@ -293,13 +293,21 @@ export async function getAllLevelTestResults() {
             return { data: [], error: null };
         }
 
-        // Step 3: Get profiles for these students to find their user_ids
-        const { data: profiles, error: profilesError } = await supabase
+        // Step 3: Get ALL profiles and filter manually (case-insensitive matching)
+        const { data: allProfiles, error: profilesError } = await supabase
             .from('profiles')
-            .select('id, email, full_name')
-            .in('email', studentEmails);
+            .select('id, email, full_name');
 
-        if (profilesError || !profiles || profiles.length === 0) {
+        if (profilesError || !allProfiles) {
+            return { data: [], error: null };
+        }
+
+        // Filter profiles by matching emails (case-insensitive)
+        const profiles = allProfiles.filter(p =>
+            p.email && studentEmails.includes(p.email.toLowerCase())
+        );
+
+        if (profiles.length === 0) {
             return { data: [], error: null };
         }
 

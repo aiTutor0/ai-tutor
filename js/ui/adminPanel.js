@@ -72,13 +72,45 @@ function getAllUsers() {
     return Object.values(allUsers);
 }
 
-// Render all users in Users tab
-function renderAllUsers() {
+// Render all users in Users tab - fetches from Supabase
+async function renderAllUsers() {
     const list = document.getElementById('admin-users-list');
     if (!list) return;
 
-    const users = getAllUsers();
-    const onlineEmails = getOnlineUsers().map(u => u.email);
+    // Show loading
+    list.innerHTML = `<div class="admin-row"><div style="grid-column:1/-1; text-align:center; padding:20px; color:var(--color-text-muted);"><i class="fa-solid fa-spinner fa-spin"></i> Loading users...</div></div>`;
+
+    // Try to fetch from Supabase
+    let users = [];
+    try {
+        const { createClient } = await import('https://esm.sh/@supabase/supabase-js@2');
+        const SUPABASE_URL = 'https://ywnfcilnpgmqjpjxoxxb.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl3bmZjaWxucGdtcWpwanhveHhiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzM4NTE4NDIsImV4cCI6MjA0OTQyNzg0Mn0.r7oSPBl55O7w0aoMdA76O5Mw_W1gch-_acdUq8kNyL0';
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        const { data, error } = await supabase
+            .from('profiles')
+            .select('id, email, full_name, role, updated_at');
+
+        if (!error && data) {
+            users = data.map(p => ({
+                email: p.email,
+                name: p.full_name || p.email?.split('@')[0] || 'Unknown',
+                role: p.role || 'student',
+                lastActive: p.updated_at ? new Date(p.updated_at).getTime() : null
+            }));
+        }
+    } catch (err) {
+        console.log('Supabase fetch failed, falling back to localStorage:', err);
+    }
+
+    // Fallback to localStorage if Supabase fails
+    if (users.length === 0) {
+        users = getAllUsers();
+    }
+
+    // Get online status from localStorage (only works for same-browser users)
+    const onlineEmails = getOnlineUsers().map(u => u.email?.toLowerCase());
 
     if (users.length === 0) {
         list.innerHTML = `<div class="admin-row"><div style="grid-column:1/-1; text-align:center; padding:20px; color:var(--color-text-muted);">No users found</div></div>`;
@@ -86,7 +118,7 @@ function renderAllUsers() {
     }
 
     list.innerHTML = users.map(user => {
-        const isOnline = onlineEmails.includes(user.email);
+        const isOnline = onlineEmails.includes(user.email?.toLowerCase());
         const lastActive = user.lastActive ? new Date(user.lastActive).toLocaleString() : 'Never';
 
         return `
@@ -101,6 +133,7 @@ function renderAllUsers() {
     `;
     }).join('');
 }
+
 
 // Render online users
 function renderOnlineUsers() {
@@ -129,12 +162,41 @@ function renderOnlineUsers() {
     }).join('');
 }
 
-// Populate user select dropdown
-function populateUserSelect() {
+// Populate user select dropdown - fetches from Supabase
+async function populateUserSelect() {
     const select = document.getElementById('admin-user-select');
     if (!select) return;
 
-    const users = getAllUsers();
+    select.innerHTML = '<option value="">Loading users...</option>';
+
+    // Try to fetch from Supabase
+    let users = [];
+    try {
+        const { createClient } = await import('https://esm.sh/@supabase/supabase-js@2');
+        const SUPABASE_URL = 'https://ywnfcilnpgmqjpjxoxxb.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl3bmZjaWxucGdtcWpwanhveHhiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzM4NTE4NDIsImV4cCI6MjA0OTQyNzg0Mn0.r7oSPBl55O7w0aoMdA76O5Mw_W1gch-_acdUq8kNyL0';
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        const { data, error } = await supabase
+            .from('profiles')
+            .select('email, full_name, role');
+
+        if (!error && data) {
+            users = data.map(p => ({
+                email: p.email,
+                name: p.full_name || p.email?.split('@')[0] || 'Unknown',
+                role: p.role || 'student'
+            }));
+        }
+    } catch (err) {
+        console.log('Supabase fetch failed, falling back to localStorage:', err);
+        users = getAllUsers();
+    }
+
+    // Fallback
+    if (users.length === 0) {
+        users = getAllUsers();
+    }
 
     select.innerHTML = '<option value="">-- Select a user --</option>';
     users.forEach(user => {
@@ -144,6 +206,7 @@ function populateUserSelect() {
         select.appendChild(option);
     });
 }
+
 
 // Load and display user's chat history
 window.loadUserChats = function (email) {
