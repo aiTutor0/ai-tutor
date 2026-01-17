@@ -1051,15 +1051,53 @@ export function exportChat() {
 
   // Check if we're in group chat mode
   if (currentToolMode === 'group') {
-    // Get current room name from tool title
-    const toolTitle = document.getElementById('tool-title');
-    let roomName = toolTitle?.textContent || 'Room';
-    roomName = roomName.replace(/^🏠\s*/, '').trim();
-    const roomKey = `room_${roomName.replace(/\s+/g, '_')}`;
+    // Use global room variables set by selectGroupRoom
+    const roomId = window.currentGroupRoomId;
+    const roomName = window.currentGroupRoomName ||
+      document.getElementById('tool-title')?.textContent?.replace(/^🏠\s*/, '').trim() || 'Room';
+    const isLocal = window.currentGroupRoomIsLocal;
 
-    // Load room messages from localStorage
-    messages = JSON.parse(localStorage.getItem(roomKey) || '[]');
     title = `Group Chat - ${roomName}`;
+
+    // Try to get messages from the chat window directly (works for both Supabase and localStorage)
+    const chatWindow = document.getElementById('chat-window');
+    if (chatWindow) {
+      const messageDivs = chatWindow.querySelectorAll('.message');
+      messageDivs.forEach(div => {
+        const bubble = div.querySelector('.msg-bubble');
+        if (bubble) {
+          // Extract sender info and content
+          const senderDiv = bubble.querySelector('div[style*="font-size:0.75rem"]');
+          const strongTag = senderDiv?.querySelector('strong');
+          const senderName = strongTag?.textContent || 'Unknown';
+
+          // Get text content (excluding the sender info div)
+          let content = bubble.textContent || '';
+          if (senderDiv) {
+            content = content.replace(senderDiv.textContent, '').trim();
+          }
+
+          if (content) {
+            messages.push({
+              senderName: senderName,
+              content: content,
+              timestamp: Date.now()
+            });
+          }
+        }
+      });
+    }
+
+    // Fallback: try localStorage if no messages found
+    if (messages.length === 0) {
+      const roomKey = `room_${roomName.replace(/\s+/g, '_')}`;
+      const localMessages = JSON.parse(localStorage.getItem(roomKey) || '[]');
+      messages = localMessages.map(msg => ({
+        senderName: msg.senderName || msg.sender_name || msg.sender_email || 'Unknown',
+        content: msg.content,
+        timestamp: msg.timestamp || msg.created_at
+      }));
+    }
   } else {
     // Regular chat export
     const history = getHistory();
