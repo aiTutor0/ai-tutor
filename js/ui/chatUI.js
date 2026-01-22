@@ -26,6 +26,15 @@ function escapeHtml(str) {
     .replaceAll(">", "&gt;");
 }
 
+// Parse basic markdown (bold text)
+function parseMarkdown(str) {
+  if (!str) return "";
+  // First escape HTML to prevent XSS
+  let escaped = escapeHtml(str);
+  // Then convert **text** to <strong>text</strong>
+  return escaped.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+}
+
 function generateId() {
   return Date.now().toString(36) + Math.random().toString(36).substr(2);
 }
@@ -519,7 +528,7 @@ function addMessage(text, sender, skipSave = false, attachments = [], useTyping 
     <div class="msg-avatar">${sender === "user" ? '<i class="fa-solid fa-user"></i>' : '<i class="fa-solid fa-robot"></i>'}</div>
     <div class="msg-bubble" data-full-text="${escapeHtml(text)}">
         ${attachmentHTML}
-        <span class="msg-text">${useTyping ? '' : escapeHtml(text)}</span>
+        <span class="msg-text">${useTyping ? '' : (sender === 'ai' ? parseMarkdown(text) : escapeHtml(text))}</span>
     </div>
     ${actionButtons}
   `;
@@ -540,7 +549,7 @@ function addMessage(text, sender, skipSave = false, attachments = [], useTyping 
   // Typing animation for AI messages
   if (useTyping && sender === "ai") {
     const textSpan = div.querySelector('.msg-text');
-    typeText(textSpan, text, mw);
+    typeText(textSpan, text, mw, true); // Pass true to indicate markdown parsing needed
   }
 
   if (!skipSave && currentChatId) {
@@ -551,13 +560,16 @@ function addMessage(text, sender, skipSave = false, attachments = [], useTyping 
 }
 
 // Typing animation function
-function typeText(element, text, scrollContainer) {
+function typeText(element, text, scrollContainer, useMarkdown = false) {
   let index = 0;
-  const escaped = escapeHtml(text);
+  const processedText = useMarkdown ? parseMarkdown(text) : escapeHtml(text);
 
   function type() {
-    if (index < escaped.length) {
-      element.innerHTML = escaped.substring(0, index + 1);
+    if (index < text.length) {
+      // Calculate how many characters of the original text we've shown
+      const currentText = text.substring(0, index + 1);
+      // Apply the appropriate processing
+      element.innerHTML = useMarkdown ? parseMarkdown(currentText) : escapeHtml(currentText);
       index++;
       scrollContainer.scrollTop = scrollContainer.scrollHeight;
       setTimeout(type, TYPING_SPEED_MS);
@@ -1080,12 +1092,29 @@ export async function sendMessage() {
   }
 
   try {
-    // Send to OpenAI with conversation history
+    // Get user's integrated language level
+    let userLevel = null;
+    try {
+      const { getUserLevel } = await import('../services/chatService.js');
+      const { data } = await getUserLevel();
+      if (data && data.language_level) {
+        userLevel = {
+          level: data.language_level,
+          description: data.level_description
+        };
+        console.log('📚 User level loaded:', userLevel);
+      }
+    } catch (err) {
+      console.log('No user level set or error fetching:', err);
+    }
+
+    // Send to OpenAI with conversation history and user level
     const aiText = await callOpenAI({
       toolMode: currentToolMode,
       userText: text,
       images: images, // Send images array (only images)
-      messages: messages // Send conversation history (token-limited)
+      messages: messages, // Send conversation history (token-limited)
+      userLevel: userLevel // Send user's language level
     });
     loadingDiv.remove();
     addMessage(aiText, "ai", false, [], true); // Use typing animation

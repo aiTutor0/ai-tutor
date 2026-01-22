@@ -32,6 +32,7 @@ export default async (request, context) => {
     const body = await request.json();
     const userText = body.userText || "";
     const toolMode = body.toolMode || "chat";
+    const userLevel = body.userLevel || null; // Get user's language level
     const model = process.env.OPENAI_MODEL || body.model || "gpt-4o-mini";
 
     // Tool-specific system prompts
@@ -44,7 +45,18 @@ export default async (request, context) => {
       level: "You are an English proficiency assessor. Help evaluate the user's English level based on their responses."
     };
 
-    const systemPrompt = systemPrompts[toolMode] || systemPrompts.chat;
+    let systemPrompt = systemPrompts[toolMode] || systemPrompts.chat;
+
+    // Enhance prompt with user level if available
+    if (userLevel && userLevel.level) {
+      const levelGuidance = `\n\nIMPORTANT: The user's English proficiency level is ${userLevel.level} (${userLevel.description}). Please adjust your responses accordingly:
+- Use vocabulary and grammar appropriate for ${userLevel.level} level
+- Provide explanations that match their comprehension level
+- Offer constructive feedback suited to their current abilities
+- Challenge them appropriately without overwhelming them`;
+
+      systemPrompt += levelGuidance;
+    }
 
     // Call OpenAI Chat Completions API
     const openaiResponse = await fetch("https://api.openai.com/v1/chat/completions", {

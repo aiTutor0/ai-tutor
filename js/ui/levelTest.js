@@ -396,7 +396,10 @@ function showResults() {
         </p>
 
         <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
-          <button class="primary-btn" onclick="retakeLevelTest()">
+          <button class="primary-btn" onclick="integrateLevel('${result.level}', '${result.description}')" id="integrate-level-btn">
+            <i class="fa-solid fa-link"></i> Integrate Level
+          </button>
+          <button class="ghost-btn" onclick="retakeLevelTest()">
             <i class="fa-solid fa-rotate"></i> Take Again
           </button>
           <button class="ghost-btn" onclick="goToLevelStart()">
@@ -407,6 +410,44 @@ function showResults() {
     `;
   }
 }
+
+// Integrate level - save to user preferences
+window.integrateLevel = async function (level, description) {
+  const btn = document.getElementById('integrate-level-btn');
+  if (!btn) return;
+
+  // Disable button during save
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Integrating...';
+
+  try {
+    const { saveUserLevel } = await import('../services/chatService.js');
+    const { error } = await saveUserLevel(level, description);
+
+    if (error) {
+      console.error('❌ Failed to integrate level:', error);
+      alert('Seviye entegrasyonu başarısız oldu. Lütfen tekrar deneyin.');
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fa-solid fa-link"></i> Integrate Level';
+    } else {
+      console.log('✅ Level integrated successfully:', level, description);
+      alert('Seviyeniz entegre edilmiştir! 🎉\n\nAI artık tüm sohbetlerde seviyenizi bilerek cevap verecek.');
+
+      // Update button to show success
+      btn.innerHTML = '<i class="fa-solid fa-check"></i> Integrated';
+      btn.style.background = 'var(--color-success-bg)';
+      btn.style.color = 'var(--color-success-text)';
+
+      // Keep button disabled to prevent re-integration
+      btn.disabled = true;
+    }
+  } catch (err) {
+    console.error('❌ Error integrating level:', err);
+    alert('Seviye entegrasyonu başarısız oldu. Lütfen tekrar deneyin.');
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fa-solid fa-link"></i> Integrate Level';
+  }
+};
 
 // Retake test
 window.retakeLevelTest = function () {

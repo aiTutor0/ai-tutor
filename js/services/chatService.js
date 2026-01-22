@@ -502,3 +502,48 @@ export async function updateUserPreferences(preferences) {
 
     return { error };
 }
+
+// ======================================
+// USER LANGUAGE LEVEL
+// ======================================
+
+/**
+ * Save user's language level from level test
+ */
+export async function saveUserLevel(level, description) {
+    if (!supabase) return { error: { message: "Supabase bağlı değil (demo)" } };
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return { error: { message: "Not authenticated" } };
+
+    // Store level in user_preferences table
+    const { error } = await supabase
+        .from('user_preferences')
+        .upsert({
+            user_id: user.id,
+            language_level: level,
+            level_description: description,
+            level_integrated_at: new Date().toISOString()
+        });
+
+    return { error };
+}
+
+/**
+ * Get user's integrated language level
+ */
+export async function getUserLevel() {
+    if (!supabase) return { data: null, error: null };
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return { data: null, error: { message: "Not authenticated" } };
+
+    const { data, error } = await supabase
+        .from('user_preferences')
+        .select('language_level, level_description, level_integrated_at')
+        .eq('user_id', user.id)
+        .single();
+
+    return { data, error };
+}
+
