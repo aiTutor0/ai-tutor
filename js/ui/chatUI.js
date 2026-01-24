@@ -265,12 +265,12 @@ function handleSentFileSelect(event) {
   if (!files || files.length === 0) return;
 
   const previewContainer = document.getElementById('sent-file-preview');
-  const MAX_IMAGE_SIZE = 500 * 1024; // 500KB limit for images to prevent storage issues
+  const MAX_IMAGE_SIZE = 2 * 1024 * 1024; // 2MB limit for images to prevent storage issues
 
   Array.from(files).forEach(file => {
     // Check file size for images
     if (file.type.startsWith("image/") && file.size > MAX_IMAGE_SIZE) {
-      alert(`Image "${file.name}" is too large (${(file.size / 1024).toFixed(0)}KB). Maximum size is 500KB.`);
+      alert(`Image "${file.name}" is too large (${(file.size / 1024 / 1024).toFixed(1)}MB). Maximum size is 2MB.`);
       return;
     }
 
