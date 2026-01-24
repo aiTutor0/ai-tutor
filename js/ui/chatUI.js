@@ -265,8 +265,15 @@ function handleSentFileSelect(event) {
   if (!files || files.length === 0) return;
 
   const previewContainer = document.getElementById('sent-file-preview');
+  const MAX_IMAGE_SIZE = 500 * 1024; // 500KB limit for images to prevent storage issues
 
   Array.from(files).forEach(file => {
+    // Check file size for images
+    if (file.type.startsWith("image/") && file.size > MAX_IMAGE_SIZE) {
+      alert(`Image "${file.name}" is too large (${(file.size / 1024).toFixed(0)}KB). Maximum size is 500KB.`);
+      return;
+    }
+
     const reader = new FileReader();
 
     reader.onload = (e) => {
@@ -365,7 +372,13 @@ window.sendFilesFromSentPanel = async function () {
     const roomKey = `room_${roomName.replace(/\s+/g, '_')}`;
     const roomMessages = JSON.parse(localStorage.getItem(roomKey) || '[]');
     roomMessages.push(newMessage);
-    localStorage.setItem(roomKey, JSON.stringify(roomMessages));
+    try {
+      localStorage.setItem(roomKey, JSON.stringify(roomMessages));
+    } catch (e) {
+      console.error('localStorage quota exceeded:', e);
+      alert('Storage limit reached. Please remove some old messages or use smaller images.');
+      return;
+    }
   }
 
   // Display in chat window too

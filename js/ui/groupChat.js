@@ -148,9 +148,20 @@ function createLocalRoom(name) {
 // Delete a room
 async function deleteRoomFromSupabase(roomId, isLocal) {
   if (isLocal || !supabase) {
+    // For local rooms, roomId is the room name
+    const roomName = roomId;
+    const roomKey = `room_${roomName.replace(/\s+/g, '_')}`;
+
+    // Remove from rooms list
     const rooms = JSON.parse(localStorage.getItem(ROOMS_KEY) || '[]');
-    const updated = rooms.filter(r => r !== roomId);
+    const updated = rooms.filter(r => r !== roomName);
     localStorage.setItem(ROOMS_KEY, JSON.stringify(updated));
+
+    // Clean up all room-related data
+    localStorage.removeItem(roomKey); // Room messages
+    localStorage.removeItem(roomKey + '_creator'); // Creator email
+    localStorage.removeItem(roomKey + '_members'); // Members list
+
     return true;
   }
 
