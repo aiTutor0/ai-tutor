@@ -26,14 +26,107 @@ function escapeHtml(str) {
     .replaceAll(">", "&gt;");
 }
 
-// Parse basic markdown (bold text)
+// Parse markdown for ChatGPT-style formatting
 function parseMarkdown(str) {
   if (!str) return "";
-  // First escape HTML to prevent XSS
-  let escaped = escapeHtml(str);
-  // Then convert **text** to <strong>text</strong>
-  return escaped.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+
+  let text = str;
+
+  // First, handle code blocks (``` ... ```) - must be done before escaping HTML
+  const codeBlocks = [];
+  text = text.replace(/```(\w*)\n?([\s\S]*?)```/g, (match, lang, code) => {
+    const index = codeBlocks.length;
+    codeBlocks.push({ lang: lang || 'plaintext', code: code.trim() });
+    return `%%CODEBLOCK_${index}%%`;
+  });
+
+  // Handle inline code (` ... `)
+  const inlineCodes = [];
+  text = text.replace(/`([^`]+)`/g, (match, code) => {
+    const index = inlineCodes.length;
+    inlineCodes.push(code);
+    return `%%INLINECODE_${index}%%`;
+  });
+
+  // Escape HTML to prevent XSS
+  text = escapeHtml(text);
+
+  // Headers (### Header, ## Header, # Header)
+  text = text.replace(/^### (.+)$/gm, '<h4 class="md-h4">$1</h4>');
+  text = text.replace(/^## (.+)$/gm, '<h3 class="md-h3">$1</h3>');
+  text = text.replace(/^# (.+)$/gm, '<h2 class="md-h2">$1</h2>');
+
+  // Bold (**text** or __text__)
+  text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  text = text.replace(/__(.+?)__/g, '<strong>$1</strong>');
+
+  // Italic (*text* or _text_) - must come after bold
+  text = text.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+  text = text.replace(/_([^_]+)_/g, '<em>$1</em>');
+
+  // Strikethrough (~~text~~)
+  text = text.replace(/~~(.+?)~~/g, '<del>$1</del>');
+
+  // Unordered lists (- item or * item)
+  text = text.replace(/^[\-\*] (.+)$/gm, '<li class="md-li">$1</li>');
+  text = text.replace(/(<li class="md-li">.*<\/li>\n?)+/g, '<ul class="md-ul">$&</ul>');
+
+  // Ordered lists (1. item)
+  text = text.replace(/^\d+\. (.+)$/gm, '<li class="md-oli">$1</li>');
+  text = text.replace(/(<li class="md-oli">.*<\/li>\n?)+/g, '<ol class="md-ol">$&</ol>');
+
+  // Blockquotes (> text)
+  text = text.replace(/^&gt; (.+)$/gm, '<blockquote class="md-quote">$1</blockquote>');
+
+  // Horizontal rule (--- or ***)
+  text = text.replace(/^(\-{3,}|\*{3,})$/gm, '<hr class="md-hr">');
+
+  // Paragraphs - double newlines become paragraph breaks
+  text = text.replace(/\n\n/g, '</p><p class="md-p">');
+
+  // Single newlines become line breaks
+  text = text.replace(/\n/g, '<br>');
+
+  // Restore code blocks with syntax highlighting styling
+  text = text.replace(/%%CODEBLOCK_(\d+)%%/g, (match, index) => {
+    const block = codeBlocks[parseInt(index)];
+    const escapedCode = escapeHtml(block.code);
+    return `<div class="md-code-block">
+      <div class="md-code-header">
+        <span class="md-code-lang">${block.lang}</span>
+        <button class="md-code-copy" onclick="copyCodeBlock(this)" title="Copy code">
+          <i class="fa-solid fa-copy"></i>
+        </button>
+      </div>
+      <pre class="md-pre"><code class="md-code">${escapedCode}</code></pre>
+    </div>`;
+  });
+
+  // Restore inline code
+  text = text.replace(/%%INLINECODE_(\d+)%%/g, (match, index) => {
+    const code = inlineCodes[parseInt(index)];
+    return `<code class="md-inline-code">${escapeHtml(code)}</code>`;
+  });
+
+  // Wrap in paragraph if not already wrapped
+  if (!text.startsWith('<')) {
+    text = `<p class="md-p">${text}</p>`;
+  }
+
+  return text;
 }
+
+// Copy code block functionality
+window.copyCodeBlock = function (btn) {
+  const codeBlock = btn.closest('.md-code-block');
+  const code = codeBlock.querySelector('code').textContent;
+  navigator.clipboard.writeText(code).then(() => {
+    btn.innerHTML = '<i class="fa-solid fa-check"></i>';
+    setTimeout(() => {
+      btn.innerHTML = '<i class="fa-solid fa-copy"></i>';
+    }, 2000);
+  });
+};
 
 function generateId() {
   return Date.now().toString(36) + Math.random().toString(36).substr(2);
@@ -290,13 +383,19 @@ function handleSentFileSelect(event) {
           renderSentPreview(null, "file", file.name, previewContainer);
         };
         textReader.readAsText(file);
+      } else if (file.type === "application/pdf" || file.name.endsWith(".pdf")) {
+        // Handle PDF files - store as base64 for downloading
+        sentPanelAttachments.push({ type: 'pdf', name: file.name, content: content });
+        renderSentPreview(null, "pdf", file.name, previewContainer);
       } else {
-        alert("Only images and text files supported.");
+        alert("Only images, text files, and PDFs are supported.");
       }
     };
 
     if (file.type.startsWith("image/")) {
       reader.readAsDataURL(file);
+    } else if (file.type === "application/pdf" || file.name.endsWith(".pdf")) {
+      reader.readAsDataURL(file); // Read PDF as DataURL for download
     } else {
       reader.readAsDataURL(file);
     }
@@ -313,6 +412,8 @@ function renderSentPreview(src, type, name, container) {
 
   if (type === "image") {
     div.innerHTML = `<img src="${src}" style="width:100%; height:100%; object-fit:cover;">`;
+  } else if (type === "pdf") {
+    div.innerHTML = `<div style="width:100%; height:100%; background:var(--color-bg-secondary); display:flex; align-items:center; justify-content:center; font-size:1rem; color:#e53935;"><i class="fa-solid fa-file-pdf"></i></div>`;
   } else {
     div.innerHTML = `<div style="width:100%; height:100%; background:var(--color-bg-secondary); display:flex; align-items:center; justify-content:center; font-size:1rem;"><i class="fa-solid fa-file-lines"></i></div>`;
   }
@@ -644,26 +745,80 @@ window.copyMessage = function (msgId) {
   });
 };
 
-// Delete message
+// Delete message with undo
+let undoDeleteTimeout = null;
+let pendingDelete = null;
+
 window.deleteMessage = function (msgId) {
-  if (!confirm('Delete this message?')) return;
-
   const msgDiv = document.querySelector(`[data-msg-id="${msgId}"]`);
-  if (msgDiv) msgDiv.remove();
+  if (!msgDiv) return;
 
-  // Also remove from storage
-  const history = getHistory();
-  const chat = history.find(c => c.id === currentChatId);
-  if (chat && chat.messages) {
-    // Find and remove the message (by matching content/position)
-    const bubble = msgDiv?.querySelector('.msg-bubble');
-    const text = bubble?.getAttribute('data-full-text') || '';
-    const idx = chat.messages.findIndex(m => m.content === text);
-    if (idx > -1) {
-      chat.messages.splice(idx, 1);
-      saveHistory(history);
-    }
+  // Store message data for potential undo
+  const bubble = msgDiv.querySelector('.msg-bubble');
+  const text = bubble?.getAttribute('data-full-text') || bubble?.querySelector('.msg-text')?.innerText || '';
+  const isUserMsg = msgDiv.classList.contains('user-msg');
+
+  // Hide message with animation
+  msgDiv.style.transition = 'all 0.3s ease';
+  msgDiv.style.opacity = '0';
+  msgDiv.style.transform = 'translateX(-20px)';
+
+  // Create or update undo toast
+  let undoToast = document.getElementById('undo-toast');
+  if (!undoToast) {
+    undoToast = document.createElement('div');
+    undoToast.id = 'undo-toast';
+    undoToast.style.cssText = 'position:fixed; bottom:80px; left:50%; transform:translateX(-50%); background:var(--color-card-bg); border:1px solid var(--color-border); padding:12px 20px; border-radius:12px; box-shadow:0 4px 20px rgba(0,0,0,0.15); z-index:10000; display:flex; align-items:center; gap:12px; animation:slideUp 0.3s ease;';
+    document.body.appendChild(undoToast);
   }
+
+  undoToast.innerHTML = `
+    <span style="color:var(--color-text-primary);">Message deleted</span>
+    <button id="undo-delete-btn" style="background:var(--color-accent); color:white; border:none; padding:6px 14px; border-radius:6px; cursor:pointer; font-weight:600;">Undo</button>
+  `;
+  undoToast.style.display = 'flex';
+
+  // Clear any previous pending delete
+  if (undoDeleteTimeout) {
+    clearTimeout(undoDeleteTimeout);
+  }
+
+  // Store pending delete info
+  pendingDelete = { msgDiv, msgId, text, isUserMsg };
+
+  // Set up undo button
+  document.getElementById('undo-delete-btn')?.addEventListener('click', () => {
+    if (pendingDelete) {
+      // Restore message
+      pendingDelete.msgDiv.style.opacity = '1';
+      pendingDelete.msgDiv.style.transform = 'translateX(0)';
+      pendingDelete = null;
+    }
+    clearTimeout(undoDeleteTimeout);
+    undoToast.style.display = 'none';
+  });
+
+  // Auto-delete after 5 seconds
+  undoDeleteTimeout = setTimeout(() => {
+    if (pendingDelete) {
+      // Actually remove the message
+      pendingDelete.msgDiv.remove();
+
+      // Also remove from storage
+      const history = getHistory();
+      const chat = history.find(c => c.id === currentChatId);
+      if (chat && chat.messages) {
+        const idx = chat.messages.findIndex(m => m.content === pendingDelete.text);
+        if (idx > -1) {
+          chat.messages.splice(idx, 1);
+          saveHistory(history);
+        }
+      }
+
+      pendingDelete = null;
+    }
+    undoToast.style.display = 'none';
+  }, 5000);
 };
 
 // Edit message

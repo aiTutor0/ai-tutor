@@ -666,9 +666,8 @@ window.selectGroupRoom = async function (roomId, encodedName, isLocal) {
 let roomSubscription = null;
 
 function subscribeToRoomMessages(roomId) {
-  if (roomSubscription) {
-    supabase.removeChannel(roomSubscription);
-  }
+  // Clean up previous subscription first
+  unsubscribeFromRoomMessages();
 
   roomSubscription = supabase
     .channel(`room_${roomId}`)
@@ -735,6 +734,21 @@ function subscribeToRoomMessages(roomId) {
     })
     .subscribe();
 }
+
+// Cleanup subscription
+function unsubscribeFromRoomMessages() {
+  if (roomSubscription && supabase) {
+    try {
+      supabase.removeChannel(roomSubscription);
+    } catch (e) {
+      console.warn('Error removing subscription:', e);
+    }
+    roomSubscription = null;
+  }
+}
+
+// Cleanup on page unload
+window.addEventListener('beforeunload', unsubscribeFromRoomMessages);
 
 
 // Show room members

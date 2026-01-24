@@ -110,23 +110,29 @@ window.deleteRoom = (encoded) => {
   localStorage.removeItem(roomKey + '_members');
 };
 
-// Global: room seçimi (artık çalışıyor)
+// Global: room seçimi - delegate to groupChat's selectGroupRoom
 let currentRoom = null;
 
 window.selectRoom = (encoded) => {
   const room = decodeURIComponent(encoded || "");
+  currentRoom = room;
 
-  // Access control check - verify user has permission to enter this room
+  // Use groupChat's selectGroupRoom if available (preferred - handles Supabase)
+  if (typeof window.selectGroupRoom === 'function') {
+    // Local rooms use room name as ID
+    window.selectGroupRoom(room, encodeURIComponent(room), true);
+    return;
+  }
+
+  // Fallback: handle locally
   const currentUserStr = localStorage.getItem('aitutor_current_user');
   const currentUser = currentUserStr ? JSON.parse(currentUserStr) : { email: 'user@example.com' };
   const userEmail = currentUser.email.toLowerCase();
 
-  // Get room creator and members
   const roomKey = `room_${room.replace(/\s+/g, '_')}`;
   const roomCreator = (localStorage.getItem(roomKey + '_creator') || '').toLowerCase();
   const roomMembers = JSON.parse(localStorage.getItem(roomKey + '_members') || '[]');
 
-  // Check if user is creator or member
   const isCreator = roomCreator === userEmail;
   const isMember = roomMembers.some(m => m.toLowerCase() === userEmail);
 
@@ -135,23 +141,15 @@ window.selectRoom = (encoded) => {
     return;
   }
 
-  currentRoom = room;
-
-  // Open group chat view
   window.openTool('group');
-
-  // Update title
   const toolTitle = document.getElementById('tool-title');
   if (toolTitle) toolTitle.textContent = `🏠 ${room}`;
 
-  // Load room messages from localStorage
   const roomMessages = JSON.parse(localStorage.getItem(roomKey) || '[]');
-
-  // Display room messages
   const chatWindow = document.getElementById('chat-window');
+
   if (chatWindow) {
     chatWindow.innerHTML = '';
-
     if (roomMessages.length === 0) {
       const welcomeDiv = document.createElement('div');
       welcomeDiv.className = 'message ai-msg';
@@ -165,15 +163,15 @@ window.selectRoom = (encoded) => {
         const isCurrentUser = msg.senderEmail?.toLowerCase() === currentUser.email?.toLowerCase();
         const senderName = msg.senderName || msg.senderEmail?.split('@')[0] || 'User';
         const timestamp = msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString() : '';
-
-        // Build attachment HTML
         let attachmentHTML = '';
         if (msg.attachments && msg.attachments.length > 0) {
-          attachmentHTML = msg.attachments.map(img =>
-            `<img src="${img}" style="max-width:200px; max-height:150px; border-radius:8px; margin-bottom:8px; display:block;">`
-          ).join('');
+          attachmentHTML = msg.attachments.map(att => {
+            if (typeof att === 'string' && att.startsWith('data:image')) {
+              return `<img src="${att}" style="max-width:200px; max-height:150px; border-radius:8px; margin-bottom:8px; display:block;">`;
+            }
+            return '';
+          }).join('');
         }
-
         const div = document.createElement('div');
         div.className = `message ${isCurrentUser ? 'user-msg' : 'ai-msg'}`;
         div.innerHTML = `
@@ -191,8 +189,6 @@ window.selectRoom = (encoded) => {
         chatWindow.appendChild(div);
       });
     }
-
-    // Scroll to bottom
     chatWindow.scrollTop = chatWindow.scrollHeight;
   }
 };
@@ -360,11 +356,15 @@ export async function initRouter() {
       return;
     }
 
-    // Try to create room in Supabase (falls back to localStorage)
+    // Create room using groupChat's createRoom (handles both Supabase and localStorage)
     if (typeof window.createRoom === 'function') {
       await window.createRoom(clean);
+      // Update local rooms array for immediate display
+      if (!rooms.includes(clean)) {
+        rooms.unshift(clean);
+      }
     } else {
-      // Fallback to localStorage only
+      // Fallback to localStorage only if createRoom not available
       rooms.unshift(clean);
       localStorage.setItem('aitutor_rooms', JSON.stringify(rooms));
 
@@ -376,13 +376,7 @@ export async function initRouter() {
       localStorage.setItem(roomKey + '_members', JSON.stringify([currentUser.email]));
     }
 
-    // Also add to local rooms array for immediate display
-    if (!rooms.includes(clean)) {
-      rooms.unshift(clean);
-      localStorage.setItem('aitutor_rooms', JSON.stringify(rooms));
-    }
-
-    // Render updated room list
+    // Render updated room list using groupChat's renderRooms if available
     if (typeof window.renderRooms === 'function') {
       window.renderRooms();
     } else {
@@ -600,6 +594,61 @@ export async function initRouter() {
 
   $("btn-back-home")?.addEventListener("click", () => window.showLanding());
   $("btn-back-home-2")?.addEventListener("click", () => window.showLanding());
+
+  // Password reset handlers
+  $("btn-forgot-password")?.addEventListener("click", () => {
+    $("login-form")?.classList.add("hidden");
+    $("register-form")?.classList.add("hidden");
+    $("reset-password-form")?.classList.remove("hidden");
+  });
+
+  $("btn-back-to-login")?.addEventListener("click", () => {
+    $("reset-password-form")?.classList.add("hidden");
+    $("login-form")?.classList.remove("hidden");
+  });
+
+  $("reset-password-form")?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const email = $("reset-email")?.value?.trim();
+    const newPass = $("reset-new-password")?.value;
+    const confirmPass = $("reset-confirm-password")?.value;
+    const errorEl = $("auth-error");
+
+    errorEl?.classList.add("hidden");
+
+    if (newPass.length < 6) {
+      errorEl.textContent = "Password must be at least 6 characters.";
+      errorEl?.classList.remove("hidden");
+      return;
+    }
+
+    if (newPass !== confirmPass) {
+      errorEl.textContent = "Passwords do not match.";
+      errorEl?.classList.remove("hidden");
+      return;
+    }
+
+    try {
+      // For local/demo mode - just update localStorage
+      // In real production, you'd use Supabase's password reset flow
+      const storedUsers = JSON.parse(localStorage.getItem('aitutor_local_users') || '{}');
+      if (storedUsers[email.toLowerCase()]) {
+        storedUsers[email.toLowerCase()].password = newPass;
+        localStorage.setItem('aitutor_local_users', JSON.stringify(storedUsers));
+        alert("✅ Password reset successfully! You can now login with your new password.");
+        $("reset-password-form")?.classList.add("hidden");
+        $("login-form")?.classList.remove("hidden");
+        $("login-email").value = email;
+        $("login-password").value = "";
+      } else {
+        errorEl.textContent = "Email not found. Please register first.";
+        errorEl?.classList.remove("hidden");
+      }
+    } catch (err) {
+      errorEl.textContent = "Password reset failed: " + err.message;
+      errorEl?.classList.remove("hidden");
+    }
+  });
 
   $("tab-login")?.addEventListener("click", () => setAuthTab("login"));
   $("tab-register")?.addEventListener("click", () => setAuthTab("register"));

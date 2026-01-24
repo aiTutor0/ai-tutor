@@ -320,9 +320,42 @@
               <i class="fa-solid fa-right-to-bracket"></i> Login
             </button>
 
+            <button type="button" class="link-btn" id="btn-forgot-password" style="width:100%; text-align:center;">
+              <i class="fa-solid fa-key"></i> Forgot Password?
+            </button>
+
             <button type="button" class="back-home-btn" id="btn-back-home">
               <i class="fa-solid fa-arrow-left"></i>
               Back to Home
+            </button>
+          </form>
+
+          <!-- Reset Password Form -->
+          <form id="reset-password-form" class="auth-form hidden">
+            <div class="form-group">
+              <label>Email</label>
+              <input type="email" id="reset-email" placeholder="you@example.com" required />
+            </div>
+
+            <div class="form-group">
+              <label>New Password <span
+                  style="font-weight:normal; color:var(--color-text-muted); font-size:0.85rem;">(min. 6
+                  characters)</span></label>
+              <input type="password" id="reset-new-password" placeholder="Enter new password" required minlength="6" />
+            </div>
+
+            <div class="form-group">
+              <label>Confirm New Password</label>
+              <input type="password" id="reset-confirm-password" placeholder="Confirm new password" required />
+            </div>
+
+            <button type="submit" class="primary-btn">
+              <i class="fa-solid fa-key"></i> Reset Password
+            </button>
+
+            <button type="button" class="back-home-btn" id="btn-back-to-login">
+              <i class="fa-solid fa-arrow-left"></i>
+              Back to Login
             </button>
           </form>
 
@@ -585,15 +618,65 @@
                   <div id="level-test-area">
                     <!-- Quiz will be rendered here -->
                     <div id="level-start-screen">
-                      <div class="level-intro">
+                      <div class="level-intro" style="text-align:center; padding:20px;">
                         <i class="fa-solid fa-clipboard-check"
                           style="font-size:3rem; color:var(--color-accent); margin-bottom:1rem;"></i>
-                        <h4 style="margin-bottom:12px;">Test Your English Level</h4>
-                        <p style="margin-bottom:24px;">Answer 10 multiple choice questions to find out your CEFR level
-                          (A1-C1).</p>
-                        <button class="primary-btn" onclick="startLevelTest()" style="margin-top:8px;">
-                          <i class="fa-solid fa-play"></i> Start Test
-                        </button>
+                        <h4 style="margin-bottom:12px;">Choose Your Test</h4>
+                        <p style="margin-bottom:24px; color:var(--color-text-muted);">Select a test type to evaluate
+                          your English proficiency</p>
+
+                        <div class="test-type-selector" style="display:grid; gap:16px; max-width:500px; margin:0 auto;">
+                          <!-- General Level Test -->
+                          <button class="test-type-btn" onclick="startLevelTest('general')"
+                            style="display:flex; align-items:center; gap:16px; padding:20px; background:var(--color-card-bg); border:2px solid var(--color-border); border-radius:14px; cursor:pointer; text-align:left; transition:all 0.2s;"
+                            onmouseover="this.style.borderColor='var(--color-accent)'"
+                            onmouseout="this.style.borderColor='var(--color-border)'">
+                            <div
+                              style="width:50px; height:50px; background:linear-gradient(135deg, #10b981, #059669); border-radius:12px; display:flex; align-items:center; justify-content:center; color:white; font-size:1.3rem;">
+                              <i class="fa-solid fa-chart-line"></i>
+                            </div>
+                            <div>
+                              <div style="font-weight:700; font-size:1.1rem; color:var(--color-text-primary);">General
+                                Level Test</div>
+                              <div style="font-size:0.85rem; color:var(--color-text-muted);">CEFR levels A1-C1 • Grammar
+                                & Structure</div>
+                            </div>
+                          </button>
+
+                          <!-- IELTS Practice -->
+                          <button class="test-type-btn" onclick="startLevelTest('ielts')"
+                            style="display:flex; align-items:center; gap:16px; padding:20px; background:var(--color-card-bg); border:2px solid var(--color-border); border-radius:14px; cursor:pointer; text-align:left; transition:all 0.2s;"
+                            onmouseover="this.style.borderColor='#4f46e5'"
+                            onmouseout="this.style.borderColor='var(--color-border)'">
+                            <div
+                              style="width:50px; height:50px; background:linear-gradient(135deg, #4f46e5, #7c3aed); border-radius:12px; display:flex; align-items:center; justify-content:center; color:white; font-size:1.3rem;">
+                              <i class="fa-solid fa-graduation-cap"></i>
+                            </div>
+                            <div>
+                              <div style="font-weight:700; font-size:1.1rem; color:var(--color-text-primary);">IELTS
+                                Practice Test</div>
+                              <div style="font-size:0.85rem; color:var(--color-text-muted);">Band Score 4.0-9.0 •
+                                Reading & Vocabulary</div>
+                            </div>
+                          </button>
+
+                          <!-- TOEFL Practice -->
+                          <button class="test-type-btn" onclick="startLevelTest('toefl')"
+                            style="display:flex; align-items:center; gap:16px; padding:20px; background:var(--color-card-bg); border:2px solid var(--color-border); border-radius:14px; cursor:pointer; text-align:left; transition:all 0.2s;"
+                            onmouseover="this.style.borderColor='#0891b2'"
+                            onmouseout="this.style.borderColor='var(--color-border)'">
+                            <div
+                              style="width:50px; height:50px; background:linear-gradient(135deg, #0891b2, #0e7490); border-radius:12px; display:flex; align-items:center; justify-content:center; color:white; font-size:1.3rem;">
+                              <i class="fa-solid fa-university"></i>
+                            </div>
+                            <div>
+                              <div style="font-weight:700; font-size:1.1rem; color:var(--color-text-primary);">TOEFL
+                                Practice Test</div>
+                              <div style="font-size:0.85rem; color:var(--color-text-muted);">Score 0-120 • Academic
+                                English</div>
+                            </div>
+                          </button>
+                        </div>
                       </div>
 
                       <div id="previous-results" class="level-results-history">
@@ -603,6 +686,10 @@
 
                     <div id="level-quiz-screen" class="hidden">
                       <div class="quiz-progress">
+                        <div id="quiz-title"
+                          style="font-weight:700; font-size:1.1rem; margin-bottom:8px; color:var(--color-text-primary);">
+                          <i class="fa-solid fa-chart-line"></i> General Level Test
+                        </div>
                         <span id="quiz-progress-text">Question 1 of 10</span>
                         <div class="progress-bar">
                           <div id="quiz-progress-fill" class="progress-fill" style="width:10%"></div>
