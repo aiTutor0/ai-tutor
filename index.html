@@ -95,6 +95,63 @@
         <a href="javascript:void(0)" class="menu-link" data-link="tutor" onclick="openTool('tutor', event)">
           <i class="fa-solid fa-chalkboard-user"></i> Topic Explainer
         </a>
+
+        <!-- Speak Menu with Submenu -->
+        <a href="javascript:void(0)" class="menu-link menu-sub" onclick="toggleSpeakMenu(event)">
+          <i class="fa-solid fa-microphone-lines"></i> Speak
+          <span class="menu-caret" id="speak-caret"><i class="fa-solid fa-chevron-down"></i></span>
+        </a>
+
+        <div class="speak-panel hidden" id="speak-panel">
+          <a href="javascript:void(0)" class="menu-link" onclick="openSpeakMode('academic', event)">
+            <i class="fa-solid fa-graduation-cap"></i> Academic Speaking
+          </a>
+          <a href="javascript:void(0)" class="menu-link" onclick="openSpeakMode('native', event)">
+            <i class="fa-solid fa-comments"></i> Native Speaking
+          </a>
+        </div>
+
+        <!-- Writing Menu -->
+        <a href="javascript:void(0)" class="menu-link menu-sub" onclick="toggleWritingMenu(event)">
+          <i class="fa-solid fa-pen-fancy"></i> Writing
+          <span class="menu-caret" id="writing-caret"><i class="fa-solid fa-chevron-down"></i></span>
+        </a>
+        <div class="skill-panel hidden" id="writing-panel">
+          <a href="javascript:void(0)" class="menu-link" onclick="openSkillMode('writing', 'essay', event)">
+            <i class="fa-solid fa-file-lines"></i> Essay Writing
+          </a>
+          <a href="javascript:void(0)" class="menu-link" onclick="openSkillMode('writing', 'task', event)">
+            <i class="fa-solid fa-chart-line"></i> Task Response
+          </a>
+        </div>
+
+        <!-- Listening Menu -->
+        <a href="javascript:void(0)" class="menu-link menu-sub" onclick="toggleListeningMenu(event)">
+          <i class="fa-solid fa-headphones"></i> Listening
+          <span class="menu-caret" id="listening-caret"><i class="fa-solid fa-chevron-down"></i></span>
+        </a>
+        <div class="skill-panel hidden" id="listening-panel">
+          <a href="javascript:void(0)" class="menu-link" onclick="openSkillMode('listening', 'academic', event)">
+            <i class="fa-solid fa-graduation-cap"></i> Academic Listening
+          </a>
+          <a href="javascript:void(0)" class="menu-link" onclick="openSkillMode('listening', 'conversation', event)">
+            <i class="fa-solid fa-comments"></i> Conversation Practice
+          </a>
+        </div>
+
+        <!-- Reading Menu -->
+        <a href="javascript:void(0)" class="menu-link menu-sub" onclick="toggleReadingMenu(event)">
+          <i class="fa-solid fa-book-open"></i> Reading
+          <span class="menu-caret" id="reading-caret"><i class="fa-solid fa-chevron-down"></i></span>
+        </a>
+        <div class="skill-panel hidden" id="reading-panel">
+          <a href="javascript:void(0)" class="menu-link" onclick="openSkillMode('reading', 'academic', event)">
+            <i class="fa-solid fa-book"></i> Academic Reading
+          </a>
+          <a href="javascript:void(0)" class="menu-link" onclick="openSkillMode('reading', 'speed', event)">
+            <i class="fa-solid fa-bolt"></i> Speed Reading
+          </a>
+        </div>
       </nav>
 
       <!-- Profil (dropdown: Back + Logout) -->
@@ -707,6 +764,415 @@
                   </div>
                 </div>
               </div>
+
+              <!-- SPEAK PANEL -->
+              <div id="panel-speak" class="tab-panel hidden">
+                <div class="panel-content speak-container">
+                  <!-- Mode Selection Screen -->
+                  <div id="speak-mode-selection">
+                    <div class="panel-header">
+                      <h3><i class="fa-solid fa-microphone-lines"></i> Real-Time Speaking Practice</h3>
+                      <p class="muted">Choose your speaking mode and start practicing with AI</p>
+                    </div>
+
+                    <div class="speak-mode-cards">
+                      <div class="speak-mode-card academic" onclick="openSpeakMode('academic', event)">
+                        <div class="mode-icon"><i class="fa-solid fa-graduation-cap"></i></div>
+                        <h4>Academic Speaking</h4>
+                        <p>Practice formal English with advanced vocabulary and academic expressions. Perfect for
+                          presentations, interviews, and professional settings.</p>
+                        <ul class="mode-features">
+                          <li><i class="fa-solid fa-check"></i> Formal language corrections</li>
+                          <li><i class="fa-solid fa-check"></i> Academic vocabulary</li>
+                          <li><i class="fa-solid fa-check"></i> Grammar precision</li>
+                        </ul>
+                        <button class="primary-btn">
+                          <i class="fa-solid fa-play"></i> Start Academic
+                        </button>
+                      </div>
+
+                      <div class="speak-mode-card native" onclick="openSpeakMode('native', event)">
+                        <div class="mode-icon"><i class="fa-solid fa-comments"></i></div>
+                        <h4>Native Speaking</h4>
+                        <p>Practice casual conversation like a native speaker. Learn idioms, slang, and natural
+                          expressions used in everyday life.</p>
+                        <ul class="mode-features">
+                          <li><i class="fa-solid fa-check"></i> Casual expressions</li>
+                          <li><i class="fa-solid fa-check"></i> Natural flow</li>
+                          <li><i class="fa-solid fa-check"></i> Idioms & slang</li>
+                        </ul>
+                        <button class="outline-btn">
+                          <i class="fa-solid fa-play"></i> Start Native
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Session Screen -->
+                  <div id="speak-session-screen" class="hidden">
+                    <div class="speak-session-header">
+                      <button class="ghost-btn" onclick="backToModeSelection()">
+                        <i class="fa-solid fa-arrow-left"></i> Back
+                      </button>
+                      <div id="speak-mode-indicator" class="speak-mode-indicator">Mode</div>
+                      <div id="speak-connection-status" class="status-disconnected">Disconnected</div>
+                    </div>
+
+                    <div class="speak-session-content">
+                      <!-- AI Avatar with speaking animation -->
+                      <div class="speak-ai-section">
+                        <div id="speak-ai-avatar" class="speak-ai-avatar">
+                          <div class="avatar-waves">
+                            <span></span><span></span><span></span><span></span>
+                          </div>
+                          <i class="fa-solid fa-robot"></i>
+                        </div>
+                      </div>
+
+                      <!-- Transcript Area -->
+                      <div class="speak-transcript-section">
+                        <h4><i class="fa-solid fa-scroll"></i> Conversation</h4>
+                        <div id="speak-transcript" class="speak-transcript">
+                          <div class="transcript-placeholder">
+                            <i class="fa-solid fa-microphone"></i>
+                            <p>Press Start to begin speaking</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Corrections Panel -->
+                      <div class="speak-corrections-section">
+                        <h4><i class="fa-solid fa-lightbulb"></i> Real-Time Corrections</h4>
+                        <div id="speak-corrections" class="speak-corrections"></div>
+                      </div>
+                    </div>
+
+                    <!-- Control Buttons -->
+                    <div class="speak-controls">
+                      <button id="speak-start-btn" class="speak-control-btn start" onclick="startSpeakSession()">
+                        <i class="fa-solid fa-play"></i> Start
+                      </button>
+                      <button id="speak-stop-btn" class="speak-control-btn stop hidden" onclick="stopSpeakSession()">
+                        <i class="fa-solid fa-stop"></i> End Session
+                      </button>
+                      <button id="speak-mute-btn" class="speak-control-btn mute hidden" onclick="toggleSpeakMute()">
+                        <i class="fa-solid fa-microphone"></i>
+                      </button>
+                    </div>
+
+                    <!-- Previous Sessions -->
+                    <div class="speak-history-section">
+                      <h4><i class="fa-solid fa-history"></i> Recent Sessions</h4>
+                      <div id="speak-history-list" class="speak-history-list">
+                        <p class="no-history">No previous sessions</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Session Summary Modal -->
+                  <div id="speak-summary-modal" class="speak-summary-modal hidden"></div>
+                </div>
+              </div>
+
+              <!-- WRITING PANEL -->
+              <div id="panel-writing" class="tab-panel hidden">
+                <div class="panel-content skill-container">
+                  <!-- Mode Selection Screen -->
+                  <div id="writing-mode-selection">
+                    <div class="panel-header">
+                      <h3><i class="fa-solid fa-pen-fancy"></i> Writing Practice</h3>
+                      <p class="muted">Improve your writing skills for IELTS & TOEFL</p>
+                    </div>
+
+                    <div class="skill-mode-cards">
+                      <div class="skill-mode-card writing-essay" onclick="startEssayWriting(event)">
+                        <div class="mode-icon"><i class="fa-solid fa-file-lines"></i></div>
+                        <h4>Essay Writing</h4>
+                        <p>Practice academic essays with AI feedback. Get band score predictions and detailed
+                          corrections.</p>
+                        <ul class="mode-features">
+                          <li><i class="fa-solid fa-check"></i> IELTS Task 2 style essays</li>
+                          <li><i class="fa-solid fa-check"></i> Grammar & vocabulary analysis</li>
+                          <li><i class="fa-solid fa-check"></i> Band score prediction</li>
+                        </ul>
+                        <button class="primary-btn">
+                          <i class="fa-solid fa-play"></i> Start Essay Practice
+                        </button>
+                      </div>
+
+                      <div class="skill-mode-card writing-task" onclick="openSkillMode('writing', 'task', event)">
+                        <div class="mode-icon"><i class="fa-solid fa-chart-line"></i></div>
+                        <h4>Task Response</h4>
+                        <p>Describe graphs, charts, and diagrams. Perfect for IELTS Task 1 preparation.</p>
+                        <ul class="mode-features">
+                          <li><i class="fa-solid fa-check"></i> Graph interpretation</li>
+                          <li><i class="fa-solid fa-check"></i> Data description</li>
+                          <li><i class="fa-solid fa-check"></i> Academic vocabulary</li>
+                        </ul>
+                        <button class="outline-btn">
+                          <i class="fa-solid fa-play"></i> Start Task Practice
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Essay Session Screen -->
+                  <div id="writing-session-screen" class="hidden">
+                    <div class="essay-session-header">
+                      <button class="ghost-btn" onclick="backToWritingSelection()">
+                        <i class="fa-solid fa-arrow-left"></i> Back
+                      </button>
+                      <h3><i class="fa-solid fa-file-lines"></i> Essay Writing</h3>
+                    </div>
+
+                    <div class="essay-session-content">
+                      <!-- Topic Section -->
+                      <div class="essay-topic-section">
+                        <div class="topic-header">
+                          <h4><i class="fa-solid fa-question-circle"></i> Essay Topic</h4>
+                          <button class="ghost-btn small" onclick="getNewTopic()">
+                            <i class="fa-solid fa-refresh"></i> New Topic
+                          </button>
+                        </div>
+                        <div id="essay-topic-display" class="essay-topic-box">
+                          Click "Start Essay Practice" to get a topic.
+                        </div>
+                      </div>
+
+                      <!-- Writing Area -->
+                      <div class="essay-writing-section">
+                        <div class="writing-header">
+                          <h4><i class="fa-solid fa-pen"></i> Your Essay</h4>
+                          <span id="word-count-display" class="word-count">0 / 250-400 words</span>
+                        </div>
+                        <textarea id="essay-textarea" class="essay-textarea" placeholder="Write your essay here. Aim for 250-400 words.
+
+Tips:
+• Start with an introduction stating your position
+• Use 2-3 body paragraphs with examples
+• Write a conclusion summarizing your view" oninput="updateWordCount()"></textarea>
+
+                        <div class="essay-actions">
+                          <button id="submit-essay-btn" class="primary-btn" onclick="submitEssayForReview()">
+                            <i class="fa-solid fa-paper-plane"></i> Submit for Review
+                          </button>
+                        </div>
+                      </div>
+
+                      <!-- Feedback Panel -->
+                      <div id="essay-feedback-panel" class="essay-feedback-panel hidden">
+                        <!-- Feedback will be inserted here by JS -->
+                      </div>
+
+                      <!-- History Section -->
+                      <div class="essay-history-section">
+                        <h4><i class="fa-solid fa-history"></i> Recent Essays</h4>
+                        <div id="essay-history-list" class="essay-history-list">
+                          <p class="no-history">No previous essays</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- LISTENING PANEL -->
+              <div id="panel-listening" class="tab-panel hidden">
+                <div class="panel-content skill-container">
+                  <!-- Mode Selection Screen -->
+                  <div id="listening-mode-selection">
+                    <div class="panel-header">
+                      <h3><i class="fa-solid fa-headphones"></i> Listening Practice</h3>
+                      <p class="muted">Train your listening skills for academic and everyday situations</p>
+                    </div>
+
+                    <div class="skill-mode-cards">
+                      <div class="skill-mode-card listening-academic" onclick="startAcademicListening(event)">
+                        <div class="mode-icon"><i class="fa-solid fa-graduation-cap"></i></div>
+                        <h4>Academic Listening</h4>
+                        <p>Practice with lectures, presentations, and academic discussions.</p>
+                        <ul class="mode-features">
+                          <li><i class="fa-solid fa-check"></i> Audio playback with replay</li>
+                          <li><i class="fa-solid fa-check"></i> Comprehension questions</li>
+                          <li><i class="fa-solid fa-check"></i> Transcript review</li>
+                        </ul>
+                        <button class="primary-btn">
+                          <i class="fa-solid fa-play"></i> Start Academic Listening
+                        </button>
+                      </div>
+
+                      <div class="skill-mode-card listening-conversation"
+                        onclick="openSkillMode('listening', 'conversation', event)">
+                        <div class="mode-icon"><i class="fa-solid fa-comments"></i></div>
+                        <h4>Conversation Practice</h4>
+                        <p>Listen to everyday conversations and learn natural expressions.</p>
+                        <ul class="mode-features">
+                          <li><i class="fa-solid fa-check"></i> Daily life dialogues</li>
+                          <li><i class="fa-solid fa-check"></i> Idioms & expressions</li>
+                          <li><i class="fa-solid fa-check"></i> Comprehension check</li>
+                        </ul>
+                        <button class="outline-btn">
+                          <i class="fa-solid fa-play"></i> Start Conversation Practice
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Listening Session Screen -->
+                  <div id="listening-session-screen" class="hidden">
+                    <div class="listening-session-header">
+                      <button class="ghost-btn" onclick="backToListeningSelection()">
+                        <i class="fa-solid fa-arrow-left"></i> Back
+                      </button>
+                      <h3 id="listening-title"><i class="fa-solid fa-headphones"></i> Academic Listening</h3>
+                    </div>
+
+                    <!-- Loading State -->
+                    <div id="listening-loading" class="listening-loading hidden">
+                      <i class="fa-solid fa-spinner fa-spin"></i>
+                      <p>Generating listening content...</p>
+                    </div>
+
+                    <!-- Main Content -->
+                    <div id="listening-content" class="listening-session-content">
+                      <!-- Audio Player -->
+                      <div id="listening-audio-container" class="listening-audio-section">
+                        <!-- Audio player will be inserted here by JS -->
+                      </div>
+
+                      <!-- Questions Section -->
+                      <div class="listening-questions-section">
+                        <div id="listening-questions-container" class="listening-questions-container">
+                          <!-- Questions will be inserted here -->
+                        </div>
+
+                        <div class="listening-submit-actions">
+                          <button class="primary-btn" onclick="submitListeningAnswers()">
+                            <i class="fa-solid fa-check"></i> Submit Answers
+                          </button>
+                        </div>
+                      </div>
+
+                      <!-- Results Panel -->
+                      <div id="listening-results-panel" class="listening-results-panel hidden">
+                        <!-- Results will be inserted here by JS -->
+                      </div>
+
+                      <!-- History Section -->
+                      <div class="listening-history-section">
+                        <h4><i class="fa-solid fa-history"></i> Recent Sessions</h4>
+                        <div id="listening-history-list" class="listening-history-list">
+                          <p class="no-history">No previous sessions</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- READING PANEL -->
+              <div id="panel-reading" class="tab-panel hidden">
+                <div class="panel-content skill-container">
+                  <!-- Mode Selection Screen -->
+                  <div id="reading-mode-selection">
+                    <div class="panel-header">
+                      <h3><i class="fa-solid fa-book-open"></i> Reading Practice</h3>
+                      <p class="muted">Enhance your reading comprehension for exams</p>
+                    </div>
+
+                    <div class="skill-mode-cards">
+                      <div class="skill-mode-card reading-academic" onclick="startAcademicReading(event)">
+                        <div class="mode-icon"><i class="fa-solid fa-book"></i></div>
+                        <h4>Academic Reading</h4>
+                        <p>Read academic passages and answer IELTS-style questions with timer.</p>
+                        <ul class="mode-features">
+                          <li><i class="fa-solid fa-check"></i> True/False/Not Given</li>
+                          <li><i class="fa-solid fa-check"></i> Matching & multiple choice</li>
+                          <li><i class="fa-solid fa-check"></i> Timed practice</li>
+                        </ul>
+                        <button class="primary-btn">
+                          <i class="fa-solid fa-play"></i> Start Academic Reading
+                        </button>
+                      </div>
+
+                      <div class="skill-mode-card reading-speed" onclick="openSkillMode('reading', 'speed', event)">
+                        <div class="mode-icon"><i class="fa-solid fa-bolt"></i></div>
+                        <h4>Speed Reading</h4>
+                        <p>Improve your reading speed with skimming and scanning exercises.</p>
+                        <ul class="mode-features">
+                          <li><i class="fa-solid fa-check"></i> WPM measurement</li>
+                          <li><i class="fa-solid fa-check"></i> Skimming practice</li>
+                          <li><i class="fa-solid fa-check"></i> Scanning exercises</li>
+                        </ul>
+                        <button class="outline-btn">
+                          <i class="fa-solid fa-play"></i> Start Speed Reading
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Reading Session Screen -->
+                  <div id="reading-session-screen" class="hidden">
+                    <div class="reading-session-header">
+                      <button class="ghost-btn" onclick="backToReadingSelection()">
+                        <i class="fa-solid fa-arrow-left"></i> Back
+                      </button>
+                      <h3><i class="fa-solid fa-book"></i> Academic Reading</h3>
+                      <div class="reading-timer">
+                        <i class="fa-solid fa-clock"></i>
+                        <span id="reading-timer">20:00</span>
+                      </div>
+                    </div>
+
+                    <!-- Loading State -->
+                    <div id="reading-loading" class="reading-loading hidden">
+                      <i class="fa-solid fa-spinner fa-spin"></i>
+                      <p>Generating passage...</p>
+                    </div>
+
+                    <!-- Main Content -->
+                    <div id="reading-content" class="reading-session-content">
+                      <div class="reading-layout">
+                        <!-- Passage Section -->
+                        <div class="passage-section">
+                          <div id="passage-container" class="passage-container">
+                            <!-- Passage will be inserted here -->
+                          </div>
+                        </div>
+
+                        <!-- Questions Section -->
+                        <div class="questions-section">
+                          <div class="questions-header">
+                            <h4><i class="fa-solid fa-question-circle"></i> Questions</h4>
+                          </div>
+                          <div id="questions-container" class="questions-container">
+                            <!-- Questions will be inserted here -->
+                          </div>
+
+                          <div class="reading-submit-actions">
+                            <button class="primary-btn" onclick="submitReadingAnswers()">
+                              <i class="fa-solid fa-check"></i> Submit Answers
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Results Panel -->
+                      <div id="reading-results-panel" class="reading-results-panel hidden">
+                        <!-- Results will be inserted here by JS -->
+                      </div>
+
+                      <!-- History Section -->
+                      <div class="reading-history-section">
+                        <h4><i class="fa-solid fa-history"></i> Recent Sessions</h4>
+                        <div id="reading-history-list" class="reading-history-list">
+                          <p class="no-history">No previous sessions</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </section>
           </main>
         </div>
@@ -720,6 +1186,11 @@
   <script src="./js/ui/levelTest.js"></script>
   <script type="module" src="./js/ui/groupChat.js"></script>
   <script src="./js/ui/adminPanel.js"></script>
+  <script src="./js/ui/skillsUI.js"></script>
+  <script type="module" src="./js/ui/writingUI.js"></script>
+  <script type="module" src="./js/ui/readingUI.js"></script>
+  <script type="module" src="./js/ui/listeningUI.js"></script>
+  <script type="module" src="./js/ui/speakUI.js"></script>
   <script type="module" src="./js/app.js"></script>
 </body>
 

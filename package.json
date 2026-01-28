@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "netlify dev",
     "dev:local": "node server/index.js",
+    "serve": "npx http-server -p 3000 -c-1",
     "start": "node server/index.js",
     "deploy": "netlify deploy --prod"
   },

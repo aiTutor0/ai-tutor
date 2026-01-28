@@ -1188,6 +1188,7 @@ body.dark-mode {
   overflow-y: auto;
 }
 
+<<<<<<< HEAD
 /* === LINK BUTTON (Forgot Password) === */
 .link-btn {
   background: none;
@@ -1221,6 +1222,350 @@ body.dark-mode {
 }
 
 @keyframes pulse {
+=======
+/* ================================================
+   SPEAK UI STYLES
+   ================================================ */
+
+/* Sidebar Speak Panel */
+.speak-panel {
+  padding-left: 16px;
+  border-left: 2px solid var(--color-accent);
+  margin-left: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.speak-panel .menu-link {
+  font-size: 0.9rem;
+  padding: 8px 12px;
+}
+
+.speak-panel .menu-link i {
+  width: 20px;
+}
+
+#speak-caret.rotated {
+  transform: rotate(180deg);
+}
+
+/* Speak Container */
+.speak-container {
+  padding: 24px;
+  height: 100%;
+  overflow-y: auto;
+}
+
+/* Mode Selection Cards */
+.speak-mode-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+  margin-top: 24px;
+}
+
+.speak-mode-card {
+  background: var(--color-card-bg);
+  border: 2px solid var(--color-card-border);
+  border-radius: 20px;
+  padding: 28px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.speak-mode-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+.speak-mode-card.academic:hover {
+  border-color: #8b5cf6;
+}
+
+.speak-mode-card.native:hover {
+  border-color: #10b981;
+}
+
+.speak-mode-card .mode-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+}
+
+.speak-mode-card.academic .mode-icon {
+  background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+  color: white;
+}
+
+.speak-mode-card.native .mode-icon {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+}
+
+.speak-mode-card h4 {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--color-text-primary);
+}
+
+.speak-mode-card p {
+  color: var(--color-text-muted);
+  line-height: 1.6;
+}
+
+.mode-features {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mode-features li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-text-secondary);
+  font-size: 0.95rem;
+}
+
+.mode-features li i {
+  color: var(--color-accent);
+}
+
+/* Session Screen */
+.speak-session-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--color-border);
+  margin-bottom: 20px;
+}
+
+.speak-mode-indicator {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.speak-mode-indicator.academic {
+  background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+  color: white;
+}
+
+.speak-mode-indicator.native {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+}
+
+.status-connected {
+  color: #10b981;
+  font-weight: 600;
+}
+
+.status-disconnected {
+  color: var(--color-text-muted);
+}
+
+/* Session Content Grid */
+.speak-session-content {
+  display: grid;
+  grid-template-columns: 200px 1fr 280px;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+@media (max-width: 1000px) {
+  .speak-session-content {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* AI Avatar */
+.speak-ai-section {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 20px;
+}
+
+.speak-ai-avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-accent) 0%, #8b5cf6 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.speak-ai-avatar i {
+  font-size: 3rem;
+  color: white;
+  z-index: 2;
+}
+
+.avatar-waves {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.speak-ai-avatar.speaking .avatar-waves {
+  opacity: 1;
+}
+
+.avatar-waves span {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 3px solid var(--color-accent);
+  animation: wave-pulse 1.5s infinite;
+}
+
+.avatar-waves span:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.avatar-waves span:nth-child(2) {
+  animation-delay: 0.3s;
+}
+
+.avatar-waves span:nth-child(3) {
+  animation-delay: 0.6s;
+}
+
+.avatar-waves span:nth-child(4) {
+  animation-delay: 0.9s;
+}
+
+@keyframes wave-pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+
+  100% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+}
+
+/* Transcript Section */
+.speak-transcript-section h4,
+.speak-corrections-section h4,
+.speak-history-section h4 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.speak-transcript {
+  background: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  padding: 16px;
+  min-height: 300px;
+  max-height: 400px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.transcript-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--color-text-muted);
+  gap: 12px;
+}
+
+.transcript-placeholder i {
+  font-size: 3rem;
+  opacity: 0.5;
+}
+
+.transcript-message {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.transcript-message.user {
+  flex-direction: row-reverse;
+}
+
+.transcript-message .message-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  flex-shrink: 0;
+}
+
+.transcript-message.user .message-avatar {
+  background: var(--color-accent);
+  color: white;
+}
+
+.transcript-message.assistant .message-avatar {
+  background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+  color: white;
+}
+
+.transcript-message .message-content {
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  padding: 10px 14px;
+  border-radius: 12px;
+  max-width: 85%;
+  line-height: 1.5;
+}
+
+.transcript-message.user .message-content {
+  background: var(--color-accent);
+  color: white;
+  border: none;
+}
+
+.transcript-message.streaming .message-content {
+  border-color: var(--color-accent);
+  animation: streaming-pulse 1s infinite;
+}
+
+@keyframes streaming-pulse {
+>>>>>>> b7b8fbb (speak ve sql dosyalari branch icin kaydedildi)
 
   0%,
   100% {
@@ -1228,6 +1573,7 @@ body.dark-mode {
   }
 
   50% {
+<<<<<<< HEAD
     opacity: 0.5;
   }
 }
@@ -1343,10 +1689,76 @@ body.dark-mode {
   gap: 8px;
   border: 1px solid var(--color-border);
   margin-bottom: 8px;
+=======
+    opacity: 0.7;
+  }
+}
+
+/* Corrections Section */
+.speak-corrections {
+  max-height: 300px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.correction-item {
+  background: var(--color-correction-bg, #fef3c7);
+  border: 1px solid var(--color-correction-border, #fcd34d);
+  border-radius: 12px;
+  padding: 12px 14px;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  transition: all 0.3s ease;
+}
+
+.correction-item i {
+  color: #f59e0b;
+  font-size: 1.1rem;
+  margin-top: 2px;
+}
+
+.correction-item.highlight {
+  animation: correction-highlight 2s ease-out;
+}
+
+@keyframes correction-highlight {
+  0% {
+    background: #fde68a;
+    transform: scale(1.02);
+  }
+
+  100% {
+    background: var(--color-correction-bg, #fef3c7);
+    transform: scale(1);
+  }
+}
+
+/* Control Buttons */
+.speak-controls {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.speak-control-btn {
+  padding: 14px 28px;
+  border-radius: 16px;
+  font-size: 1rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: none;
+>>>>>>> b7b8fbb (speak ve sql dosyalari branch icin kaydedildi)
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
+<<<<<<< HEAD
 .pdf-attachment:hover {
   background: var(--color-accent-light);
   border-color: var(--color-accent);
@@ -1486,10 +1898,587 @@ body.dark-mode {
   border-left: 4px solid var(--color-accent);
   background: var(--color-bg-tertiary);
   border-radius: 0 8px 8px 0;
+=======
+.speak-control-btn.start {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+}
+
+.speak-control-btn.start:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+}
+
+.speak-control-btn.stop {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
+}
+
+.speak-control-btn.stop:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);
+}
+
+.speak-control-btn.mute {
+  background: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-primary);
+  padding: 14px;
+}
+
+.speak-control-btn.mute.muted {
+  background: #ef4444;
+  color: white;
+  border-color: #ef4444;
+}
+
+.speak-control-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* History Section */
+.speak-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.history-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  background: var(--color-bg-tertiary);
+  border-radius: 10px;
+  font-size: 0.9rem;
+}
+
+.history-mode {
+  font-size: 1.2rem;
+}
+
+.history-duration {
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.history-date {
+  color: var(--color-text-muted);
+  margin-left: auto;
+}
+
+.no-history {
+  color: var(--color-text-muted);
+  text-align: center;
+  padding: 20px;
+}
+
+/* Summary Modal */
+.speak-summary-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.speak-summary-modal.hidden {
+  display: none;
+}
+
+.summary-content {
+  background: var(--color-card-bg);
+  border-radius: 20px;
+  padding: 32px;
+  max-width: 400px;
+  text-align: center;
+}
+
+.summary-content h3 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 1.4rem;
+  color: #10b981;
+  margin-bottom: 24px;
+}
+
+.summary-stats {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.summary-stats .stat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.summary-stats .stat-value {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--color-accent);
+}
+
+.summary-stats .stat-label {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+
+/* Toast Notification */
+.speak-toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  padding: 14px 24px;
+  border-radius: 12px;
+  box-shadow: var(--shadow-lg);
+  font-weight: 600;
+  z-index: 1001;
+  transition: transform 0.3s ease;
+  opacity: 0;
+}
+
+.speak-toast.show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+
+.speak-toast.success {
+  border-left: 4px solid #10b981;
+}
+
+.speak-toast.error {
+  border-left: 4px solid #ef4444;
+}
+
+/* ================================================
+   SKILL PANELS (Writing, Listening, Reading)
+   ================================================ */
+
+/* Sidebar Skill Panel */
+.skill-panel {
+  padding-left: 16px;
+  border-left: 2px solid var(--color-accent);
+  margin-left: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.skill-panel .menu-link {
+  font-size: 0.9rem;
+  padding: 8px 12px;
+}
+
+.skill-panel .menu-link i {
+  width: 20px;
+}
+
+#writing-caret.rotated,
+#listening-caret.rotated,
+#reading-caret.rotated {
+  transform: rotate(180deg);
+}
+
+/* Skill Container */
+.skill-container {
+  padding: 24px;
+  height: 100%;
+  overflow-y: auto;
+}
+
+/* Skill Mode Cards - uses same structure as speak */
+.skill-mode-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+  margin-top: 24px;
+}
+
+.skill-mode-card {
+  background: var(--color-card-bg);
+  border: 2px solid var(--color-card-border);
+  border-radius: 20px;
+  padding: 28px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.skill-mode-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Writing Cards */
+.skill-mode-card.writing-essay:hover {
+  border-color: #f59e0b;
+}
+
+.skill-mode-card.writing-essay .mode-icon {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: white;
+}
+
+.skill-mode-card.writing-task:hover {
+  border-color: #8b5cf6;
+}
+
+.skill-mode-card.writing-task .mode-icon {
+  background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+  color: white;
+}
+
+/* Listening Cards */
+.skill-mode-card.listening-academic:hover {
+  border-color: #3b82f6;
+}
+
+.skill-mode-card.listening-academic .mode-icon {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+}
+
+.skill-mode-card.listening-conversation:hover {
+  border-color: #10b981;
+}
+
+.skill-mode-card.listening-conversation .mode-icon {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+}
+
+/* Reading Cards */
+.skill-mode-card.reading-academic:hover {
+  border-color: #ec4899;
+}
+
+.skill-mode-card.reading-academic .mode-icon {
+  background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
+  color: white;
+}
+
+.skill-mode-card.reading-speed:hover {
+  border-color: #f97316;
+}
+
+.skill-mode-card.reading-speed .mode-icon {
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+  color: white;
+}
+
+.skill-mode-card .mode-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+}
+
+.skill-mode-card h4 {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--color-text-primary);
+}
+
+.skill-mode-card p {
+  color: var(--color-text-muted);
+  line-height: 1.6;
+}
+
+/* ================================================
+   ESSAY WRITING STYLES
+   ================================================ */
+
+/* Session Header */
+.essay-session-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--color-border);
+  margin-bottom: 20px;
+}
+
+.essay-session-header h3 {
+  margin: 0;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Topic Section */
+.essay-topic-section {
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.topic-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.topic-header h4 {
+  margin: 0;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ghost-btn.small {
+  padding: 6px 12px;
+  font-size: 0.85rem;
+}
+
+.essay-topic-box {
+  background: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 16px;
+  line-height: 1.6;
+  font-style: italic;
+  color: var(--color-text-primary);
+}
+
+/* Writing Section */
+.essay-writing-section {
+  margin-bottom: 20px;
+}
+
+.writing-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.writing-header h4 {
+  margin: 0;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.word-count {
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 4px 12px;
+  background: var(--color-bg-tertiary);
+  border-radius: 20px;
+}
+
+.essay-textarea {
+  width: 100%;
+  min-height: 350px;
+  padding: 16px;
+  border: 2px solid var(--color-border);
+  border-radius: 12px;
+  background: var(--color-card-bg);
+  color: var(--color-text-primary);
+  font-size: 1rem;
+  line-height: 1.8;
+  resize: vertical;
+  transition: border-color 0.2s;
+}
+
+.essay-textarea:focus {
+  outline: none;
+  border-color: var(--color-accent);
+}
+
+.essay-textarea::placeholder {
+  color: var(--color-text-muted);
+  opacity: 0.7;
+}
+
+.essay-actions {
+  margin-top: 16px;
+  display: flex;
+  gap: 12px;
+}
+
+/* Feedback Panel */
+.essay-feedback-panel {
+  background: var(--color-card-bg);
+  border: 2px solid var(--color-accent);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 20px;
+}
+
+.feedback-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.feedback-header h3 {
+  margin: 0;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.band-score-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: linear-gradient(135deg, var(--color-accent) 0%, #8b5cf6 100%);
+  padding: 12px 24px;
+  border-radius: 12px;
+  color: white;
+}
+
+.band-label {
+  font-size: 0.75rem;
+  opacity: 0.9;
+}
+
+.band-value {
+  font-size: 2rem;
+  font-weight: 900;
+}
+
+.score-breakdown {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.score-item {
+  background: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.score-label {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+
+.score-value {
+  font-weight: 800;
+  font-size: 1.1rem;
+  color: var(--color-accent);
+}
+
+.feedback-section {
+  margin-bottom: 16px;
+}
+
+.feedback-section h4 {
+  margin: 0 0 10px 0;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.95rem;
+}
+
+.feedback-section p {
+  margin: 0;
+  line-height: 1.6;
+}
+
+.feedback-section ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.feedback-section li {
+  margin-bottom: 6px;
+}
+
+.feedback-section.strengths h4 i {
+  color: #10b981;
+}
+
+.feedback-section.weaknesses h4 i {
+  color: #f59e0b;
+}
+
+.feedback-section.grammar-errors h4 i {
+  color: #ef4444;
+}
+
+.feedback-section.suggestions h4 i {
+  color: #3b82f6;
+}
+
+/* Error Items */
+.error-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.error-item {
+  background: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.error-original {
+  color: #ef4444;
+  text-decoration: line-through;
+  opacity: 0.8;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.error-corrected {
+  color: #10b981;
+  font-weight: 600;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.error-explanation {
+  margin-top: 8px;
+  font-size: 0.85rem;
+>>>>>>> b7b8fbb (speak ve sql dosyalari branch icin kaydedildi)
   color: var(--color-text-muted);
   font-style: italic;
 }
 
+<<<<<<< HEAD
 /* Horizontal rule */
 .md-hr {
   border: none;
@@ -1517,4 +2506,73 @@ body.dark-mode .md-inline-code {
 /* Make AI message bubbles wider for better code display */
 .ai-msg .msg-bubble {
   max-width: min(85%, 700px);
+=======
+.feedback-actions {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--color-border);
+}
+
+/* History Section */
+.essay-history-section {
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  padding: 20px;
+}
+
+.essay-history-section h4 {
+  margin: 0 0 12px 0;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.essay-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.essay-history-list .history-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  background: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.essay-history-list .history-item:hover {
+  border-color: var(--color-accent);
+}
+
+.history-score {
+  background: var(--color-accent);
+  color: white;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-weight: 800;
+  font-size: 0.9rem;
+}
+
+.history-words {
+  flex: 1;
+  color: var(--color-text-muted);
+}
+
+.history-date {
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+}
+
+.no-history {
+  color: var(--color-text-muted);
+  text-align: center;
+  padding: 20px;
+>>>>>>> b7b8fbb (speak ve sql dosyalari branch icin kaydedildi)
 }

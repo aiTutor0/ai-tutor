@@ -284,6 +284,94 @@ app.post('/api/transcribe', rateLimit, async (req, res) => {
   }
 });
 
+// OpenAI Realtime API Token endpoint
+// Generates ephemeral tokens for WebRTC connection
+app.post('/api/realtime-token', rateLimit, async (req, res) => {
+  const apiKey = process.env.OPENAI_API_KEY;
+
+  if (!apiKey) {
+    return res.status(500).json({ error: 'OPENAI_API_KEY missing on server' });
+  }
+
+  try {
+    const { mode = 'academic' } = req.body;
+
+    // Validate mode
+    if (!['academic', 'native'].includes(mode)) {
+      return res.status(400).json({ error: 'Invalid mode. Must be "academic" or "native"' });
+    }
+
+    // System instructions based on mode
+    const instructions = {
+      academic: `You are an academic English speaking tutor. Your role is to:
+1. Speak in formal, academic English
+2. Correct grammar, pronunciation, and word choice in real-time
+3. Suggest more sophisticated vocabulary and sentence structures
+4. Provide corrections using formal academic language
+5. Focus on clarity, precision, and proper grammar
+6. When correcting, say something like: "A more academic way to express that would be..."
+7. Keep responses concise but educational
+8. Speak at a moderate pace for learners`,
+
+      native: `You are a casual English conversation partner. Your role is to:
+1. Speak naturally like a native English speaker
+2. Use common idioms, slang, and everyday expressions
+3. Correct mistakes with casual, friendly suggestions
+4. Suggest more natural ways to express things
+5. Focus on fluency and natural conversation flow
+6. When correcting, say something like: "Native speakers usually say..."
+7. Keep the conversation fun and engaging
+8. Use contractions and casual speech patterns`
+    };
+
+    // Request ephemeral token from OpenAI
+    const response = await fetch('https://api.openai.com/v1/realtime/sessions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-realtime-preview-2024-12-17',
+        voice: 'alloy',
+        instructions: instructions[mode],
+        input_audio_transcription: {
+          model: 'whisper-1'
+        },
+        turn_detection: {
+          type: 'server_vad',
+          threshold: 0.5,
+          prefix_padding_ms: 300,
+          silence_duration_ms: 500
+        }
+      })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      console.error('OpenAI Realtime Token Error:', data);
+      return res.status(response.status).json({
+        error: data.error?.message || 'Failed to create realtime session'
+      });
+    }
+
+    res.json({
+      token: data.client_secret?.value,
+      expiresAt: data.client_secret?.expires_at,
+      sessionId: data.id,
+      mode: mode
+    });
+
+  } catch (error) {
+    console.error('Realtime Token Error:', error);
+    res.status(500).json({
+      error: 'Failed to generate realtime token',
+      message: error.message
+    });
+  }
+});
+
 // SPA fallback - serve index.html for all other routes
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'index.html'));
