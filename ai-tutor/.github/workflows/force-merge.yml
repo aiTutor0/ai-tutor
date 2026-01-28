@@ -1,0 +1,20 @@
+name: Force Merge Frontend
+on:
+  workflow_dispatch:
+jobs:
+  merge:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: main
+      - name: Force Merge
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git fetch origin frontend
+          git checkout origin/frontend -- .
+          git commit -m "Brute force merge frontend into main"
+          git push origin main
