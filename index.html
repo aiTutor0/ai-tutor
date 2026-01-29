@@ -96,9 +96,9 @@
           <i class="fa-solid fa-chalkboard-user"></i> Topic Explainer
         </a>
 
-        <!-- Speak Menu with Submenu -->
+        <!-- Speaking Menu with Submenu -->
         <a href="javascript:void(0)" class="menu-link menu-sub" onclick="toggleSpeakMenu(event)">
-          <i class="fa-solid fa-microphone-lines"></i> Speak
+          <i class="fa-solid fa-microphone-lines"></i> Speaking
           <span class="menu-caret" id="speak-caret"><i class="fa-solid fa-chevron-down"></i></span>
         </a>
 
@@ -900,7 +900,7 @@
                         </button>
                       </div>
 
-                      <div class="skill-mode-card writing-task" onclick="openSkillMode('writing', 'task', event)">
+                      <div class="skill-mode-card writing-task" onclick="startTaskWriting(event)">
                         <div class="mode-icon"><i class="fa-solid fa-chart-line"></i></div>
                         <h4>Task Response</h4>
                         <p>Describe graphs, charts, and diagrams. Perfect for IELTS Task 1 preparation.</p>
@@ -1001,8 +1001,7 @@ Tips:
                         </button>
                       </div>
 
-                      <div class="skill-mode-card listening-conversation"
-                        onclick="openSkillMode('listening', 'conversation', event)">
+                      <div class="skill-mode-card listening-conversation" onclick="startConversationListening(event)">
                         <div class="mode-icon"><i class="fa-solid fa-comments"></i></div>
                         <h4>Conversation Practice</h4>
                         <p>Listen to everyday conversations and learn natural expressions.</p>
@@ -1095,7 +1094,7 @@ Tips:
                         </button>
                       </div>
 
-                      <div class="skill-mode-card reading-speed" onclick="openSkillMode('reading', 'speed', event)">
+                      <div class="skill-mode-card reading-speed" onclick="startSpeedReading(event)">
                         <div class="mode-icon"><i class="fa-solid fa-bolt"></i></div>
                         <h4>Speed Reading</h4>
                         <p>Improve your reading speed with skimming and scanning exercises.</p>
