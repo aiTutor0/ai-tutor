@@ -24,35 +24,30 @@ export function initListeningUI() {
 // ACADEMIC LISTENING MODE
 // ======================================
 
-window.startAcademicListening = async function (event) {
-    if (event) event.preventDefault();
-
+// Called by skillsUI.js when academic listening is started
+window.loadListeningContent = async function (mode = 'academic') {
     if (isLoading) return;
 
     try {
         isLoading = true;
-        showListeningLoading(true);
-
-        // Hide mode selection, show session screen
-        document.getElementById('listening-mode-selection')?.classList.add('hidden');
-        document.getElementById('listening-session-screen')?.classList.remove('hidden');
-
+        showListeningLoading(mode, true);
         sessionStartTime = Date.now();
 
         // Generate listening content
-        const data = await generateListeningContent(null, 'academic');
+        const data = await generateListeningContent(null, mode);
         currentListeningData = data;
+        currentListeningData.mode = mode;
         userAnswers = {};
 
-        // Display content
-        displayListeningContent(data);
+        // Display content based on mode
+        displayListeningContent(data, mode);
 
-        showListeningLoading(false);
+        showListeningLoading(mode, false);
     } catch (error) {
         console.error('Failed to start listening:', error);
-        showListeningLoading(false);
+        showListeningLoading(mode, false);
         alert('Failed to generate listening content. Please try again.');
-        backToListeningSelection();
+        // Don't go back, let user try again
     } finally {
         isLoading = false;
     }
@@ -82,9 +77,10 @@ function resetListeningSession() {
     }
 }
 
-function showListeningLoading(show) {
-    const loader = document.getElementById('listening-loading');
-    const content = document.getElementById('listening-content');
+function showListeningLoading(mode, show) {
+    const prefix = mode === 'academic' ? 'academic-listening' : 'conversation-listening';
+    const loader = document.getElementById(`${prefix}-loading`);
+    const content = document.getElementById(`${prefix}-content`);
 
     if (show) {
         loader?.classList.remove('hidden');
@@ -99,22 +95,18 @@ function showListeningLoading(show) {
 // DISPLAY FUNCTIONS
 // ======================================
 
-function displayListeningContent(data) {
-    // Display title and topic
-    const titleDiv = document.getElementById('listening-title');
-    if (titleDiv) {
-        titleDiv.textContent = data.title || 'Academic Listening';
-    }
+function displayListeningContent(data, mode = 'academic') {
+    const prefix = mode === 'academic' ? 'academic' : 'conversation';
 
     // Create audio player for transcript
-    createAudioPlayer(data.transcript);
+    createAudioPlayer(data.transcript, prefix);
 
     // Display questions
-    displayListeningQuestions(data.questions);
+    displayListeningQuestions(data.questions, prefix);
 }
 
-function createAudioPlayer(transcript) {
-    const audioContainer = document.getElementById('listening-audio-container');
+function createAudioPlayer(transcript, prefix = 'academic') {
+    const audioContainer = document.getElementById(`${prefix}-audio-container`);
     if (!audioContainer) return;
 
     // Use Web Speech API for TTS (browser-based, no cost)
@@ -195,8 +187,8 @@ window.replayListeningAudio = function () {
     setTimeout(() => window.playListeningAudio(), 100);
 };
 
-function displayListeningQuestions(questions) {
-    const container = document.getElementById('listening-questions-container');
+function displayListeningQuestions(questions, prefix = 'academic') {
+    const container = document.getElementById(`${prefix}-listening-questions`);
     if (!container) return;
 
     container.innerHTML = '<h4><i class="fa-solid fa-question-circle"></i> Comprehension Questions</h4>';
