@@ -265,7 +265,7 @@
 
 /* Landing Responsive */
 @media (max-width: 920px) {
-  .landing-hero {
+.landing-hero {
     grid-template-columns: 1fr;
   }
 }
@@ -666,7 +666,7 @@
   border: none;
   border-radius: 0;
   overflow: hidden;
-  /* Prevent interface-level scroll */
+/* Prevent interface-level scroll */
 }
 
 .chat-window {
@@ -679,9 +679,9 @@
   gap: 14px;
   background: var(--color-chat-bg);
   min-height: 0;
-  /* Critical for flex child to shrink */
+/* Critical for flex child to shrink */
   max-height: 100%;
-  /* Ensure it doesn't exceed container */
+/* Ensure it doesn't exceed container */
 }
 
 .message {
@@ -857,11 +857,11 @@
 
 /* Responsive for workspace */
 @media (max-width: 980px) {
-  .ws-grid {
+.ws-grid {
     grid-template-columns: 1fr;
   }
 
-  .ws-right {
+.ws-right {
     display: none;
   }
 }
@@ -969,16 +969,16 @@
 
 /* Admin table responsive */
 @media (max-width: 960px) {
-  .admin-row {
+.admin-row {
     grid-template-columns: 1fr;
     gap: 6px;
   }
 
-  .admin-head {
+.admin-head {
     display: none;
   }
 
-  .admin-row>div {
+.admin-row>div {
     padding: 2px 0;
   }
 }
@@ -1220,7 +1220,20 @@ body.dark-mode {
   }
 }
 
-@keyframes pulse {/* =========================================   SPEAK UI STYLES
+@keyframes pulse {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* ================================================
+   SPEAK UI STYLES
    ================================================ */
 
 /* Sidebar Speak Panel */
@@ -1383,7 +1396,7 @@ body.dark-mode {
 }
 
 @media (max-width: 1000px) {
-  .speak-session-content {
+.speak-session-content {
     grid-template-columns: 1fr;
   }
 }
@@ -1637,12 +1650,12 @@ body.dark-mode {
 /* High contrast mode support */
 @media (prefers-contrast: high) {
 
-  .primary-btn,
-  .ghost-btn {
+.primary-btn,
+.ghost-btn {
     border-width: 2px;
   }
 
-  .msg-bubble {
+.msg-bubble {
     border: 1px solid var(--color-border);
   }
 }
@@ -1661,9 +1674,9 @@ body.dark-mode {
 /* === MODAL MOBILE RESPONSIVENESS === */
 @media (max-width: 480px) {
 
-  #members-modal>div,
-  #invitations-modal>div,
-  .modal-content {
+#members-modal>div,
+#invitations-modal>div,
+.modal-content {
     width: 95% !important;
     max-width: 95% !important;
     margin: 10px;
@@ -1682,8 +1695,8 @@ body.dark-mode {
   align-items: center;
   gap: 8px;
   border: 1px solid var(--color-border);
-  margin-bottom: 8px;    opacity: 0.7;
-  }
+  margin-bottom: 8px;
+  opacity: 0.7;
 }
 
 /* Corrections Section */
@@ -1887,7 +1900,10 @@ body.dark-mode {
   padding: 12px 16px;
   border-left: 4px solid var(--color-accent);
   background: var(--color-bg-tertiary);
-  border-radius: 0 8px 8px 0;.speak-control-btn.start {
+  border-radius: 0 8px 8px 0;
+}
+
+.speak-control-btn.start {
   background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   color: white;
 }
@@ -2570,14 +2586,37 @@ body.dark-mode .md-inline-code {
 }
 
 /* Card colors */
-.skill-mode-card.writing-essay .mode-icon { background: linear-gradient(135deg, #6366f1, #8b5cf6); }
-.skill-mode-card.writing-task .mode-icon { background: linear-gradient(135deg, #10b981, #14b8a6); }
-.skill-mode-card.listening-academic .mode-icon { background: linear-gradient(135deg, #f59e0b, #f97316); }
-.skill-mode-card.listening-conversation .mode-icon { background: linear-gradient(135deg, #ec4899, #f43f5e); }
-.skill-mode-card.reading-academic .mode-icon { background: linear-gradient(135deg, #3b82f6, #0ea5e9); }
-.skill-mode-card.reading-speed .mode-icon { background: linear-gradient(135deg, #f97316, #eab308); }
-.speak-mode-card.academic .mode-icon { background: linear-gradient(135deg, #8b5cf6, #a855f7); }
-.speak-mode-card.native .mode-icon { background: linear-gradient(135deg, #14b8a6, #22c55e); }
+.skill-mode-card.writing-essay .mode-icon {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+}
+
+.skill-mode-card.writing-task .mode-icon {
+  background: linear-gradient(135deg, #10b981, #14b8a6);
+}
+
+.skill-mode-card.listening-academic .mode-icon {
+  background: linear-gradient(135deg, #f59e0b, #f97316);
+}
+
+.skill-mode-card.listening-conversation .mode-icon {
+  background: linear-gradient(135deg, #ec4899, #f43f5e);
+}
+
+.skill-mode-card.reading-academic .mode-icon {
+  background: linear-gradient(135deg, #3b82f6, #0ea5e9);
+}
+
+.skill-mode-card.reading-speed .mode-icon {
+  background: linear-gradient(135deg, #f97316, #eab308);
+}
+
+.speak-mode-card.academic .mode-icon {
+  background: linear-gradient(135deg, #8b5cf6, #a855f7);
+}
+
+.speak-mode-card.native .mode-icon {
+  background: linear-gradient(135deg, #14b8a6, #22c55e);
+}
 
 .skill-mode-card h4,
 .speak-mode-card h4 {
@@ -2733,14 +2772,32 @@ body.dark-mode .md-inline-code {
 }
 
 @keyframes wave {
-  0% { transform: scale(1); opacity: 0.6; }
-  100% { transform: scale(1.5); opacity: 0; }
+  0% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
 }
 
-.avatar-waves span:nth-child(1) { animation-delay: 0s; }
-.avatar-waves span:nth-child(2) { animation-delay: 0.2s; }
-.avatar-waves span:nth-child(3) { animation-delay: 0.4s; }
-.avatar-waves span:nth-child(4) { animation-delay: 0.6s; }
+.avatar-waves span:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.avatar-waves span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.avatar-waves span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+.avatar-waves span:nth-child(4) {
+  animation-delay: 0.6s;
+}
 
 .speak-transcript-section,
 .speak-corrections-section {
@@ -3013,7 +3070,7 @@ body.dark-mode .md-inline-code {
 }
 
 @media (max-width: 900px) {
-  .reading-layout {
+.reading-layout {
     grid-template-columns: 1fr;
   }
 }
