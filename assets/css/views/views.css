@@ -1188,7 +1188,6 @@ body.dark-mode {
   overflow-y: auto;
 }
 
-<<<<<<< HEAD
 /* === LINK BUTTON (Forgot Password) === */
 .link-btn {
   background: none;
@@ -1221,10 +1220,7 @@ body.dark-mode {
   }
 }
 
-@keyframes pulse {
-=======
-/* ================================================
-   SPEAK UI STYLES
+@keyframes pulse {/* =========================================   SPEAK UI STYLES
    ================================================ */
 
 /* Sidebar Speak Panel */
@@ -1565,7 +1561,6 @@ body.dark-mode {
 }
 
 @keyframes streaming-pulse {
->>>>>>> b7b8fbb (speak ve sql dosyalari branch icin kaydedildi)
 
   0%,
   100% {
@@ -1573,7 +1568,6 @@ body.dark-mode {
   }
 
   50% {
-<<<<<<< HEAD
     opacity: 0.5;
   }
 }
@@ -1688,9 +1682,7 @@ body.dark-mode {
   align-items: center;
   gap: 8px;
   border: 1px solid var(--color-border);
-  margin-bottom: 8px;
-=======
-    opacity: 0.7;
+  margin-bottom: 8px;    opacity: 0.7;
   }
 }
 
@@ -1753,12 +1745,10 @@ body.dark-mode {
   align-items: center;
   gap: 10px;
   border: none;
->>>>>>> b7b8fbb (speak ve sql dosyalari branch icin kaydedildi)
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
-<<<<<<< HEAD
 .pdf-attachment:hover {
   background: var(--color-accent-light);
   border-color: var(--color-accent);
@@ -1897,9 +1887,7 @@ body.dark-mode {
   padding: 12px 16px;
   border-left: 4px solid var(--color-accent);
   background: var(--color-bg-tertiary);
-  border-radius: 0 8px 8px 0;
-=======
-.speak-control-btn.start {
+  border-radius: 0 8px 8px 0;.speak-control-btn.start {
   background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   color: white;
 }
@@ -2065,8 +2053,7 @@ body.dark-mode {
   border-left: 4px solid #ef4444;
 }
 
-/* ================================================
-   SKILL PANELS (Writing, Listening, Reading)
+/* =========================================   SKILL PANELS (Writing, Listening, Reading)
    ================================================ */
 
 /* Sidebar Skill Panel */
@@ -2204,8 +2191,7 @@ body.dark-mode {
   line-height: 1.6;
 }
 
-/* ================================================
-   ESSAY WRITING STYLES
+/* =========================================   ESSAY WRITING STYLES
    ================================================ */
 
 /* Session Header */
@@ -2473,12 +2459,10 @@ body.dark-mode {
 .error-explanation {
   margin-top: 8px;
   font-size: 0.85rem;
->>>>>>> b7b8fbb (speak ve sql dosyalari branch icin kaydedildi)
   color: var(--color-text-muted);
   font-style: italic;
 }
 
-<<<<<<< HEAD
 /* Horizontal rule */
 .md-hr {
   border: none;
@@ -2506,7 +2490,608 @@ body.dark-mode .md-inline-code {
 /* Make AI message bubbles wider for better code display */
 .ai-msg .msg-bubble {
   max-width: min(85%, 700px);
-=======
+}
+
+/* ===============================   SKILL PANELS - Speaking, Writing, Listening, Reading
+   ====================================== */
+
+/* Skill Container */
+.skill-container,
+.speak-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Panel Header */
+.skill-container .panel-header,
+.speak-container .panel-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.skill-container .panel-header h3,
+.speak-container .panel-header h3 {
+  font-size: 1.8rem;
+  font-weight: 800;
+  margin: 0 0 8px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.skill-container .panel-header .muted,
+.speak-container .panel-header .muted {
+  color: var(--color-text-muted);
+  font-size: 1rem;
+}
+
+/* Mode Cards Grid */
+.skill-mode-cards,
+.speak-mode-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+/* Individual Mode Card */
+.skill-mode-card,
+.speak-mode-card {
+  background: var(--color-card-bg);
+  border: 2px solid var(--color-border);
+  border-radius: 20px;
+  padding: 28px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.skill-mode-card:hover,
+.speak-mode-card:hover {
+  border-color: var(--color-accent);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+}
+
+.skill-mode-card .mode-icon,
+.speak-mode-card .mode-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: white;
+}
+
+/* Card colors */
+.skill-mode-card.writing-essay .mode-icon { background: linear-gradient(135deg, #6366f1, #8b5cf6); }
+.skill-mode-card.writing-task .mode-icon { background: linear-gradient(135deg, #10b981, #14b8a6); }
+.skill-mode-card.listening-academic .mode-icon { background: linear-gradient(135deg, #f59e0b, #f97316); }
+.skill-mode-card.listening-conversation .mode-icon { background: linear-gradient(135deg, #ec4899, #f43f5e); }
+.skill-mode-card.reading-academic .mode-icon { background: linear-gradient(135deg, #3b82f6, #0ea5e9); }
+.skill-mode-card.reading-speed .mode-icon { background: linear-gradient(135deg, #f97316, #eab308); }
+.speak-mode-card.academic .mode-icon { background: linear-gradient(135deg, #8b5cf6, #a855f7); }
+.speak-mode-card.native .mode-icon { background: linear-gradient(135deg, #14b8a6, #22c55e); }
+
+.skill-mode-card h4,
+.speak-mode-card h4 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--color-text-primary);
+}
+
+.skill-mode-card p,
+.speak-mode-card p {
+  color: var(--color-text-muted);
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+/* Mode Features List */
+.mode-features {
+  list-style: none;
+  padding: 0;
+  margin: 8px 0 16px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mode-features li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
+}
+
+.mode-features li i {
+  color: var(--color-accent);
+  font-size: 0.85rem;
+}
+
+/* Card Buttons */
+.skill-mode-card .primary-btn,
+.skill-mode-card .outline-btn,
+.speak-mode-card .primary-btn,
+.speak-mode-card .outline-btn {
+  margin-top: auto;
+  width: 100%;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s;
+}
+
+/* Session Screens */
+.speak-session-header,
+.essay-session-header,
+.listening-session-header,
+.reading-session-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--color-border);
+  margin-bottom: 24px;
+}
+
+.speak-session-header h3,
+.essay-session-header h3,
+.listening-session-header h3,
+.reading-session-header h3 {
+  flex: 1;
+  font-size: 1.4rem;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Ghost Button */
+.ghost-btn {
+  background: transparent;
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s;
+}
+
+.ghost-btn:hover {
+  background: var(--color-bg-tertiary);
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.ghost-btn.small {
+  padding: 6px 10px;
+  font-size: 0.85rem;
+}
+
+/* Speak specific styles */
+.speak-session-content {
+  display: grid;
+  gap: 24px;
+}
+
+.speak-ai-section {
+  display: flex;
+  justify-content: center;
+  padding: 32px;
+}
+
+.speak-ai-avatar {
+  width: 120px;
+  height: 120px;
+  background: linear-gradient(135deg, var(--color-accent), #8b5cf6);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  color: white;
+  position: relative;
+}
+
+.speak-ai-avatar.speaking .avatar-waves span {
+  animation: wave 0.8s infinite;
+}
+
+.avatar-waves {
+  position: absolute;
+  inset: -20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatar-waves span {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border: 2px solid var(--color-accent);
+  border-radius: 50%;
+  opacity: 0;
+}
+
+@keyframes wave {
+  0% { transform: scale(1); opacity: 0.6; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+
+.avatar-waves span:nth-child(1) { animation-delay: 0s; }
+.avatar-waves span:nth-child(2) { animation-delay: 0.2s; }
+.avatar-waves span:nth-child(3) { animation-delay: 0.4s; }
+.avatar-waves span:nth-child(4) { animation-delay: 0.6s; }
+
+.speak-transcript-section,
+.speak-corrections-section {
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  padding: 20px;
+}
+
+.speak-transcript-section h4,
+.speak-corrections-section h4 {
+  margin: 0 0 12px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+}
+
+.speak-transcript {
+  min-height: 150px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.transcript-placeholder {
+  text-align: center;
+  color: var(--color-text-muted);
+  padding: 40px;
+}
+
+.transcript-placeholder i {
+  font-size: 2rem;
+  margin-bottom: 12px;
+  display: block;
+}
+
+.speak-controls {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  padding: 20px;
+}
+
+.speak-control-btn {
+  padding: 16px 32px;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.2s;
+  border: none;
+}
+
+.speak-control-btn.start {
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  color: white;
+}
+
+.speak-control-btn.stop {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+}
+
+.speak-control-btn.mute {
+  background: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-primary);
+}
+
+.speak-control-btn:hover {
+  transform: scale(1.05);
+}
+
+/* Status indicators */
+.speak-mode-indicator {
+  background: var(--color-accent);
+  color: white;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.status-connected {
+  color: #22c55e;
+}
+
+.status-disconnected {
+  color: #ef4444;
+}
+
+/* Writing specific styles */
+.essay-session-content {
+  display: grid;
+  gap: 24px;
+}
+
+.essay-topic-section,
+.essay-writing-section {
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  padding: 20px;
+}
+
+.topic-header,
+.writing-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.topic-header h4,
+.writing-header h4 {
+  margin: 0;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.essay-topic-box {
+  background: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 20px;
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+.word-count {
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+}
+
+.essay-textarea {
+  width: 100%;
+  min-height: 300px;
+  padding: 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  font-size: 1rem;
+  line-height: 1.7;
+  resize: vertical;
+  font-family: inherit;
+}
+
+.essay-textarea:focus {
+  outline: none;
+  border-color: var(--color-accent);
+}
+
+.essay-actions {
+  margin-top: 16px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Essay Feedback Panel */
+.essay-feedback-panel {
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  padding: 24px;
+}
+
+.feedback-header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.band-score-display {
+  font-size: 3rem;
+  font-weight: 900;
+  color: var(--color-accent);
+}
+
+.score-breakdown {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.score-item {
+  background: var(--color-bg-tertiary);
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+}
+
+.score-item .score {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--color-accent);
+}
+
+.score-item .label {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  margin-top: 4px;
+}
+
+/* Listening specific styles */
+.listening-session-content {
+  display: grid;
+  gap: 24px;
+}
+
+.listening-audio-section {
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  padding: 24px;
+  text-align: center;
+}
+
+.listening-questions-section,
+.listening-results-panel {
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  padding: 24px;
+}
+
+.listening-questions-container,
+.questions-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.listening-submit-actions,
+.reading-submit-actions {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.listening-loading,
+.reading-loading {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--color-text-muted);
+}
+
+.listening-loading i,
+.reading-loading i {
+  font-size: 2.5rem;
+  margin-bottom: 16px;
+  display: block;
+}
+
+/* Reading specific styles */
+.reading-session-content {
+  display: grid;
+  gap: 24px;
+}
+
+.reading-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+@media (max-width: 900px) {
+  .reading-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.passage-section {
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  padding: 20px;
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+.passage-container {
+  line-height: 1.8;
+  font-size: 1rem;
+}
+
+.questions-section {
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  padding: 20px;
+}
+
+.questions-header h4 {
+  margin: 0 0 16px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.reading-timer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--color-bg-tertiary);
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+/* History Sections */
+.speak-history-section,
+.listening-history-section,
+.reading-history-section {
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  padding: 20px;
+}
+
+.speak-history-section h4,
+.listening-history-section h4,
+.reading-history-section h4 {
+  margin: 0 0 12px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.speak-history-list,
+.listening-history-list,
+.reading-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Results Panel */
+.listening-results-panel,
+.reading-results-panel {
+  background: var(--color-card-bg);
+  border: 2px solid var(--color-accent);
+  border-radius: 16px;
+  padding: 24px;
+}
+
 .feedback-actions {
   margin-top: 20px;
   padding-top: 16px;
@@ -2574,5 +3159,4 @@ body.dark-mode .md-inline-code {
   color: var(--color-text-muted);
   text-align: center;
   padding: 20px;
->>>>>>> b7b8fbb (speak ve sql dosyalari branch icin kaydedildi)
 }
