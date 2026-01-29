@@ -92,9 +92,9 @@ window.openSkillMode = function (skill, mode, event) {
 function resetSkillPanelToModeSelection(skill) {
     // Hide all session screens for this skill
     const sessionScreens = {
-        'writing': ['writing-session-screen'],
-        'listening': ['listening-session-screen'],
-        'reading': ['reading-session-screen']
+        'writing': ['essay-session-screen', 'task-session-screen'],
+        'listening': ['academic-listening-screen', 'conversation-listening-screen'],
+        'reading': ['academic-reading-screen', 'speed-reading-screen']
     };
 
     const modeSelections = {
@@ -133,8 +133,12 @@ window.startEssayWriting = function (event) {
     const modeSelection = document.getElementById('writing-mode-selection');
     if (modeSelection) modeSelection.classList.add('hidden');
 
-    // Show session screen
-    const sessionScreen = document.getElementById('writing-session-screen');
+    // Hide task screen (if open)
+    const taskScreen = document.getElementById('task-session-screen');
+    if (taskScreen) taskScreen.classList.add('hidden');
+
+    // Show essay session screen
+    const sessionScreen = document.getElementById('essay-session-screen');
     if (sessionScreen) sessionScreen.classList.remove('hidden');
 
     // Update title
@@ -148,9 +152,12 @@ window.startEssayWriting = function (event) {
 };
 
 window.backToWritingSelection = function () {
-    // Hide session screen
-    const sessionScreen = document.getElementById('writing-session-screen');
-    if (sessionScreen) sessionScreen.classList.add('hidden');
+    // Hide both session screens
+    const essayScreen = document.getElementById('essay-session-screen');
+    if (essayScreen) essayScreen.classList.add('hidden');
+
+    const taskScreen = document.getElementById('task-session-screen');
+    if (taskScreen) taskScreen.classList.add('hidden');
 
     // Show mode selection
     const modeSelection = document.getElementById('writing-mode-selection');
@@ -171,8 +178,12 @@ window.startTaskWriting = function (event) {
     const modeSelection = document.getElementById('writing-mode-selection');
     if (modeSelection) modeSelection.classList.add('hidden');
 
-    // Show session screen
-    const sessionScreen = document.getElementById('writing-session-screen');
+    // Hide essay screen (if open)
+    const essayScreen = document.getElementById('essay-session-screen');
+    if (essayScreen) essayScreen.classList.add('hidden');
+
+    // Show task session screen
+    const sessionScreen = document.getElementById('task-session-screen');
     if (sessionScreen) sessionScreen.classList.remove('hidden');
 
     // Update title
@@ -199,15 +210,17 @@ window.startAcademicListening = function (event) {
     const modeSelection = document.getElementById('listening-mode-selection');
     if (modeSelection) modeSelection.classList.add('hidden');
 
-    // Show session screen
-    const sessionScreen = document.getElementById('listening-session-screen');
+    // Hide conversation screen (if open)
+    const convScreen = document.getElementById('conversation-listening-screen');
+    if (convScreen) convScreen.classList.add('hidden');
+
+    // Show academic listening screen
+    const sessionScreen = document.getElementById('academic-listening-screen');
     if (sessionScreen) sessionScreen.classList.remove('hidden');
 
     // Update title
-    const listeningTitle = document.getElementById('listening-title');
-    if (listeningTitle) {
-        listeningTitle.innerHTML = '<i class="fa-solid fa-headphones"></i> Academic Listening';
-    }
+    const toolTitle = document.getElementById('tool-title');
+    if (toolTitle) toolTitle.textContent = 'Academic Listening';
 
     // Start loading content if function available
     if (window.loadListeningContent) {
@@ -225,15 +238,17 @@ window.startConversationListening = function (event) {
     const modeSelection = document.getElementById('listening-mode-selection');
     if (modeSelection) modeSelection.classList.add('hidden');
 
-    // Show session screen
-    const sessionScreen = document.getElementById('listening-session-screen');
+    // Hide academic screen (if open)
+    const acadScreen = document.getElementById('academic-listening-screen');
+    if (acadScreen) acadScreen.classList.add('hidden');
+
+    // Show conversation listening screen
+    const sessionScreen = document.getElementById('conversation-listening-screen');
     if (sessionScreen) sessionScreen.classList.remove('hidden');
 
     // Update title
-    const listeningTitle = document.getElementById('listening-title');
-    if (listeningTitle) {
-        listeningTitle.innerHTML = '<i class="fa-solid fa-comments"></i> Conversation Practice';
-    }
+    const toolTitle = document.getElementById('tool-title');
+    if (toolTitle) toolTitle.textContent = 'Conversation Practice';
 
     // Start loading content if function available
     if (window.loadListeningContent) {
@@ -242,9 +257,12 @@ window.startConversationListening = function (event) {
 };
 
 window.backToListeningSelection = function () {
-    // Hide session screen
-    const sessionScreen = document.getElementById('listening-session-screen');
-    if (sessionScreen) sessionScreen.classList.add('hidden');
+    // Hide both session screens
+    const acadScreen = document.getElementById('academic-listening-screen');
+    if (acadScreen) acadScreen.classList.add('hidden');
+
+    const convScreen = document.getElementById('conversation-listening-screen');
+    if (convScreen) convScreen.classList.add('hidden');
 
     // Show mode selection
     const modeSelection = document.getElementById('listening-mode-selection');
@@ -269,15 +287,17 @@ window.startAcademicReading = function (event) {
     const modeSelection = document.getElementById('reading-mode-selection');
     if (modeSelection) modeSelection.classList.add('hidden');
 
-    // Show session screen
-    const sessionScreen = document.getElementById('reading-session-screen');
+    // Hide speed reading screen (if open)
+    const speedScreen = document.getElementById('speed-reading-screen');
+    if (speedScreen) speedScreen.classList.add('hidden');
+
+    // Show academic reading screen
+    const sessionScreen = document.getElementById('academic-reading-screen');
     if (sessionScreen) sessionScreen.classList.remove('hidden');
 
-    // Update title if exists
-    const readingTitle = document.getElementById('reading-title');
-    if (readingTitle) {
-        readingTitle.innerHTML = '<i class="fa-solid fa-book"></i> Academic Reading';
-    }
+    // Update title
+    const toolTitle = document.getElementById('tool-title');
+    if (toolTitle) toolTitle.textContent = 'Academic Reading';
 
     // Start loading content if function available
     if (window.loadReadingContent) {
@@ -295,15 +315,17 @@ window.startSpeedReading = function (event) {
     const modeSelection = document.getElementById('reading-mode-selection');
     if (modeSelection) modeSelection.classList.add('hidden');
 
-    // Show session screen
-    const sessionScreen = document.getElementById('reading-session-screen');
+    // Hide academic reading screen (if open)
+    const acadScreen = document.getElementById('academic-reading-screen');
+    if (acadScreen) acadScreen.classList.add('hidden');
+
+    // Show speed reading screen
+    const sessionScreen = document.getElementById('speed-reading-screen');
     if (sessionScreen) sessionScreen.classList.remove('hidden');
 
-    // Update title if exists
-    const readingTitle = document.getElementById('reading-title');
-    if (readingTitle) {
-        readingTitle.innerHTML = '<i class="fa-solid fa-bolt"></i> Speed Reading';
-    }
+    // Update title
+    const toolTitle = document.getElementById('tool-title');
+    if (toolTitle) toolTitle.textContent = 'Speed Reading';
 
     // Start loading content if function available
     if (window.loadReadingContent) {
@@ -312,9 +334,12 @@ window.startSpeedReading = function (event) {
 };
 
 window.backToReadingSelection = function () {
-    // Hide session screen
-    const sessionScreen = document.getElementById('reading-session-screen');
-    if (sessionScreen) sessionScreen.classList.add('hidden');
+    // Hide both session screens
+    const acadScreen = document.getElementById('academic-reading-screen');
+    if (acadScreen) acadScreen.classList.add('hidden');
+
+    const speedScreen = document.getElementById('speed-reading-screen');
+    if (speedScreen) speedScreen.classList.add('hidden');
 
     // Show mode selection
     const modeSelection = document.getElementById('reading-mode-selection');
