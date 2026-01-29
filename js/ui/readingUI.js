@@ -20,100 +20,119 @@ let sessionStartTime = null;
 // ======================================
 
 export function initReadingUI() {
-    console.log('Reading UI initialized');
+  console.log('Reading UI initialized');
 }
 
 // ======================================
 // ACADEMIC READING MODE
 // ======================================
 
-window.startAcademicReading = async function (event) {
-    if (event) event.preventDefault();
-    if (isLoading) return;
+// Called by skillsUI.js when academic or speed reading is started
+window.loadReadingContent = async function (mode = 'academic') {
+  if (isLoading) return;
 
-    // Show session screen
-    const modeSelection = document.getElementById('reading-mode-selection');
-    const sessionScreen = document.getElementById('reading-session-screen');
+  // Reset state
+  resetReadingSession(mode);
 
-    if (modeSelection) modeSelection.classList.add('hidden');
-    if (sessionScreen) sessionScreen.classList.remove('hidden');
+  // Show loading
+  showReadingLoading(mode, true);
 
-    // Reset state
-    resetReadingSession();
+  try {
+    if (mode === 'academic') {
+      // Generate passage
+      const data = await generateReadingPassage();
+      currentPassage = data;
+      currentQuestions = data.questions || [];
 
-    // Show loading
-    showReadingLoading(true);
+      // Display passage
+      displayPassage(data, mode);
 
-    try {
-        // Generate passage
-        const data = await generateReadingPassage();
-        currentPassage = data;
-        currentQuestions = data.questions || [];
+      // Display questions
+      displayQuestions(data.questions, mode);
 
-        // Display passage
-        displayPassage(data);
+      // Start timer
+      startTimer(mode);
 
-        // Display questions
-        displayQuestions(data.questions);
+      // Record start time
+      sessionStartTime = Date.now();
 
-        // Start timer
-        startTimer();
+      // Load history
+      loadReadingHistory(mode);
+    } else {
+      // Speed reading mode - simpler content
+      const data = await generateReadingPassage('speed');
+      currentPassage = data;
+      currentQuestions = data.questions || [];
 
-        // Record start time
-        sessionStartTime = Date.now();
-
-        // Load history
-        loadReadingHistory();
-
-    } catch (error) {
-        console.error('Failed to generate passage:', error);
-        alert('Failed to load reading passage. Please try again.');
-        backToReadingSelection();
-    } finally {
-        showReadingLoading(false);
+      displaySpeedPassage(data);
+      sessionStartTime = Date.now();
     }
+  } catch (error) {
+    console.error('Failed to generate passage:', error);
+    alert('Failed to load reading passage. Please try again.');
+  } finally {
+    showReadingLoading(mode, false);
+  }
 };
 
-function resetReadingSession() {
-    currentPassage = null;
-    currentQuestions = [];
-    userAnswers = {};
-    timeRemaining = 1200;
-    sessionStartTime = null;
+function displaySpeedPassage(data) {
+  const passageContainer = document.getElementById('speed-passage-container');
+  if (passageContainer) {
+    passageContainer.innerHTML = `
+            <h3>${data.title || 'Speed Reading Passage'}</h3>
+            <div class="passage-text">
+                ${data.passage.split('\n').map(p => `<p>${p}</p>`).join('')}
+            </div>
+        `;
+  }
 
-    if (timerInterval) {
-        clearInterval(timerInterval);
-        timerInterval = null;
-    }
-
-    // Clear UI
-    const passageContainer = document.getElementById('passage-container');
-    const questionsContainer = document.getElementById('questions-container');
-    const resultsPanel = document.getElementById('reading-results-panel');
-
-    if (passageContainer) passageContainer.innerHTML = '';
-    if (questionsContainer) questionsContainer.innerHTML = '';
-    if (resultsPanel) resultsPanel.classList.add('hidden');
+  // Store word count for WPM calculation
+  window.currentWordCount = data.wordCount || 150;
 }
 
-function showReadingLoading(show) {
-    isLoading = show;
-    const loadingEl = document.getElementById('reading-loading');
-    const contentEl = document.getElementById('reading-content');
+function resetReadingSession(mode = 'academic') {
+  currentPassage = null;
+  currentQuestions = [];
+  userAnswers = {};
+  timeRemaining = 1200;
+  sessionStartTime = null;
 
-    if (loadingEl) loadingEl.classList.toggle('hidden', !show);
-    if (contentEl) contentEl.classList.toggle('hidden', show);
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
+
+  // Clear UI based on mode
+  const prefix = mode === 'academic' ? 'academic-reading' : 'speed-reading';
+  const passageContainer = document.getElementById(mode === 'speed' ? 'speed-passage-container' : 'passage-container');
+  const questionsContainer = document.getElementById(mode === 'speed' ? 'speed-questions-container' : 'questions-container');
+  const resultsPanel = document.getElementById(`${prefix}-results`);
+
+  if (passageContainer) passageContainer.innerHTML = '';
+  if (questionsContainer) questionsContainer.innerHTML = '';
+  if (resultsPanel) resultsPanel.classList.add('hidden');
+}
+
+function showReadingLoading(mode, show) {
+  isLoading = show;
+  const prefix = mode === 'academic' ? 'academic-reading' : 'speed-reading';
+  const loadingEl = document.getElementById(`${prefix}-loading`);
+  const contentEl = document.getElementById(`${prefix}-content`);
+
+  if (loadingEl) loadingEl.classList.toggle('hidden', !show);
+  if (contentEl) contentEl.classList.toggle('hidden', show);
 }
 
 // ======================================
 // DISPLAY FUNCTIONS
 // ======================================
 
-function displayPassage(data) {
-    const container = document.getElementById('passage-container');
-    if (!container) return;
+function displayPassage(data, mode = 'academic') {
+  const containerId = mode === 'academic' ? 'passage-container' : 'speed-passage-container';
+  const container = document.getElementById(containerId);
+  if (!container) return;
 
-    container.innerHTML = `
+  container.innerHTML = `
     <div class="passage-header">
       <h3>${data.title || 'Reading Passage'}</h3>
       <span class="passage-word-count">${data.wordCount || '~500'} words</span>
@@ -125,14 +144,14 @@ function displayPassage(data) {
 }
 
 function displayQuestions(questions) {
-    const container = document.getElementById('questions-container');
-    if (!container) return;
+  const container = document.getElementById('questions-container');
+  if (!container) return;
 
-    container.innerHTML = questions.map((q, index) => {
-        let inputHtml = '';
+  container.innerHTML = questions.map((q, index) => {
+    let inputHtml = '';
 
-        if (q.type === 'true_false_ng') {
-            inputHtml = `
+    if (q.type === 'true_false_ng') {
+      inputHtml = `
         <div class="tfng-options">
           <label class="tfng-option">
             <input type="radio" name="q${index}" value="True" onchange="updateAnswer(${index}, 'True')">
@@ -148,8 +167,8 @@ function displayQuestions(questions) {
           </label>
         </div>
       `;
-        } else if (q.type === 'multiple_choice') {
-            inputHtml = `
+    } else if (q.type === 'multiple_choice') {
+      inputHtml = `
         <div class="mc-options">
           ${q.options.map(opt => `
             <label class="mc-option">
@@ -159,15 +178,15 @@ function displayQuestions(questions) {
           `).join('')}
         </div>
       `;
-        } else {
-            inputHtml = `
+    } else {
+      inputHtml = `
         <input type="text" class="fill-blank-input" 
           placeholder="Type your answer..." 
           oninput="updateAnswer(${index}, this.value)">
       `;
-        }
+    }
 
-        return `
+    return `
       <div class="question-item" id="question-${index}">
         <div class="question-number">Question ${index + 1}</div>
         <div class="question-type">${formatQuestionType(q.type)}</div>
@@ -175,16 +194,16 @@ function displayQuestions(questions) {
         ${inputHtml}
       </div>
     `;
-    }).join('');
+  }).join('');
 }
 
 function formatQuestionType(type) {
-    const types = {
-        'true_false_ng': 'True / False / Not Given',
-        'multiple_choice': 'Multiple Choice',
-        'fill_blank': 'Fill in the Blank'
-    };
-    return types[type] || type;
+  const types = {
+    'true_false_ng': 'True / False / Not Given',
+    'multiple_choice': 'Multiple Choice',
+    'fill_blank': 'Fill in the Blank'
+  };
+  return types[type] || type;
 }
 
 // ======================================
@@ -192,34 +211,34 @@ function formatQuestionType(type) {
 // ======================================
 
 function startTimer() {
+  updateTimerDisplay();
+
+  timerInterval = setInterval(() => {
+    timeRemaining--;
     updateTimerDisplay();
 
-    timerInterval = setInterval(() => {
-        timeRemaining--;
-        updateTimerDisplay();
-
-        if (timeRemaining <= 0) {
-            clearInterval(timerInterval);
-            submitReadingAnswers();
-        }
-    }, 1000);
+    if (timeRemaining <= 0) {
+      clearInterval(timerInterval);
+      submitReadingAnswers();
+    }
+  }, 1000);
 }
 
 function updateTimerDisplay() {
-    const timerEl = document.getElementById('reading-timer');
-    if (!timerEl) return;
+  const timerEl = document.getElementById('reading-timer');
+  if (!timerEl) return;
 
-    const minutes = Math.floor(timeRemaining / 60);
-    const seconds = timeRemaining % 60;
-    timerEl.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  const minutes = Math.floor(timeRemaining / 60);
+  const seconds = timeRemaining % 60;
+  timerEl.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
 
-    // Warning colors
-    if (timeRemaining <= 60) {
-        timerEl.classList.add('danger');
-    } else if (timeRemaining <= 300) {
-        timerEl.classList.add('warning');
-        timerEl.classList.remove('danger');
-    }
+  // Warning colors
+  if (timeRemaining <= 60) {
+    timerEl.classList.add('danger');
+  } else if (timeRemaining <= 300) {
+    timerEl.classList.add('warning');
+    timerEl.classList.remove('danger');
+  }
 }
 
 // ======================================
@@ -227,56 +246,56 @@ function updateTimerDisplay() {
 // ======================================
 
 window.updateAnswer = function (index, value) {
-    userAnswers[index] = value;
+  userAnswers[index] = value;
 };
 
 window.submitReadingAnswers = async function () {
-    if (!currentPassage || currentQuestions.length === 0) return;
+  if (!currentPassage || currentQuestions.length === 0) return;
 
-    // Stop timer
-    if (timerInterval) {
-        clearInterval(timerInterval);
-        timerInterval = null;
-    }
+  // Stop timer
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
 
-    // Calculate time taken
-    const timeTaken = sessionStartTime ? Math.floor((Date.now() - sessionStartTime) / 1000) : 0;
+  // Calculate time taken
+  const timeTaken = sessionStartTime ? Math.floor((Date.now() - sessionStartTime) / 1000) : 0;
 
-    // Check answers
-    const answersArray = currentQuestions.map((_, i) => userAnswers[i] || '');
-    const results = checkAnswers(currentQuestions, answersArray);
+  // Check answers
+  const answersArray = currentQuestions.map((_, i) => userAnswers[i] || '');
+  const results = checkAnswers(currentQuestions, answersArray);
 
-    // Display results
-    displayResults(results);
+  // Display results
+  displayResults(results);
 
-    // Save to database
-    try {
-        await saveReadingSession({
-            mode: 'academic',
-            passageTitle: currentPassage.title,
-            passageContent: currentPassage.passage,
-            wordCount: currentPassage.wordCount,
-            questions: currentQuestions,
-            userAnswers: answersArray,
-            correctCount: results.correctCount,
-            totalQuestions: results.totalQuestions,
-            scorePercentage: results.scorePercentage,
-            timeTaken: timeTaken,
-            timeLimit: 1200
-        });
+  // Save to database
+  try {
+    await saveReadingSession({
+      mode: 'academic',
+      passageTitle: currentPassage.title,
+      passageContent: currentPassage.passage,
+      wordCount: currentPassage.wordCount,
+      questions: currentQuestions,
+      userAnswers: answersArray,
+      correctCount: results.correctCount,
+      totalQuestions: results.totalQuestions,
+      scorePercentage: results.scorePercentage,
+      timeTaken: timeTaken,
+      timeLimit: 1200
+    });
 
-        loadReadingHistory();
-    } catch (error) {
-        console.error('Failed to save reading session:', error);
-    }
+    loadReadingHistory();
+  } catch (error) {
+    console.error('Failed to save reading session:', error);
+  }
 };
 
 function displayResults(results) {
-    const resultsPanel = document.getElementById('reading-results-panel');
-    if (!resultsPanel) return;
+  const resultsPanel = document.getElementById('reading-results-panel');
+  if (!resultsPanel) return;
 
-    resultsPanel.classList.remove('hidden');
-    resultsPanel.innerHTML = `
+  resultsPanel.classList.remove('hidden');
+  resultsPanel.innerHTML = `
     <div class="results-header">
       <h3><i class="fa-solid fa-chart-pie"></i> Results</h3>
       <div class="score-circle">
@@ -313,48 +332,37 @@ function displayResults(results) {
     </div>
   `;
 
-    // Highlight questions with answers
-    results.results.forEach((r, i) => {
-        const questionEl = document.getElementById(`question-${i}`);
-        if (questionEl) {
-            questionEl.classList.add(r.isCorrect ? 'answered-correct' : 'answered-incorrect');
-        }
-    });
+  // Highlight questions with answers
+  results.results.forEach((r, i) => {
+    const questionEl = document.getElementById(`question-${i}`);
+    if (questionEl) {
+      questionEl.classList.add(r.isCorrect ? 'answered-correct' : 'answered-incorrect');
+    }
+  });
 }
 
 // ======================================
 // NAVIGATION
 // ======================================
 
-window.backToReadingSelection = function () {
-    if (timerInterval) {
-        clearInterval(timerInterval);
-        timerInterval = null;
-    }
-
-    const modeSelection = document.getElementById('reading-mode-selection');
-    const sessionScreen = document.getElementById('reading-session-screen');
-
-    if (modeSelection) modeSelection.classList.remove('hidden');
-    if (sessionScreen) sessionScreen.classList.add('hidden');
-};
+// backToReadingSelection is handled by skillsUI.js
 
 // ======================================
 // HISTORY
 // ======================================
 
 async function loadReadingHistory() {
-    const historyList = document.getElementById('reading-history-list');
-    if (!historyList) return;
+  const historyList = document.getElementById('reading-history-list');
+  if (!historyList) return;
 
-    const { data: sessions } = await getReadingHistory(5);
+  const { data: sessions } = await getReadingHistory(5);
 
-    if (!sessions || sessions.length === 0) {
-        historyList.innerHTML = '<p class="no-history">No previous sessions</p>';
-        return;
-    }
+  if (!sessions || sessions.length === 0) {
+    historyList.innerHTML = '<p class="no-history">No previous sessions</p>';
+    return;
+  }
 
-    historyList.innerHTML = sessions.map(s => `
+  historyList.innerHTML = sessions.map(s => `
     <div class="history-item">
       <span class="history-score">${s.score_percentage || 0}%</span>
       <span class="history-info">${s.correct_answers}/${s.total_questions}</span>
@@ -364,13 +372,13 @@ async function loadReadingHistory() {
 }
 
 function formatDate(dateStr) {
-    const date = new Date(dateStr);
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  const date = new Date(dateStr);
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
 
 // Initialize on DOM ready
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initReadingUI);
+  document.addEventListener('DOMContentLoaded', initReadingUI);
 } else {
-    initReadingUI();
+  initReadingUI();
 }

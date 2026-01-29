@@ -28,15 +28,9 @@ export function initWritingUI() {
 // ESSAY WRITING MODE
 // ======================================
 
-window.startEssayWriting = async function (event) {
-  if (event) event.preventDefault();
-
-  // Show essay session screen
-  const modeSelection = document.getElementById('writing-mode-selection');
-  const sessionScreen = document.getElementById('writing-session-screen');
-
-  if (modeSelection) modeSelection.classList.add('hidden');
-  if (sessionScreen) sessionScreen.classList.remove('hidden');
+// Called by skillsUI.js when essay writing is started
+window.loadEssayContent = async function () {
+  currentMode = 'essay';
 
   // Get random topic
   currentTopic = getRandomEssayTopic();
@@ -49,8 +43,8 @@ window.startEssayWriting = async function (event) {
   const essayTextarea = document.getElementById('essay-textarea');
   if (essayTextarea) {
     essayTextarea.value = '';
-    updateWordCount();
   }
+  updateEssayWordCount();
 
   // Reset evaluation
   currentEvaluation = null;
@@ -61,6 +55,25 @@ window.startEssayWriting = async function (event) {
   loadEssayHistory();
 };
 
+// Called by skillsUI.js when task writing is started
+window.loadTaskContent = async function () {
+  currentMode = 'task';
+
+  // Get task topic/chart
+  // TODO: Implement task generation
+  const topicDisplay = document.getElementById('task-topic-display');
+  if (topicDisplay) {
+    topicDisplay.textContent = 'Click "New Task" to get a chart/graph description task.';
+  }
+
+  // Clear textarea
+  const taskTextarea = document.getElementById('task-textarea');
+  if (taskTextarea) {
+    taskTextarea.value = '';
+  }
+  updateTaskWordCount();
+};
+
 window.getNewTopic = function () {
   currentTopic = getRandomEssayTopic();
   const topicDisplay = document.getElementById('essay-topic-display');
@@ -69,9 +82,9 @@ window.getNewTopic = function () {
   }
 };
 
-window.updateWordCount = function () {
+window.updateEssayWordCount = function () {
   const textarea = document.getElementById('essay-textarea');
-  const countDisplay = document.getElementById('word-count-display');
+  const countDisplay = document.getElementById('essay-word-count');
 
   if (textarea && countDisplay) {
     const words = textarea.value.trim().split(/\s+/).filter(w => w.length > 0);
@@ -84,6 +97,28 @@ window.updateWordCount = function () {
     } else if (count < 250) {
       countDisplay.style.color = '#f59e0b'; // yellow
     } else if (count <= 400) {
+      countDisplay.style.color = '#10b981'; // green
+    } else {
+      countDisplay.style.color = '#f59e0b'; // yellow (too long)
+    }
+  }
+};
+
+window.updateTaskWordCount = function () {
+  const textarea = document.getElementById('task-textarea');
+  const countDisplay = document.getElementById('task-word-count');
+
+  if (textarea && countDisplay) {
+    const words = textarea.value.trim().split(/\s+/).filter(w => w.length > 0);
+    const count = words.length;
+    countDisplay.textContent = `${count} / 150-200 words`;
+
+    // Color coding
+    if (count < 100) {
+      countDisplay.style.color = '#ef4444'; // red
+    } else if (count < 150) {
+      countDisplay.style.color = '#f59e0b'; // yellow
+    } else if (count <= 200) {
       countDisplay.style.color = '#10b981'; // green
     } else {
       countDisplay.style.color = '#f59e0b'; // yellow (too long)
@@ -245,13 +280,7 @@ window.startNewEssay = function () {
   if (feedbackPanel) feedbackPanel.classList.add('hidden');
 };
 
-window.backToWritingSelection = function () {
-  const modeSelection = document.getElementById('writing-mode-selection');
-  const sessionScreen = document.getElementById('writing-session-screen');
-
-  if (modeSelection) modeSelection.classList.remove('hidden');
-  if (sessionScreen) sessionScreen.classList.add('hidden');
-};
+// backToWritingSelection is handled by skillsUI.js
 
 // ======================================
 // ESSAY HISTORY

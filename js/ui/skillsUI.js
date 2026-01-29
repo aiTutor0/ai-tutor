@@ -146,8 +146,8 @@ window.startEssayWriting = function (event) {
     if (toolTitle) toolTitle.textContent = 'Essay Writing';
 
     // Get initial topic if writingUI has the function
-    if (window.getNewTopic) {
-        window.getNewTopic();
+    if (window.loadEssayContent) {
+        window.loadEssayContent();
     }
 };
 
@@ -191,8 +191,8 @@ window.startTaskWriting = function (event) {
     if (toolTitle) toolTitle.textContent = 'Task Response';
 
     // Get task topic if function available
-    if (window.getNewTaskTopic) {
-        window.getNewTaskTopic();
+    if (window.loadTaskContent) {
+        window.loadTaskContent();
     }
 };
 
