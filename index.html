@@ -914,443 +914,444 @@
                         </button>
                       </div>
                     </div>
+                  </div>
 
-                    <!-- Essay Session Screen -->
-                    <div id="essay-session-screen" class="hidden">
-                      <div class="essay-session-header">
-                        <button class="ghost-btn" onclick="backToWritingSelection()">
-                          <i class="fa-solid fa-arrow-left"></i> Back
-                        </button>
-                        <h3><i class="fa-solid fa-file-lines"></i> Essay Writing</h3>
+                  <!-- Essay Session Screen -->
+                  <div id="essay-session-screen" class="hidden">
+                    <div class="essay-session-header">
+                      <button class="ghost-btn" onclick="backToWritingSelection()">
+                        <i class="fa-solid fa-arrow-left"></i> Back
+                      </button>
+                      <h3><i class="fa-solid fa-file-lines"></i> Essay Writing</h3>
+                    </div>
+
+                    <div class="essay-session-content">
+                      <!-- Topic Section -->
+                      <div class="essay-topic-section">
+                        <div class="topic-header">
+                          <h4><i class="fa-solid fa-question-circle"></i> Essay Topic</h4>
+                          <button class="ghost-btn small" onclick="getNewTopic()">
+                            <i class="fa-solid fa-refresh"></i> New Topic
+                          </button>
+                        </div>
+                        <div id="essay-topic-display" class="essay-topic-box">
+                          Click "Start Essay Practice" to get a topic.
+                        </div>
                       </div>
 
-                      <div class="essay-session-content">
-                        <!-- Topic Section -->
-                        <div class="essay-topic-section">
-                          <div class="topic-header">
-                            <h4><i class="fa-solid fa-question-circle"></i> Essay Topic</h4>
-                            <button class="ghost-btn small" onclick="getNewTopic()">
-                              <i class="fa-solid fa-refresh"></i> New Topic
-                            </button>
-                          </div>
-                          <div id="essay-topic-display" class="essay-topic-box">
-                            Click "Start Essay Practice" to get a topic.
-                          </div>
+                      <!-- Writing Area -->
+                      <div class="essay-writing-section">
+                        <div class="writing-header">
+                          <h4><i class="fa-solid fa-pen"></i> Your Essay</h4>
+                          <span id="essay-word-count" class="word-count">0 / 250-400 words</span>
                         </div>
-
-                        <!-- Writing Area -->
-                        <div class="essay-writing-section">
-                          <div class="writing-header">
-                            <h4><i class="fa-solid fa-pen"></i> Your Essay</h4>
-                            <span id="essay-word-count" class="word-count">0 / 250-400 words</span>
-                          </div>
-                          <textarea id="essay-textarea" class="essay-textarea" placeholder="Write your essay here. Aim for 250-400 words.
+                        <textarea id="essay-textarea" class="essay-textarea" placeholder="Write your essay here. Aim for 250-400 words.
 
 Tips:
 • Start with an introduction stating your position
 • Use 2-3 body paragraphs with examples
 • Write a conclusion summarizing your view" oninput="updateEssayWordCount()"></textarea>
 
-                          <div class="essay-actions">
-                            <button id="submit-essay-btn" class="primary-btn" onclick="submitEssayForReview()">
-                              <i class="fa-solid fa-paper-plane"></i> Submit for Review
-                            </button>
-                          </div>
+                        <div class="essay-actions">
+                          <button id="submit-essay-btn" class="primary-btn" onclick="submitEssayForReview()">
+                            <i class="fa-solid fa-paper-plane"></i> Submit for Review
+                          </button>
                         </div>
+                      </div>
 
-                        <!-- Feedback Panel -->
-                        <div id="essay-feedback-panel" class="essay-feedback-panel hidden">
-                          <!-- Feedback will be inserted here by JS -->
-                        </div>
+                      <!-- Feedback Panel -->
+                      <div id="essay-feedback-panel" class="essay-feedback-panel hidden">
+                        <!-- Feedback will be inserted here by JS -->
+                      </div>
 
-                        <!-- History Section -->
-                        <div class="essay-history-section">
-                          <h4><i class="fa-solid fa-history"></i> Recent Essays</h4>
-                          <div id="essay-history-list" class="essay-history-list">
-                            <p class="no-history">No previous essays</p>
-                          </div>
+                      <!-- History Section -->
+                      <div class="essay-history-section">
+                        <h4><i class="fa-solid fa-history"></i> Recent Essays</h4>
+                        <div id="essay-history-list" class="essay-history-list">
+                          <p class="no-history">No previous essays</p>
                         </div>
                       </div>
                     </div>
+                  </div>
 
-                    <!-- Task Session Screen -->
-                    <div id="task-session-screen" class="hidden">
-                      <div class="task-session-header">
-                        <button class="ghost-btn" onclick="backToWritingSelection()">
-                          <i class="fa-solid fa-arrow-left"></i> Back
-                        </button>
-                        <h3><i class="fa-solid fa-chart-line"></i> Task Response</h3>
+                  <!-- Task Session Screen -->
+                  <div id="task-session-screen" class="hidden">
+                    <div class="task-session-header">
+                      <button class="ghost-btn" onclick="backToWritingSelection()">
+                        <i class="fa-solid fa-arrow-left"></i> Back
+                      </button>
+                      <h3><i class="fa-solid fa-chart-line"></i> Task Response</h3>
+                    </div>
+
+                    <div class="task-session-content">
+                      <!-- Task Description Section -->
+                      <div class="task-topic-section">
+                        <div class="topic-header">
+                          <h4><i class="fa-solid fa-chart-bar"></i> Task Description</h4>
+                          <button class="ghost-btn small" onclick="getNewTaskTopic()">
+                            <i class="fa-solid fa-refresh"></i> New Task
+                          </button>
+                        </div>
+                        <div id="task-topic-display" class="task-topic-box">
+                          Click "Start Task Practice" to get a task.
+                        </div>
+                        <div id="task-chart-container" class="task-chart-container hidden">
+                          <!-- Chart will be inserted here by JS -->
+                        </div>
                       </div>
 
-                      <div class="task-session-content">
-                        <!-- Task Description Section -->
-                        <div class="task-topic-section">
-                          <div class="topic-header">
-                            <h4><i class="fa-solid fa-chart-bar"></i> Task Description</h4>
-                            <button class="ghost-btn small" onclick="getNewTaskTopic()">
-                              <i class="fa-solid fa-refresh"></i> New Task
-                            </button>
-                          </div>
-                          <div id="task-topic-display" class="task-topic-box">
-                            Click "Start Task Practice" to get a task.
-                          </div>
-                          <div id="task-chart-container" class="task-chart-container hidden">
-                            <!-- Chart will be inserted here by JS -->
-                          </div>
+                      <!-- Writing Area -->
+                      <div class="task-writing-section">
+                        <div class="writing-header">
+                          <h4><i class="fa-solid fa-pen"></i> Your Response</h4>
+                          <span id="task-word-count" class="word-count">0 / 150-200 words</span>
                         </div>
-
-                        <!-- Writing Area -->
-                        <div class="task-writing-section">
-                          <div class="writing-header">
-                            <h4><i class="fa-solid fa-pen"></i> Your Response</h4>
-                            <span id="task-word-count" class="word-count">0 / 150-200 words</span>
-                          </div>
-                          <textarea id="task-textarea" class="task-textarea" placeholder="Describe the chart/graph here. Aim for 150-200 words.
+                        <textarea id="task-textarea" class="task-textarea" placeholder="Describe the chart/graph here. Aim for 150-200 words.
 
 Tips:
 • Start with an overview of the main trends
 • Describe key features with data
 • Compare and contrast where relevant" oninput="updateTaskWordCount()"></textarea>
 
-                          <div class="task-actions">
-                            <button id="submit-task-btn" class="primary-btn" onclick="submitTaskForReview()">
-                              <i class="fa-solid fa-paper-plane"></i> Submit for Review
-                            </button>
-                          </div>
+                        <div class="task-actions">
+                          <button id="submit-task-btn" class="primary-btn" onclick="submitTaskForReview()">
+                            <i class="fa-solid fa-paper-plane"></i> Submit for Review
+                          </button>
                         </div>
+                      </div>
 
-                        <!-- Feedback Panel -->
-                        <div id="task-feedback-panel" class="task-feedback-panel hidden">
-                          <!-- Feedback will be inserted here by JS -->
-                        </div>
+                      <!-- Feedback Panel -->
+                      <div id="task-feedback-panel" class="task-feedback-panel hidden">
+                        <!-- Feedback will be inserted here by JS -->
+                      </div>
 
-                        <!-- History Section -->
-                        <div class="task-history-section">
-                          <h4><i class="fa-solid fa-history"></i> Recent Tasks</h4>
-                          <div id="task-history-list" class="task-history-list">
-                            <p class="no-history">No previous tasks</p>
-                          </div>
+                      <!-- History Section -->
+                      <div class="task-history-section">
+                        <h4><i class="fa-solid fa-history"></i> Recent Tasks</h4>
+                        <div id="task-history-list" class="task-history-list">
+                          <p class="no-history">No previous tasks</p>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
+              </div>
 
-                <!-- LISTENING PANEL -->
-                <div id="panel-listening" class="tab-panel hidden">
-                  <div class="panel-content skill-container">
-                    <!-- Mode Selection Screen -->
-                    <div id="listening-mode-selection">
-                      <div class="panel-header">
-                        <h3><i class="fa-solid fa-headphones"></i> Listening Practice</h3>
-                        <p class="muted">Train your listening skills for academic and everyday situations</p>
+              <!-- LISTENING PANEL -->
+              <div id="panel-listening" class="tab-panel hidden">
+                <div class="panel-content skill-container">
+                  <!-- Mode Selection Screen -->
+                  <div id="listening-mode-selection">
+                    <div class="panel-header">
+                      <h3><i class="fa-solid fa-headphones"></i> Listening Practice</h3>
+                      <p class="muted">Train your listening skills for academic and everyday situations</p>
+                    </div>
+
+                    <div class="skill-mode-cards">
+                      <div class="skill-mode-card listening-academic" onclick="startAcademicListening(event)">
+                        <div class="mode-icon"><i class="fa-solid fa-graduation-cap"></i></div>
+                        <h4>Academic Listening</h4>
+                        <p>Practice with lectures, presentations, and academic discussions.</p>
+                        <ul class="mode-features">
+                          <li><i class="fa-solid fa-check"></i> Audio playback with replay</li>
+                          <li><i class="fa-solid fa-check"></i> Comprehension questions</li>
+                          <li><i class="fa-solid fa-check"></i> Transcript review</li>
+                        </ul>
+                        <button class="primary-btn">
+                          <i class="fa-solid fa-play"></i> Start Academic Listening
+                        </button>
                       </div>
 
-                      <div class="skill-mode-cards">
-                        <div class="skill-mode-card listening-academic" onclick="startAcademicListening(event)">
-                          <div class="mode-icon"><i class="fa-solid fa-graduation-cap"></i></div>
-                          <h4>Academic Listening</h4>
-                          <p>Practice with lectures, presentations, and academic discussions.</p>
-                          <ul class="mode-features">
-                            <li><i class="fa-solid fa-check"></i> Audio playback with replay</li>
-                            <li><i class="fa-solid fa-check"></i> Comprehension questions</li>
-                            <li><i class="fa-solid fa-check"></i> Transcript review</li>
-                          </ul>
-                          <button class="primary-btn">
-                            <i class="fa-solid fa-play"></i> Start Academic Listening
-                          </button>
+                      <div class="skill-mode-card listening-conversation" onclick="startConversationListening(event)">
+                        <div class="mode-icon"><i class="fa-solid fa-comments"></i></div>
+                        <h4>Conversation Practice</h4>
+                        <p>Listen to everyday conversations and learn natural expressions.</p>
+                        <ul class="mode-features">
+                          <li><i class="fa-solid fa-check"></i> Daily life dialogues</li>
+                          <li><i class="fa-solid fa-check"></i> Idioms & expressions</li>
+                          <li><i class="fa-solid fa-check"></i> Comprehension check</li>
+                        </ul>
+                        <button class="outline-btn">
+                          <i class="fa-solid fa-play"></i> Start Conversation Practice
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Academic Listening Session Screen -->
+                  <div id="academic-listening-screen" class="hidden">
+                    <div class="listening-session-header">
+                      <button class="ghost-btn" onclick="backToListeningSelection()">
+                        <i class="fa-solid fa-arrow-left"></i> Back
+                      </button>
+                      <h3><i class="fa-solid fa-graduation-cap"></i> Academic Listening</h3>
+                    </div>
+
+                    <!-- Loading State -->
+                    <div id="academic-listening-loading" class="listening-loading hidden">
+                      <i class="fa-solid fa-spinner fa-spin"></i>
+                      <p>Generating academic content...</p>
+                    </div>
+
+                    <!-- Main Content -->
+                    <div id="academic-listening-content" class="listening-session-content">
+                      <!-- Audio Player -->
+                      <div id="academic-audio-container" class="listening-audio-section">
+                        <!-- Audio player will be inserted here by JS -->
+                      </div>
+
+                      <!-- Questions Section -->
+                      <div class="listening-questions-section">
+                        <div id="academic-listening-questions" class="listening-questions-container">
+                          <!-- Questions will be inserted here -->
                         </div>
 
-                        <div class="skill-mode-card listening-conversation" onclick="startConversationListening(event)">
-                          <div class="mode-icon"><i class="fa-solid fa-comments"></i></div>
-                          <h4>Conversation Practice</h4>
-                          <p>Listen to everyday conversations and learn natural expressions.</p>
-                          <ul class="mode-features">
-                            <li><i class="fa-solid fa-check"></i> Daily life dialogues</li>
-                            <li><i class="fa-solid fa-check"></i> Idioms & expressions</li>
-                            <li><i class="fa-solid fa-check"></i> Comprehension check</li>
-                          </ul>
-                          <button class="outline-btn">
-                            <i class="fa-solid fa-play"></i> Start Conversation Practice
+                        <div class="listening-submit-actions">
+                          <button class="primary-btn" onclick="submitAcademicListeningAnswers()">
+                            <i class="fa-solid fa-check"></i> Submit Answers
                           </button>
+                        </div>
+                      </div>
+
+                      <!-- Results Panel -->
+                      <div id="academic-listening-results" class="listening-results-panel hidden">
+                        <!-- Results will be inserted here by JS -->
+                      </div>
+
+                      <!-- History Section -->
+                      <div class="listening-history-section">
+                        <h4><i class="fa-solid fa-history"></i> Recent Academic Sessions</h4>
+                        <div id="academic-listening-history" class="listening-history-list">
+                          <p class="no-history">No previous sessions</p>
                         </div>
                       </div>
                     </div>
+                  </div>
 
-                    <!-- Academic Listening Session Screen -->
-                    <div id="academic-listening-screen" class="hidden">
-                      <div class="listening-session-header">
-                        <button class="ghost-btn" onclick="backToListeningSelection()">
-                          <i class="fa-solid fa-arrow-left"></i> Back
+                  <!-- Conversation Listening Session Screen -->
+                  <div id="conversation-listening-screen" class="hidden">
+                    <div class="listening-session-header">
+                      <button class="ghost-btn" onclick="backToListeningSelection()">
+                        <i class="fa-solid fa-arrow-left"></i> Back
+                      </button>
+                      <h3><i class="fa-solid fa-comments"></i> Conversation Practice</h3>
+                    </div>
+
+                    <!-- Loading State -->
+                    <div id="conversation-listening-loading" class="listening-loading hidden">
+                      <i class="fa-solid fa-spinner fa-spin"></i>
+                      <p>Generating conversation content...</p>
+                    </div>
+
+                    <!-- Main Content -->
+                    <div id="conversation-listening-content" class="listening-session-content">
+                      <!-- Audio Player -->
+                      <div id="conversation-audio-container" class="listening-audio-section">
+                        <!-- Audio player will be inserted here by JS -->
+                      </div>
+
+                      <!-- Questions Section -->
+                      <div class="listening-questions-section">
+                        <div id="conversation-listening-questions" class="listening-questions-container">
+                          <!-- Questions will be inserted here -->
+                        </div>
+
+                        <div class="listening-submit-actions">
+                          <button class="primary-btn" onclick="submitConversationListeningAnswers()">
+                            <i class="fa-solid fa-check"></i> Submit Answers
+                          </button>
+                        </div>
+                      </div>
+
+                      <!-- Results Panel -->
+                      <div id="conversation-listening-results" class="listening-results-panel hidden">
+                        <!-- Results will be inserted here by JS -->
+                      </div>
+
+                      <!-- History Section -->
+                      <div class="listening-history-section">
+                        <h4><i class="fa-solid fa-history"></i> Recent Conversation Sessions</h4>
+                        <div id="conversation-listening-history" class="listening-history-list">
+                          <p class="no-history">No previous sessions</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- READING PANEL -->
+              <div id="panel-reading" class="tab-panel hidden">
+                <div class="panel-content skill-container">
+                  <!-- Mode Selection Screen -->
+                  <div id="reading-mode-selection">
+                    <div class="panel-header">
+                      <h3><i class="fa-solid fa-book-open"></i> Reading Practice</h3>
+                      <p class="muted">Enhance your reading comprehension for exams</p>
+                    </div>
+
+                    <div class="skill-mode-cards">
+                      <div class="skill-mode-card reading-academic" onclick="startAcademicReading(event)">
+                        <div class="mode-icon"><i class="fa-solid fa-book"></i></div>
+                        <h4>Academic Reading</h4>
+                        <p>Read academic passages and answer IELTS-style questions with timer.</p>
+                        <ul class="mode-features">
+                          <li><i class="fa-solid fa-check"></i> True/False/Not Given</li>
+                          <li><i class="fa-solid fa-check"></i> Matching & multiple choice</li>
+                          <li><i class="fa-solid fa-check"></i> Timed practice</li>
+                        </ul>
+                        <button class="primary-btn">
+                          <i class="fa-solid fa-play"></i> Start Academic Reading
                         </button>
-                        <h3><i class="fa-solid fa-graduation-cap"></i> Academic Listening</h3>
                       </div>
 
-                      <!-- Loading State -->
-                      <div id="academic-listening-loading" class="listening-loading hidden">
-                        <i class="fa-solid fa-spinner fa-spin"></i>
-                        <p>Generating academic content...</p>
+                      <div class="skill-mode-card reading-speed" onclick="startSpeedReading(event)">
+                        <div class="mode-icon"><i class="fa-solid fa-bolt"></i></div>
+                        <h4>Speed Reading</h4>
+                        <p>Improve your reading speed with skimming and scanning exercises.</p>
+                        <ul class="mode-features">
+                          <li><i class="fa-solid fa-check"></i> WPM measurement</li>
+                          <li><i class="fa-solid fa-check"></i> Skimming practice</li>
+                          <li><i class="fa-solid fa-check"></i> Scanning exercises</li>
+                        </ul>
+                        <button class="outline-btn">
+                          <i class="fa-solid fa-play"></i> Start Speed Reading
+                        </button>
                       </div>
+                    </div>
+                  </div>
 
-                      <!-- Main Content -->
-                      <div id="academic-listening-content" class="listening-session-content">
-                        <!-- Audio Player -->
-                        <div id="academic-audio-container" class="listening-audio-section">
-                          <!-- Audio player will be inserted here by JS -->
+                  <!-- Academic Reading Session Screen -->
+                  <div id="academic-reading-screen" class="hidden">
+                    <div class="reading-session-header">
+                      <button class="ghost-btn" onclick="backToReadingSelection()">
+                        <i class="fa-solid fa-arrow-left"></i> Back
+                      </button>
+                      <h3><i class="fa-solid fa-book"></i> Academic Reading</h3>
+                      <div class="reading-timer">
+                        <i class="fa-solid fa-clock"></i>
+                        <span id="academic-reading-timer">20:00</span>
+                      </div>
+                    </div>
+
+                    <!-- Loading State -->
+                    <div id="academic-reading-loading" class="reading-loading hidden">
+                      <i class="fa-solid fa-spinner fa-spin"></i>
+                      <p>Generating academic passage...</p>
+                    </div>
+
+                    <!-- Main Content -->
+                    <div id="academic-reading-content" class="reading-session-content">
+                      <div class="reading-layout">
+                        <!-- Passage Section -->
+                        <div class="passage-section">
+                          <div id="academic-passage-container" class="passage-container">
+                            <!-- Passage will be inserted here -->
+                          </div>
                         </div>
 
                         <!-- Questions Section -->
-                        <div class="listening-questions-section">
-                          <div id="academic-listening-questions" class="listening-questions-container">
+                        <div class="questions-section">
+                          <div class="questions-header">
+                            <h4><i class="fa-solid fa-question-circle"></i> Questions</h4>
+                          </div>
+                          <div id="academic-questions-container" class="questions-container">
                             <!-- Questions will be inserted here -->
                           </div>
 
-                          <div class="listening-submit-actions">
-                            <button class="primary-btn" onclick="submitAcademicListeningAnswers()">
+                          <div class="reading-submit-actions">
+                            <button class="primary-btn" onclick="submitAcademicReadingAnswers()">
                               <i class="fa-solid fa-check"></i> Submit Answers
                             </button>
                           </div>
                         </div>
+                      </div>
 
-                        <!-- Results Panel -->
-                        <div id="academic-listening-results" class="listening-results-panel hidden">
-                          <!-- Results will be inserted here by JS -->
-                        </div>
+                      <!-- Results Panel -->
+                      <div id="academic-reading-results" class="reading-results-panel hidden">
+                        <!-- Results will be inserted here by JS -->
+                      </div>
 
-                        <!-- History Section -->
-                        <div class="listening-history-section">
-                          <h4><i class="fa-solid fa-history"></i> Recent Academic Sessions</h4>
-                          <div id="academic-listening-history" class="listening-history-list">
-                            <p class="no-history">No previous sessions</p>
-                          </div>
+                      <!-- History Section -->
+                      <div class="reading-history-section">
+                        <h4><i class="fa-solid fa-history"></i> Recent Academic Sessions</h4>
+                        <div id="academic-reading-history" class="reading-history-list">
+                          <p class="no-history">No previous sessions</p>
                         </div>
                       </div>
                     </div>
+                  </div>
 
-                    <!-- Conversation Listening Session Screen -->
-                    <div id="conversation-listening-screen" class="hidden">
-                      <div class="listening-session-header">
-                        <button class="ghost-btn" onclick="backToListeningSelection()">
-                          <i class="fa-solid fa-arrow-left"></i> Back
-                        </button>
-                        <h3><i class="fa-solid fa-comments"></i> Conversation Practice</h3>
+                  <!-- Speed Reading Session Screen -->
+                  <div id="speed-reading-screen" class="hidden">
+                    <div class="reading-session-header">
+                      <button class="ghost-btn" onclick="backToReadingSelection()">
+                        <i class="fa-solid fa-arrow-left"></i> Back
+                      </button>
+                      <h3><i class="fa-solid fa-bolt"></i> Speed Reading</h3>
+                      <div class="reading-stats">
+                        <span id="speed-reading-wpm" class="wpm-display">0 WPM</span>
+                        <span id="speed-reading-timer" class="timer-display">00:00</span>
                       </div>
+                    </div>
 
-                      <!-- Loading State -->
-                      <div id="conversation-listening-loading" class="listening-loading hidden">
-                        <i class="fa-solid fa-spinner fa-spin"></i>
-                        <p>Generating conversation content...</p>
-                      </div>
+                    <!-- Loading State -->
+                    <div id="speed-reading-loading" class="reading-loading hidden">
+                      <i class="fa-solid fa-spinner fa-spin"></i>
+                      <p>Generating content...</p>
+                    </div>
 
-                      <!-- Main Content -->
-                      <div id="conversation-listening-content" class="listening-session-content">
-                        <!-- Audio Player -->
-                        <div id="conversation-audio-container" class="listening-audio-section">
-                          <!-- Audio player will be inserted here by JS -->
+                    <!-- Main Content -->
+                    <div id="speed-reading-content" class="reading-session-content">
+                      <div class="speed-reading-layout">
+                        <!-- Passage Section -->
+                        <div class="passage-section speed-passage">
+                          <div class="speed-controls">
+                            <button class="primary-btn" id="start-speed-btn" onclick="startSpeedTimer()">
+                              <i class="fa-solid fa-play"></i> Start Reading
+                            </button>
+                            <button class="ghost-btn hidden" id="done-speed-btn" onclick="stopSpeedTimer()">
+                              <i class="fa-solid fa-stop"></i> Done Reading
+                            </button>
+                          </div>
+                          <div id="speed-passage-container" class="passage-container">
+                            <!-- Passage will be inserted here -->
+                          </div>
                         </div>
 
-                        <!-- Questions Section -->
-                        <div class="listening-questions-section">
-                          <div id="conversation-listening-questions" class="listening-questions-container">
+                        <!-- Quick Questions Section -->
+                        <div id="speed-questions-section" class="questions-section hidden">
+                          <div class="questions-header">
+                            <h4><i class="fa-solid fa-question-circle"></i> Quick Questions</h4>
+                          </div>
+                          <div id="speed-questions-container" class="questions-container">
                             <!-- Questions will be inserted here -->
                           </div>
 
-                          <div class="listening-submit-actions">
-                            <button class="primary-btn" onclick="submitConversationListeningAnswers()">
+                          <div class="reading-submit-actions">
+                            <button class="primary-btn" onclick="submitSpeedReadingAnswers()">
                               <i class="fa-solid fa-check"></i> Submit Answers
                             </button>
                           </div>
                         </div>
+                      </div>
 
-                        <!-- Results Panel -->
-                        <div id="conversation-listening-results" class="listening-results-panel hidden">
-                          <!-- Results will be inserted here by JS -->
-                        </div>
+                      <!-- Results Panel -->
+                      <div id="speed-reading-results" class="reading-results-panel hidden">
+                        <!-- Results will be inserted here by JS -->
+                      </div>
 
-                        <!-- History Section -->
-                        <div class="listening-history-section">
-                          <h4><i class="fa-solid fa-history"></i> Recent Conversation Sessions</h4>
-                          <div id="conversation-listening-history" class="listening-history-list">
-                            <p class="no-history">No previous sessions</p>
-                          </div>
+                      <!-- History Section -->
+                      <div class="reading-history-section">
+                        <h4><i class="fa-solid fa-history"></i> Recent Speed Reading Sessions</h4>
+                        <div id="speed-reading-history" class="reading-history-list">
+                          <p class="no-history">No previous sessions</p>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
-
-                <!-- READING PANEL -->
-                <div id="panel-reading" class="tab-panel hidden">
-                  <div class="panel-content skill-container">
-                    <!-- Mode Selection Screen -->
-                    <div id="reading-mode-selection">
-                      <div class="panel-header">
-                        <h3><i class="fa-solid fa-book-open"></i> Reading Practice</h3>
-                        <p class="muted">Enhance your reading comprehension for exams</p>
-                      </div>
-
-                      <div class="skill-mode-cards">
-                        <div class="skill-mode-card reading-academic" onclick="startAcademicReading(event)">
-                          <div class="mode-icon"><i class="fa-solid fa-book"></i></div>
-                          <h4>Academic Reading</h4>
-                          <p>Read academic passages and answer IELTS-style questions with timer.</p>
-                          <ul class="mode-features">
-                            <li><i class="fa-solid fa-check"></i> True/False/Not Given</li>
-                            <li><i class="fa-solid fa-check"></i> Matching & multiple choice</li>
-                            <li><i class="fa-solid fa-check"></i> Timed practice</li>
-                          </ul>
-                          <button class="primary-btn">
-                            <i class="fa-solid fa-play"></i> Start Academic Reading
-                          </button>
-                        </div>
-
-                        <div class="skill-mode-card reading-speed" onclick="startSpeedReading(event)">
-                          <div class="mode-icon"><i class="fa-solid fa-bolt"></i></div>
-                          <h4>Speed Reading</h4>
-                          <p>Improve your reading speed with skimming and scanning exercises.</p>
-                          <ul class="mode-features">
-                            <li><i class="fa-solid fa-check"></i> WPM measurement</li>
-                            <li><i class="fa-solid fa-check"></i> Skimming practice</li>
-                            <li><i class="fa-solid fa-check"></i> Scanning exercises</li>
-                          </ul>
-                          <button class="outline-btn">
-                            <i class="fa-solid fa-play"></i> Start Speed Reading
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-
-                    <!-- Academic Reading Session Screen -->
-                    <div id="academic-reading-screen" class="hidden">
-                      <div class="reading-session-header">
-                        <button class="ghost-btn" onclick="backToReadingSelection()">
-                          <i class="fa-solid fa-arrow-left"></i> Back
-                        </button>
-                        <h3><i class="fa-solid fa-book"></i> Academic Reading</h3>
-                        <div class="reading-timer">
-                          <i class="fa-solid fa-clock"></i>
-                          <span id="academic-reading-timer">20:00</span>
-                        </div>
-                      </div>
-
-                      <!-- Loading State -->
-                      <div id="academic-reading-loading" class="reading-loading hidden">
-                        <i class="fa-solid fa-spinner fa-spin"></i>
-                        <p>Generating academic passage...</p>
-                      </div>
-
-                      <!-- Main Content -->
-                      <div id="academic-reading-content" class="reading-session-content">
-                        <div class="reading-layout">
-                          <!-- Passage Section -->
-                          <div class="passage-section">
-                            <div id="academic-passage-container" class="passage-container">
-                              <!-- Passage will be inserted here -->
-                            </div>
-                          </div>
-
-                          <!-- Questions Section -->
-                          <div class="questions-section">
-                            <div class="questions-header">
-                              <h4><i class="fa-solid fa-question-circle"></i> Questions</h4>
-                            </div>
-                            <div id="academic-questions-container" class="questions-container">
-                              <!-- Questions will be inserted here -->
-                            </div>
-
-                            <div class="reading-submit-actions">
-                              <button class="primary-btn" onclick="submitAcademicReadingAnswers()">
-                                <i class="fa-solid fa-check"></i> Submit Answers
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-
-                        <!-- Results Panel -->
-                        <div id="academic-reading-results" class="reading-results-panel hidden">
-                          <!-- Results will be inserted here by JS -->
-                        </div>
-
-                        <!-- History Section -->
-                        <div class="reading-history-section">
-                          <h4><i class="fa-solid fa-history"></i> Recent Academic Sessions</h4>
-                          <div id="academic-reading-history" class="reading-history-list">
-                            <p class="no-history">No previous sessions</p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <!-- Speed Reading Session Screen -->
-                    <div id="speed-reading-screen" class="hidden">
-                      <div class="reading-session-header">
-                        <button class="ghost-btn" onclick="backToReadingSelection()">
-                          <i class="fa-solid fa-arrow-left"></i> Back
-                        </button>
-                        <h3><i class="fa-solid fa-bolt"></i> Speed Reading</h3>
-                        <div class="reading-stats">
-                          <span id="speed-reading-wpm" class="wpm-display">0 WPM</span>
-                          <span id="speed-reading-timer" class="timer-display">00:00</span>
-                        </div>
-                      </div>
-
-                      <!-- Loading State -->
-                      <div id="speed-reading-loading" class="reading-loading hidden">
-                        <i class="fa-solid fa-spinner fa-spin"></i>
-                        <p>Generating content...</p>
-                      </div>
-
-                      <!-- Main Content -->
-                      <div id="speed-reading-content" class="reading-session-content">
-                        <div class="speed-reading-layout">
-                          <!-- Passage Section -->
-                          <div class="passage-section speed-passage">
-                            <div class="speed-controls">
-                              <button class="primary-btn" id="start-speed-btn" onclick="startSpeedTimer()">
-                                <i class="fa-solid fa-play"></i> Start Reading
-                              </button>
-                              <button class="ghost-btn hidden" id="done-speed-btn" onclick="stopSpeedTimer()">
-                                <i class="fa-solid fa-stop"></i> Done Reading
-                              </button>
-                            </div>
-                            <div id="speed-passage-container" class="passage-container">
-                              <!-- Passage will be inserted here -->
-                            </div>
-                          </div>
-
-                          <!-- Quick Questions Section -->
-                          <div id="speed-questions-section" class="questions-section hidden">
-                            <div class="questions-header">
-                              <h4><i class="fa-solid fa-question-circle"></i> Quick Questions</h4>
-                            </div>
-                            <div id="speed-questions-container" class="questions-container">
-                              <!-- Questions will be inserted here -->
-                            </div>
-
-                            <div class="reading-submit-actions">
-                              <button class="primary-btn" onclick="submitSpeedReadingAnswers()">
-                                <i class="fa-solid fa-check"></i> Submit Answers
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-
-                        <!-- Results Panel -->
-                        <div id="speed-reading-results" class="reading-results-panel hidden">
-                          <!-- Results will be inserted here by JS -->
-                        </div>
-
-                        <!-- History Section -->
-                        <div class="reading-history-section">
-                          <h4><i class="fa-solid fa-history"></i> Recent Speed Reading Sessions</h4>
-                          <div id="speed-reading-history" class="reading-history-list">
-                            <p class="no-history">No previous sessions</p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+              </div>
             </section>
           </main>
         </div>
