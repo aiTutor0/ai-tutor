@@ -265,7 +265,7 @@
 
 /* Landing Responsive */
 @media (max-width: 920px) {
-.landing-hero {
+  .landing-hero {
     grid-template-columns: 1fr;
   }
 }
@@ -666,7 +666,7 @@
   border: none;
   border-radius: 0;
   overflow: hidden;
-/* Prevent interface-level scroll */
+  /* Prevent interface-level scroll */
 }
 
 .chat-window {
@@ -679,9 +679,9 @@
   gap: 14px;
   background: var(--color-chat-bg);
   min-height: 0;
-/* Critical for flex child to shrink */
+  /* Critical for flex child to shrink */
   max-height: 100%;
-/* Ensure it doesn't exceed container */
+  /* Ensure it doesn't exceed container */
 }
 
 .message {
@@ -857,11 +857,11 @@
 
 /* Responsive for workspace */
 @media (max-width: 980px) {
-.ws-grid {
+  .ws-grid {
     grid-template-columns: 1fr;
   }
 
-.ws-right {
+  .ws-right {
     display: none;
   }
 }
@@ -969,16 +969,16 @@
 
 /* Admin table responsive */
 @media (max-width: 960px) {
-.admin-row {
+  .admin-row {
     grid-template-columns: 1fr;
     gap: 6px;
   }
 
-.admin-head {
+  .admin-head {
     display: none;
   }
 
-.admin-row>div {
+  .admin-row>div {
     padding: 2px 0;
   }
 }
@@ -1396,7 +1396,7 @@ body.dark-mode {
 }
 
 @media (max-width: 1000px) {
-.speak-session-content {
+  .speak-session-content {
     grid-template-columns: 1fr;
   }
 }
@@ -1650,12 +1650,12 @@ body.dark-mode {
 /* High contrast mode support */
 @media (prefers-contrast: high) {
 
-.primary-btn,
-.ghost-btn {
+  .primary-btn,
+  .ghost-btn {
     border-width: 2px;
   }
 
-.msg-bubble {
+  .msg-bubble {
     border: 1px solid var(--color-border);
   }
 }
@@ -1674,9 +1674,9 @@ body.dark-mode {
 /* === MODAL MOBILE RESPONSIVENESS === */
 @media (max-width: 480px) {
 
-#members-modal>div,
-#invitations-modal>div,
-.modal-content {
+  #members-modal>div,
+  #invitations-modal>div,
+  .modal-content {
     width: 95% !important;
     max-width: 95% !important;
     margin: 10px;
@@ -3070,7 +3070,7 @@ body.dark-mode .md-inline-code {
 }
 
 @media (max-width: 900px) {
-.reading-layout {
+  .reading-layout {
     grid-template-columns: 1fr;
   }
 }
@@ -3216,4 +3216,524 @@ body.dark-mode .md-inline-code {
   color: var(--color-text-muted);
   text-align: center;
   padding: 20px;
+}
+
+/* ======================================
+   SKILL MODE CARDS & PANELS
+   ====================================== */
+
+/* Skill Container */
+.skill-container {
+  padding: 20px;
+  max-width: 1200px;
+}
+
+/* Panel Header */
+.skill-container .panel-header {
+  margin-bottom: 24px;
+}
+
+.skill-container .panel-header h3 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.skill-container .panel-header h3 i {
+  color: var(--color-accent);
+}
+
+.skill-container .panel-header p.muted {
+  color: var(--color-text-muted);
+  font-size: 0.95rem;
+}
+
+/* Skill Mode Cards Grid */
+.skill-mode-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 24px;
+}
+
+/* Individual Mode Card */
+.skill-mode-card {
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  padding: 24px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.skill-mode-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+  border-color: var(--color-accent);
+}
+
+/* Mode Icon */
+.skill-mode-card .mode-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  margin-bottom: 8px;
+}
+
+/* Writing Card Icons */
+.skill-mode-card.writing-essay .mode-icon {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+}
+
+.skill-mode-card.writing-task .mode-icon {
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  color: white;
+}
+
+/* Listening Card Icons */
+.skill-mode-card.listening-academic .mode-icon {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+}
+
+.skill-mode-card.listening-conversation .mode-icon {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: white;
+}
+
+/* Reading Card Icons */
+.skill-mode-card.reading-academic .mode-icon {
+  background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
+  color: white;
+}
+
+.skill-mode-card.reading-speed .mode-icon {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
+}
+
+/* Card Title */
+.skill-mode-card h4 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+/* Card Description */
+.skill-mode-card>p {
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Mode Features List */
+.mode-features {
+  list-style: none;
+  padding: 0;
+  margin: 8px 0 16px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mode-features li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+}
+
+.mode-features li i {
+  color: var(--color-accent);
+  font-size: 0.8rem;
+}
+
+/* Card Buttons */
+.skill-mode-card .primary-btn,
+.skill-mode-card .outline-btn {
+  margin-top: auto;
+  width: 100%;
+  justify-content: center;
+  padding: 12px 20px;
+  font-weight: 600;
+}
+
+/* ======================================
+   SESSION SCREENS (Common Styles)
+   ====================================== */
+
+/* Session Headers */
+.essay-session-header,
+.task-session-header,
+.listening-session-header,
+.reading-session-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--color-border);
+  margin-bottom: 24px;
+}
+
+.essay-session-header h3,
+.task-session-header h3,
+.listening-session-header h3,
+.reading-session-header h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+}
+
+.essay-session-header h3 i,
+.task-session-header h3 i,
+.listening-session-header h3 i,
+.reading-session-header h3 i {
+  color: var(--color-accent);
+}
+
+/* Timer Display */
+.reading-timer,
+.reading-stats {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--color-bg-tertiary);
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  color: var(--color-accent);
+}
+
+.wpm-display {
+  color: var(--color-accent);
+  font-weight: 700;
+}
+
+.timer-display {
+  color: var(--color-text-secondary);
+}
+
+/* Session Content */
+.essay-session-content,
+.task-session-content,
+.listening-session-content,
+.reading-session-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Topic/Task Sections */
+.essay-topic-section,
+.task-topic-section {
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.topic-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.topic-header h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+.topic-header h4 i {
+  color: var(--color-accent);
+}
+
+.essay-topic-box,
+.task-topic-box {
+  background: var(--color-bg-tertiary);
+  border-radius: 8px;
+  padding: 16px;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  min-height: 60px;
+}
+
+/* Writing Sections */
+.essay-writing-section,
+.task-writing-section {
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.writing-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.writing-header h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+.writing-header h4 i {
+  color: var(--color-accent);
+}
+
+.word-count {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+/* Textareas */
+.essay-textarea,
+.task-textarea {
+  width: 100%;
+  min-height: 300px;
+  padding: 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-bg);
+  color: var(--color-text-primary);
+  font-size: 1rem;
+  line-height: 1.7;
+  resize: vertical;
+  font-family: inherit;
+}
+
+.essay-textarea:focus,
+.task-textarea:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+/* Action Buttons */
+.essay-actions,
+.task-actions {
+  margin-top: 16px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Feedback Panel */
+.essay-feedback-panel,
+.task-feedback-panel {
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-accent);
+  border-radius: 12px;
+  padding: 24px;
+}
+
+/* History Sections */
+.essay-history-section,
+.task-history-section,
+.listening-history-section,
+.reading-history-section {
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.essay-history-section h4,
+.task-history-section h4,
+.listening-history-section h4,
+.reading-history-section h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 16px 0;
+}
+
+.essay-history-section h4 i,
+.task-history-section h4 i,
+.listening-history-section h4 i,
+.reading-history-section h4 i {
+  color: var(--color-accent);
+}
+
+/* Loading States */
+.listening-loading,
+.reading-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  color: var(--color-text-muted);
+  gap: 16px;
+}
+
+.listening-loading i,
+.reading-loading i {
+  font-size: 2rem;
+  color: var(--color-accent);
+}
+
+/* Audio Section */
+.listening-audio-section {
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 20px;
+}
+
+/* Questions Sections */
+.listening-questions-section,
+.questions-section {
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.listening-questions-container,
+.questions-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.questions-header {
+  margin-bottom: 16px;
+}
+
+.questions-header h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+.questions-header h4 i {
+  color: var(--color-accent);
+}
+
+/* Submit Actions */
+.listening-submit-actions,
+.reading-submit-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 16px;
+}
+
+/* Results Panel */
+.listening-results-panel,
+.reading-results-panel {
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-accent);
+  border-radius: 12px;
+  padding: 24px;
+}
+
+/* Reading Layout */
+.reading-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.passage-section {
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 20px;
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+.passage-container {
+  line-height: 1.8;
+  color: var(--color-text-primary);
+}
+
+/* Speed Reading */
+.speed-reading-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.speed-passage {
+  max-height: none;
+}
+
+.speed-controls {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+/* Task Chart Container */
+.task-chart-container {
+  margin-top: 16px;
+  background: var(--color-bg);
+  border-radius: 8px;
+  padding: 20px;
+  min-height: 200px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .skill-mode-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .reading-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .essay-session-header,
+  .task-session-header,
+  .listening-session-header,
+  .reading-session-header {
+    flex-wrap: wrap;
+  }
+
+  .reading-timer,
+  .reading-stats {
+    margin-left: 0;
+    margin-top: 12px;
+  }
 }
