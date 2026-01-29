@@ -34,19 +34,31 @@ class RealtimeClient {
         this.startTime = new Date();
 
         try {
-            // Get ephemeral token from server
-            const tokenResponse = await fetch('/api/realtime-token', {
+            // Get ephemeral token from Netlify function
+            const tokenResponse = await fetch('/.netlify/functions/realtime-token', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ mode })
             });
 
-            if (!tokenResponse.ok) {
-                const error = await tokenResponse.json();
-                throw new Error(error.error || 'Failed to get realtime token');
+            // Check if response is JSON
+            const contentType = tokenResponse.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+                throw new Error('Server returned invalid response. Please try again later.');
             }
 
-            const { token, sessionId } = await tokenResponse.json();
+            const tokenData = await tokenResponse.json();
+
+            if (!tokenResponse.ok) {
+                throw new Error(tokenData.error || 'Failed to get realtime token');
+            }
+
+            const { token, sessionId } = tokenData;
+
+            if (!token) {
+                throw new Error('No token received from server');
+            }
+
             this.sessionId = sessionId;
 
             // Create peer connection
