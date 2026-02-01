@@ -239,6 +239,23 @@ Include 4-6 questions with focus on inference, tone, and casual language underst
       systemPrompt += levelGuidance;
     }
 
+    // Dynamic max_tokens based on toolMode - content generation needs more tokens
+    const maxTokensMap = {
+      reading_generate: 2500,
+      listening_generate: 2500,
+      conversation_generate: 2000,
+      speed_reading_generate: 1500,
+      essay_evaluate: 2000,
+      task_response_evaluate: 1500,
+      chat: 500,
+      interview: 500,
+      grammar: 800,
+      tutor: 1000,
+      translate: 500,
+      level: 500
+    };
+    const maxTokens = maxTokensMap[toolMode] || 500;
+
     // Call OpenAI Chat Completions API
     const openaiResponse = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
@@ -252,7 +269,7 @@ Include 4-6 questions with focus on inference, tone, and casual language underst
           { role: "system", content: systemPrompt },
           { role: "user", content: userText }
         ],
-        max_tokens: 500,
+        max_tokens: maxTokens,
         temperature: 0.7
       })
     });
