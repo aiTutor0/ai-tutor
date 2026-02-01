@@ -65,20 +65,6 @@ window.openSkillMode = function (skill, mode, event) {
         panel.classList.remove('hidden');
     }
 
-    // Reset to mode selection screen (hide session screens)
-    resetSkillPanelToModeSelection(skill);
-
-    // Update tool title
-    const toolTitle = document.getElementById('tool-title');
-    if (toolTitle) {
-        const titles = {
-            'writing': mode === 'essay' ? 'Essay Writing' : 'Task Response',
-            'listening': mode === 'academic' ? 'Academic Listening' : 'Conversation Practice',
-            'reading': mode === 'academic' ? 'Academic Reading' : 'Speed Reading'
-        };
-        toolTitle.textContent = titles[skill] || `${skill} Practice`;
-    }
-
     // Close mobile sidebar
     if (window.closeMobileSidebar) {
         window.closeMobileSidebar();
@@ -86,6 +72,36 @@ window.openSkillMode = function (skill, mode, event) {
 
     // Update sidebar active state
     document.querySelectorAll('.menu-link').forEach(link => link.classList.remove('active'));
+
+    // Directly start the specific mode instead of showing mode selection
+    if (skill === 'writing') {
+        if (mode === 'essay') {
+            window.startEssayWriting(null);
+        } else if (mode === 'task') {
+            window.startTaskWriting(null);
+        } else {
+            resetSkillPanelToModeSelection(skill);
+        }
+    } else if (skill === 'listening') {
+        if (mode === 'academic') {
+            window.startAcademicListening(null);
+        } else if (mode === 'conversation') {
+            window.startConversationListening(null);
+        } else {
+            resetSkillPanelToModeSelection(skill);
+        }
+    } else if (skill === 'reading') {
+        if (mode === 'academic') {
+            window.startAcademicReading(null);
+        } else if (mode === 'speed') {
+            window.startSpeedReading(null);
+        } else {
+            resetSkillPanelToModeSelection(skill);
+        }
+    } else {
+        // Default: show mode selection
+        resetSkillPanelToModeSelection(skill);
+    }
 };
 
 // Reset skill panel to show mode selection
