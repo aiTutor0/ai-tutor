@@ -59,11 +59,15 @@ window.loadEssayContent = async function () {
 window.loadTaskContent = async function () {
   currentMode = 'task';
 
-  // Get task topic/chart
-  // TODO: Implement task generation
-  const topicDisplay = document.getElementById('task-topic-display');
-  if (topicDisplay) {
-    topicDisplay.textContent = 'Click "New Task" to get a chart/graph description task.';
+  // Auto-generate a chart/task immediately if the function is available
+  if (typeof window.getNewTaskTopic === 'function') {
+    window.getNewTaskTopic();
+  } else {
+    // Fallback: just show placeholder
+    const topicDisplay = document.getElementById('task-topic-display');
+    if (topicDisplay) {
+      topicDisplay.textContent = 'Click "New Task" to get a chart/graph description task.';
+    }
   }
 
   // Clear textarea

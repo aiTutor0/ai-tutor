@@ -1009,6 +1009,11 @@ function initGroupChat() {
     setCurrentUser('demo@example.com', 'Demo User', 'student');
   }
   console.log('Group Chat initialized', supabase ? '✅ Supabase connected' : '⚠️ localStorage mode');
+
+  // Poll for new invitations every 30 seconds
+  setInterval(() => {
+    updateInvitationBadge();
+  }, 30000);
 }
 
 if (document.readyState === 'loading') {

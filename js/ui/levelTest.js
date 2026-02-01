@@ -306,10 +306,17 @@ function renderPreviousResults() {
   container.innerHTML = `
     <h4 style="margin-top:20px; margin-bottom:10px;">Previous Results</h4>
     ${results.map(r => `
-      <div class="level-result-item" style="display:flex; justify-content:space-between; align-items:center; padding:10px; background:var(--color-bg-tertiary); border-radius:8px; margin-bottom:8px;">
-        <div>
-          <strong style="color:var(--color-accent);">${r.level}</strong> - ${r.score}/10 correct
-          <span class="muted" style="font-size:0.8rem; margin-left:10px;">${new Date(r.date).toLocaleDateString()}</span>
+      <div class="level-result-item" style="display:flex; justify-content:space-between; align-items:center; padding:12px; background:var(--color-bg-tertiary); border-radius:10px; margin-bottom:8px; border:1px solid var(--color-border);">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <div style="width:44px; height:44px; background:linear-gradient(135deg, var(--color-accent), #8b5cf6); color:white; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:0.9rem;">
+            ${r.level}
+          </div>
+          <div>
+            <div style="font-weight:600; color:var(--color-text-primary);">${r.description || r.level}</div>
+            <div style="font-size:0.8rem; color:var(--color-text-muted);">
+              ${r.score}/10 correct • ${new Date(r.date).toLocaleDateString()}
+            </div>
+          </div>
         </div>
         <button class="ghost-btn" style="padding:6px 10px; font-size:0.8rem;" onclick="deleteLevelResult(${r.id})">
           <i class="fa-solid fa-trash"></i>
