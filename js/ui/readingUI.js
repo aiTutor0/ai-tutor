@@ -104,8 +104,8 @@ function resetReadingSession(mode = 'academic') {
 
   // Clear UI based on mode
   const prefix = mode === 'academic' ? 'academic-reading' : 'speed-reading';
-  const passageContainer = document.getElementById(mode === 'speed' ? 'speed-passage-container' : 'passage-container');
-  const questionsContainer = document.getElementById(mode === 'speed' ? 'speed-questions-container' : 'questions-container');
+  const passageContainer = document.getElementById(mode === 'speed' ? 'speed-passage-container' : 'academic-passage-container');
+  const questionsContainer = document.getElementById(mode === 'speed' ? 'speed-questions-container' : 'academic-questions-container');
   const resultsPanel = document.getElementById(`${prefix}-results`);
 
   if (passageContainer) passageContainer.innerHTML = '';
@@ -128,7 +128,7 @@ function showReadingLoading(mode, show) {
 // ======================================
 
 function displayPassage(data, mode = 'academic') {
-  const containerId = mode === 'academic' ? 'passage-container' : 'speed-passage-container';
+  const containerId = mode === 'academic' ? 'academic-passage-container' : 'speed-passage-container';
   const container = document.getElementById(containerId);
   if (!container) return;
 
@@ -144,7 +144,7 @@ function displayPassage(data, mode = 'academic') {
 }
 
 function displayQuestions(questions) {
-  const container = document.getElementById('questions-container');
+  const container = document.getElementById('academic-questions-container');
   if (!container) return;
 
   container.innerHTML = questions.map((q, index) => {
@@ -225,7 +225,7 @@ function startTimer() {
 }
 
 function updateTimerDisplay() {
-  const timerEl = document.getElementById('reading-timer');
+  const timerEl = document.getElementById('academic-reading-timer');
   if (!timerEl) return;
 
   const minutes = Math.floor(timeRemaining / 60);
@@ -291,7 +291,7 @@ window.submitReadingAnswers = async function () {
 };
 
 function displayResults(results) {
-  const resultsPanel = document.getElementById('reading-results-panel');
+  const resultsPanel = document.getElementById('academic-reading-results');
   if (!resultsPanel) return;
 
   resultsPanel.classList.remove('hidden');
@@ -352,7 +352,7 @@ function displayResults(results) {
 // ======================================
 
 async function loadReadingHistory() {
-  const historyList = document.getElementById('reading-history-list');
+  const historyList = document.getElementById('academic-reading-history');
   if (!historyList) return;
 
   const { data: sessions } = await getReadingHistory(5);

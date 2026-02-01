@@ -307,7 +307,8 @@ window.submitListeningAnswers = async function () {
 };
 
 function displayListeningResults(results, timeTaken) {
-    const panel = document.getElementById('listening-results-panel');
+    const prefix = currentListeningData.mode === 'academic' ? 'academic-listening' : 'conversation-listening';
+    const panel = document.getElementById(`${prefix}-results`);
     if (!panel) return;
 
     const minutes = Math.floor(timeTaken / 60);
@@ -367,8 +368,8 @@ function displayListeningResults(results, timeTaken) {
     panel.classList.remove('hidden');
 
     // Hide questions
-    document.getElementById('listening-questions-container')?.classList.add('hidden');
-    document.getElementById('listening-audio-container')?.classList.add('hidden');
+    document.getElementById(`${prefix}-questions`)?.parentElement?.classList.add('hidden');
+    document.getElementById(`${prefix.replace('-listening', '')}-audio-container`)?.classList.add('hidden');
 }
 
 // ======================================
@@ -388,8 +389,9 @@ window.backToListeningSelection = function () {
 // HISTORY
 // ======================================
 
-async function loadListeningHistory() {
-    const historyDiv = document.getElementById('listening-history-list');
+async function loadListeningHistory(mode = 'academic') {
+    const prefix = mode === 'academic' ? 'academic-listening' : 'conversation-listening';
+    const historyDiv = document.getElementById(`${prefix}-history`);
     if (!historyDiv) return;
 
     const { data, error } = await getListeningHistory(5);
