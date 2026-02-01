@@ -3688,3 +3688,192 @@ body.dark-mode .md-inline-code {
     margin-top: 12px;
   }
 }
+
+/* ======================================
+   QUESTION ITEMS - Listening/Reading Spacing Fix
+   ====================================== */
+
+.question-item {
+  background: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.question-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.question-number {
+  font-weight: 700;
+  color: var(--color-accent);
+  font-size: 0.9rem;
+}
+
+.question-type {
+  font-size: 0.75rem;
+  background: var(--color-bg-secondary);
+  padding: 4px 10px;
+  border-radius: 20px;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.question-text {
+  font-size: 1rem;
+  line-height: 1.7;
+  margin: 0 0 16px 0;
+  color: var(--color-text-primary);
+}
+
+.question-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.option-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 16px;
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  line-height: 1.5;
+}
+
+.option-label:hover {
+  border-color: var(--color-accent);
+  background: var(--color-bg-tertiary);
+}
+
+.option-label input[type="radio"] {
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.option-label span {
+  flex: 1;
+}
+
+.fill-blank-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-card-bg);
+  color: var(--color-text-primary);
+  font-size: 1rem;
+}
+
+.fill-blank-input:focus {
+  outline: none;
+  border-color: var(--color-accent);
+}
+
+/* Speed Reading Stats Display */
+.speed-stats-display {
+  display: flex;
+  gap: 24px;
+  margin-top: 16px;
+}
+
+.speed-stats-display .stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px 24px;
+  background: linear-gradient(135deg, var(--color-accent), #8b5cf6);
+  border-radius: 12px;
+  color: white;
+}
+
+.speed-stats-display .stat-value {
+  font-size: 1.8rem;
+  font-weight: 800;
+}
+
+.speed-stats-display .stat-label {
+  font-size: 0.8rem;
+  opacity: 0.9;
+}
+
+.reading-stats {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.wpm-display,
+.timer-display {
+  background: var(--color-bg-tertiary);
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.wpm-display {
+  color: var(--color-accent);
+}
+
+/* Speed Controls */
+.speed-controls {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+/* Enhanced Band Score Display for Essay */
+.band-score-display {
+  background: linear-gradient(135deg, #10b981, #059669) !important;
+  color: white;
+  padding: 16px 24px;
+  border-radius: 14px;
+  text-align: center;
+  min-width: 100px;
+}
+
+.band-score-display .band-label {
+  font-size: 0.8rem;
+  opacity: 0.95;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.band-score-display .band-value {
+  font-size: 2.2rem;
+  font-weight: 900;
+  display: block;
+}
+
+/* Listening questions container */
+.listening-questions-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.listening-questions-container h4 {
+  margin: 0 0 12px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Academic reading time display */
+.results-time-info {
+  margin: 16px 0;
+  padding: 12px;
+  background: var(--color-bg-tertiary);
+  border-radius: 8px;
+  text-align: center;
+  font-weight: 600;
+}

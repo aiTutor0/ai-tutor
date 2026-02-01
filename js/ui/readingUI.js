@@ -207,6 +207,208 @@ function formatQuestionType(type) {
 }
 
 // ======================================
+// SPEED READING TIMER
+// ======================================
+
+let speedTimerInterval = null;
+let speedStartTime = null;
+let speedTimeElapsed = 0;
+
+window.startSpeedTimer = function () {
+  speedStartTime = Date.now();
+  speedTimeElapsed = 0;
+
+  // Hide start button, show done button
+  const startBtn = document.getElementById('start-speed-btn');
+  const doneBtn = document.getElementById('done-speed-btn');
+  if (startBtn) startBtn.classList.add('hidden');
+  if (doneBtn) doneBtn.classList.remove('hidden');
+
+  // Start timer display
+  speedTimerInterval = setInterval(() => {
+    speedTimeElapsed = Math.floor((Date.now() - speedStartTime) / 1000);
+    updateSpeedTimerDisplay();
+  }, 1000);
+
+  console.log('Speed reading started');
+};
+
+window.stopSpeedTimer = function () {
+  if (speedTimerInterval) {
+    clearInterval(speedTimerInterval);
+    speedTimerInterval = null;
+  }
+
+  // Calculate WPM
+  const wordCount = window.currentWordCount || 150;
+  const minutes = speedTimeElapsed / 60;
+  const wpm = Math.round(wordCount / minutes);
+
+  // Display WPM
+  const wpmEl = document.getElementById('speed-reading-wpm');
+  if (wpmEl) wpmEl.textContent = `${wpm} WPM`;
+
+  // Hide passage, show questions
+  const passageSection = document.querySelector('.speed-passage');
+  const questionsSection = document.getElementById('speed-questions-section');
+
+  if (passageSection) passageSection.style.opacity = '0.5';
+  if (questionsSection) questionsSection.classList.remove('hidden');
+
+  // Display speed reading questions
+  displaySpeedQuestions();
+
+  console.log(`Speed reading finished: ${wpm} WPM`);
+};
+
+function updateSpeedTimerDisplay() {
+  const timerEl = document.getElementById('speed-reading-timer');
+  if (!timerEl) return;
+
+  const minutes = Math.floor(speedTimeElapsed / 60);
+  const seconds = speedTimeElapsed % 60;
+  timerEl.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+}
+
+function displaySpeedQuestions() {
+  const container = document.getElementById('speed-questions-container');
+  if (!container || !currentQuestions || currentQuestions.length === 0) return;
+
+  container.innerHTML = '';
+  currentQuestions.forEach((q, index) => {
+    const qDiv = document.createElement('div');
+    qDiv.className = 'question-item';
+
+    let inputHTML = '';
+    if (q.type === 'multiple_choice') {
+      inputHTML = `
+        <div class="question-options">
+          ${q.options.map(opt => `
+            <label class="option-label">
+              <input type="radio" name="speedq${index}" value="${opt.charAt(0)}" onchange="updateAnswer(${index}, this.value)">
+              <span>${opt}</span>
+            </label>
+          `).join('')}
+        </div>
+      `;
+    } else if (q.type === 'fill_blank') {
+      inputHTML = `<input type="text" class="fill-blank-input" placeholder="Your answer..." onchange="updateAnswer(${index}, this.value)">`;
+    } else if (q.type === 'true_false') {
+      inputHTML = `
+        <div class="question-options">
+          <label class="option-label"><input type="radio" name="speedq${index}" value="True" onchange="updateAnswer(${index}, this.value)"> <span>True</span></label>
+          <label class="option-label"><input type="radio" name="speedq${index}" value="False" onchange="updateAnswer(${index}, this.value)"> <span>False</span></label>
+        </div>
+      `;
+    }
+
+    qDiv.innerHTML = `
+      <div class="question-header">
+        <span class="question-number">Question ${index + 1}</span>
+        <span class="question-type">${formatQuestionType(q.type)}</span>
+      </div>
+      <p class="question-text">${q.question}</p>
+      ${inputHTML}
+    `;
+    container.appendChild(qDiv);
+  });
+}
+
+window.submitSpeedReadingAnswers = async function () {
+  if (!currentQuestions || currentQuestions.length === 0) {
+    alert('No questions to submit');
+    return;
+  }
+
+  const answersArray = currentQuestions.map((_, i) => userAnswers[i] || '');
+  const results = checkAnswers(currentQuestions, answersArray);
+
+  // Calculate WPM
+  const wordCount = window.currentWordCount || 150;
+  const minutes = speedTimeElapsed / 60;
+  const wpm = Math.round(wordCount / minutes);
+
+  // Display results with time info
+  displaySpeedResults(results, wpm, speedTimeElapsed);
+
+  // Save session
+  try {
+    await saveReadingSession({
+      mode: 'speed',
+      passageTitle: currentPassage?.title || 'Speed Reading',
+      passageContent: currentPassage?.passage || '',
+      wordCount: wordCount,
+      questions: currentQuestions,
+      userAnswers: answersArray,
+      correctCount: results.correctCount,
+      totalQuestions: results.totalQuestions,
+      scorePercentage: results.scorePercentage,
+      timeTaken: speedTimeElapsed,
+      timeLimit: 0,
+      wpm: wpm
+    });
+    loadReadingHistory('speed');
+  } catch (error) {
+    console.error('Failed to save speed reading session:', error);
+  }
+};
+
+function displaySpeedResults(results, wpm, timeTaken) {
+  const resultsPanel = document.getElementById('speed-reading-results');
+  if (!resultsPanel) return;
+
+  const minutes = Math.floor(timeTaken / 60);
+  const seconds = timeTaken % 60;
+
+  resultsPanel.classList.remove('hidden');
+  resultsPanel.innerHTML = `
+    <div class="results-header">
+      <h3><i class="fa-solid fa-chart-pie"></i> Speed Reading Results</h3>
+      <div class="speed-stats-display">
+        <div class="stat-item">
+          <span class="stat-value">${wpm}</span>
+          <span class="stat-label">WPM</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-value">${minutes}:${seconds.toString().padStart(2, '0')}</span>
+          <span class="stat-label">Time</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-value">${results.scorePercentage}%</span>
+          <span class="stat-label">Score</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="results-breakdown">
+      ${results.results.map((r, i) => `
+        <div class="result-item ${r.isCorrect ? 'correct' : 'incorrect'}">
+          <div class="result-icon">
+            <i class="fa-solid ${r.isCorrect ? 'fa-check' : 'fa-times'}"></i>
+          </div>
+          <div class="result-content">
+            <span class="result-question">Q${i + 1}: ${currentQuestions[i].question}</span>
+            <span class="result-answer">
+              Your answer: <strong>${r.userAnswer || '(no answer)'}</strong>
+              ${!r.isCorrect ? `<br>Correct: <strong class="correct-answer">${r.correctAnswer}</strong>` : ''}
+            </span>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+    
+    <div class="results-actions">
+      <button class="outline-btn" onclick="startSpeedReading()">
+        <i class="fa-solid fa-redo"></i> Try Again
+      </button>
+      <button class="ghost-btn" onclick="backToReadingSelection()">
+        <i class="fa-solid fa-arrow-left"></i> Back
+      </button>
+    </div>
+  `;
+}
+
+// ======================================
 // TIMER
 // ======================================
 
@@ -274,8 +476,8 @@ async function doSubmitReadingAnswers() {
   const answersArray = currentQuestions.map((_, i) => userAnswers[i] || '');
   const results = checkAnswers(currentQuestions, answersArray);
 
-  // Display results
-  displayResults(results);
+  // Display results with time information
+  displayResults(results, timeTaken);
 
   // Save to database
   try {
@@ -299,9 +501,14 @@ async function doSubmitReadingAnswers() {
   }
 };
 
-function displayResults(results) {
+function displayResults(results, timeTaken = 0) {
   const resultsPanel = document.getElementById('academic-reading-results');
   if (!resultsPanel) return;
+
+  // Format time taken
+  const minutes = Math.floor(timeTaken / 60);
+  const seconds = timeTaken % 60;
+  const timeString = `${minutes}:${seconds.toString().padStart(2, '0')}`;
 
   resultsPanel.classList.remove('hidden');
   resultsPanel.innerHTML = `
@@ -311,6 +518,10 @@ function displayResults(results) {
         <span class="score-value">${results.scorePercentage}%</span>
         <span class="score-label">${results.correctCount}/${results.totalQuestions}</span>
       </div>
+    </div>
+
+    <div class="results-time-info">
+      <i class="fa-solid fa-clock"></i> Time taken: <strong>${timeString}</strong>
     </div>
 
     <div class="results-breakdown">

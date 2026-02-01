@@ -125,18 +125,24 @@ async function doSubmitTaskResponse() {
     try {
         const evaluation = await evaluateTaskResponse(currentChart, responseText);
 
-        await saveTaskResponse({
-            chartType: currentChart.type,
-            chartData: currentChart,
-            responseText: responseText,
-            wordCount: evaluation.wordCount,
-            bandScore: evaluation.bandScore,
-            taskAchievement: evaluation.taskAchievement,
-            coherenceCohesion: evaluation.coherenceCohesion,
-            lexicalResource: evaluation.lexicalResource,
-            grammarAccuracy: evaluation.grammarAccuracy,
-            feedback: evaluation.feedback
-        });
+        // Try to save but don't fail if table doesn't exist
+        try {
+            await saveTaskResponse({
+                chartType: currentChart.type,
+                chartData: currentChart,
+                responseText: responseText,
+                wordCount: evaluation.wordCount,
+                bandScore: evaluation.bandScore,
+                taskAchievement: evaluation.taskAchievement,
+                coherenceCohesion: evaluation.coherenceCohesion,
+                lexicalResource: evaluation.lexicalResource,
+                grammarAccuracy: evaluation.grammarAccuracy,
+                feedback: evaluation.feedback
+            });
+        } catch (saveError) {
+            console.warn('Could not save task response (table may not exist):', saveError.message);
+            // Continue anyway - displaying feedback is more important
+        }
 
         displayTaskFeedback(evaluation);
 
