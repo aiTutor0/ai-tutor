@@ -1203,20 +1203,6 @@ Tips:
                           <i class="fa-solid fa-play"></i> Start Academic Reading
                         </button>
                       </div>
-
-                      <div class="skill-mode-card reading-speed" onclick="startSpeedReading(event)">
-                        <div class="mode-icon"><i class="fa-solid fa-bolt"></i></div>
-                        <h4>Speed Reading</h4>
-                        <p>Improve your reading speed with skimming and scanning exercises.</p>
-                        <ul class="mode-features">
-                          <li><i class="fa-solid fa-check"></i> WPM measurement</li>
-                          <li><i class="fa-solid fa-check"></i> Skimming practice</li>
-                          <li><i class="fa-solid fa-check"></i> Scanning exercises</li>
-                        </ul>
-                        <button class="outline-btn">
-                          <i class="fa-solid fa-play"></i> Start Speed Reading
-                        </button>
-                      </div>
                     </div>
                   </div>
 
@@ -1275,75 +1261,6 @@ Tips:
                       <div class="reading-history-section">
                         <h4><i class="fa-solid fa-history"></i> Recent Academic Sessions</h4>
                         <div id="academic-reading-history" class="reading-history-list">
-                          <p class="no-history">No previous sessions</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Speed Reading Session Screen -->
-                  <div id="speed-reading-screen" class="hidden">
-                    <div class="reading-session-header">
-                      <button class="ghost-btn" onclick="backToReadingSelection()">
-                        <i class="fa-solid fa-arrow-left"></i> Back
-                      </button>
-                      <h3><i class="fa-solid fa-bolt"></i> Speed Reading</h3>
-                      <div class="reading-stats">
-                        <span id="speed-reading-wpm" class="wpm-display">0 WPM</span>
-                        <span id="speed-reading-timer" class="timer-display">00:00</span>
-                      </div>
-                    </div>
-
-                    <!-- Loading State -->
-                    <div id="speed-reading-loading" class="reading-loading hidden">
-                      <i class="fa-solid fa-spinner fa-spin"></i>
-                      <p>Generating content...</p>
-                    </div>
-
-                    <!-- Main Content -->
-                    <div id="speed-reading-content" class="reading-session-content">
-                      <div class="speed-reading-layout">
-                        <!-- Passage Section -->
-                        <div class="passage-section speed-passage">
-                          <div class="speed-controls">
-                            <button class="primary-btn" id="start-speed-btn" onclick="startSpeedTimer()">
-                              <i class="fa-solid fa-play"></i> Start Reading
-                            </button>
-                            <button class="ghost-btn hidden" id="done-speed-btn" onclick="stopSpeedTimer()">
-                              <i class="fa-solid fa-stop"></i> Done Reading
-                            </button>
-                          </div>
-                          <div id="speed-passage-container" class="passage-container">
-                            <!-- Passage will be inserted here -->
-                          </div>
-                        </div>
-
-                        <!-- Quick Questions Section -->
-                        <div id="speed-questions-section" class="questions-section hidden">
-                          <div class="questions-header">
-                            <h4><i class="fa-solid fa-question-circle"></i> Quick Questions</h4>
-                          </div>
-                          <div id="speed-questions-container" class="questions-container">
-                            <!-- Questions will be inserted here -->
-                          </div>
-
-                          <div class="reading-submit-actions">
-                            <button class="primary-btn" onclick="submitSpeedReadingAnswers()">
-                              <i class="fa-solid fa-check"></i> Submit Answers
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-
-                      <!-- Results Panel -->
-                      <div id="speed-reading-results" class="reading-results-panel hidden">
-                        <!-- Results will be inserted here by JS -->
-                      </div>
-
-                      <!-- History Section -->
-                      <div class="reading-history-section">
-                        <h4><i class="fa-solid fa-history"></i> Recent Speed Reading Sessions</h4>
-                        <div id="speed-reading-history" class="reading-history-list">
                           <p class="no-history">No previous sessions</p>
                         </div>
                       </div>
