@@ -318,13 +318,38 @@ function renderPreviousResults() {
             </div>
           </div>
         </div>
-        <button class="ghost-btn" style="padding:6px 10px; font-size:0.8rem;" onclick="deleteLevelResult(${r.id})">
-          <i class="fa-solid fa-trash"></i>
-        </button>
+        <div style="display:flex; gap:8px;">
+          <button class="outline-btn" style="padding:6px 12px; font-size:0.8rem;" onclick="implementLevelToChat('${r.level}', '${r.description || r.level}')" title="Set this as your current level">
+            <i class="fa-solid fa-check"></i> Set Level
+          </button>
+          <button class="ghost-btn" style="padding:6px 10px; font-size:0.8rem;" onclick="deleteLevelResult(${r.id})">
+            <i class="fa-solid fa-trash"></i>
+          </button>
+        </div>
       </div>
     `).join('')}
   `;
 }
+
+// Implement level to chat/settings
+window.implementLevelToChat = function (level, description) {
+  // Store the level in localStorage for use in chat context
+  const userLevelData = {
+    level: level,
+    description: description,
+    setAt: new Date().toISOString()
+  };
+  localStorage.setItem('aitutor_user_level', JSON.stringify(userLevelData));
+
+  // Update display if there's a level indicator
+  const levelIndicator = document.getElementById('user-level-display');
+  if (levelIndicator) {
+    levelIndicator.textContent = level;
+  }
+
+  // Notify user
+  alert(`✅ Your English level has been set to ${level} (${description}).\n\nThe AI tutor will now adapt conversations to your level.`);
+};
 
 // Start test with specific type
 window.startLevelTest = function (testType = 'general') {
