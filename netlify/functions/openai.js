@@ -239,22 +239,22 @@ Include 4-6 questions with focus on inference, tone, and casual language underst
       systemPrompt += levelGuidance;
     }
 
-    // Dynamic max_tokens based on toolMode - content generation needs more tokens
+    // Dynamic max_tokens based on toolMode - increased limits for better responses
     const maxTokensMap = {
-      reading_generate: 2500,
-      listening_generate: 2500,
-      conversation_generate: 2000,
-      speed_reading_generate: 1500,
-      essay_evaluate: 2000,
-      task_response_evaluate: 1500,
-      chat: 500,
-      interview: 500,
-      grammar: 800,
-      tutor: 1000,
-      translate: 500,
-      level: 500
+      reading_generate: 4000,
+      listening_generate: 4000,
+      conversation_generate: 4000,
+      speed_reading_generate: 3000,
+      essay_evaluate: 3000,
+      task_response_evaluate: 3000,
+      chat: 2000,
+      interview: 2000,
+      grammar: 2000,
+      tutor: 2000,
+      translate: 1500,
+      level: 1500
     };
-    const maxTokens = maxTokensMap[toolMode] || 500;
+    const maxTokens = maxTokensMap[toolMode] || 2000;
 
     // Call OpenAI Chat Completions API
     const openaiResponse = await fetch("https://api.openai.com/v1/chat/completions", {
