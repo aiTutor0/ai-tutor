@@ -1,8 +1,26 @@
-// Task Response functions added at end of writingUI.js
+// Task Response functions for IELTS Writing Task 1
+
+import { generateChartData, evaluateTaskResponse, saveTaskResponse } from '../services/writingService.js';
+
+// State
+let currentMode = 'task';
+let currentChart = null;
+let isEvaluating = false;
 
 // ======================================
 // TASK RESPONSE (CHART) MODE
 // ======================================
+
+// Get new task/chart (called from HTML)
+window.getNewTaskTopic = function () {
+    currentChart = generateChartData();
+    displayChart(currentChart);
+    const textarea = document.getElementById('task-textarea');
+    if (textarea) textarea.value = '';
+    const feedbackPanel = document.getElementById('task-feedback-panel');
+    if (feedbackPanel) feedbackPanel.classList.add('hidden');
+    window.updateTaskWordCount();
+};
 
 window.startTaskResponse = async function (event) {
     if (event) event.preventDefault();
@@ -30,8 +48,10 @@ window.startTaskResponse = async function (event) {
 };
 
 function displayChart(chart) {
-    const container = document.getElementById('chart-display');
+    const container = document.getElementById('task-chart-container');
     if (!container) return;
+
+    container.classList.remove('hidden');
 
     let html = `<h4>${chart.title}</h4>`;
 
@@ -76,6 +96,15 @@ window.updateTaskWordCount = function () {
 };
 
 window.submitTaskResponse = async function () {
+    await doSubmitTaskResponse();
+};
+
+// Alias for HTML compatibility
+window.submitTaskForReview = async function () {
+    await doSubmitTaskResponse();
+};
+
+async function doSubmitTaskResponse() {
     if (isEvaluating) return;
 
     const textarea = document.getElementById('task-textarea');

@@ -260,6 +260,19 @@ window.updateListeningAnswer = function (index, value) {
 };
 
 window.submitListeningAnswers = async function () {
+    await doSubmitListeningAnswers();
+};
+
+// Aliases for HTML compatibility
+window.submitAcademicListeningAnswers = async function () {
+    await doSubmitListeningAnswers();
+};
+
+window.submitConversationListeningAnswers = async function () {
+    await doSubmitListeningAnswers();
+};
+
+async function doSubmitListeningAnswers() {
     if (!currentListeningData) return;
 
     // Check if all questions answered

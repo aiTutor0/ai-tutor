@@ -250,6 +250,15 @@ window.updateAnswer = function (index, value) {
 };
 
 window.submitReadingAnswers = async function () {
+  await doSubmitReadingAnswers();
+};
+
+// Alias for HTML compatibility
+window.submitAcademicReadingAnswers = async function () {
+  await doSubmitReadingAnswers();
+};
+
+async function doSubmitReadingAnswers() {
   if (!currentPassage || currentQuestions.length === 0) return;
 
   // Stop timer
