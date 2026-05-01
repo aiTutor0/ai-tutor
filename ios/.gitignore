@@ -1,0 +1,33 @@
+# Xcode-generated artifacts
+xcuserdata/
+*.xcworkspace/xcuserdata/
+*.xcodeproj/xcuserdata/
+*.xcodeproj/project.xcworkspace/xcuserdata/
+DerivedData/
+build/
+.build/
+
+# XcodeGen produces this; regenerate with `xcodegen generate`
+AITutor.xcodeproj/
+
+# Swift Package Manager
+.swiftpm/
+Package.resolved
+
+# Real config with secrets — copy Secrets.example.swift → Secrets.swift
+AITutor/Secrets.swift
+
+# Cocoapods (in case)
+Pods/
+
+# Carthage
+Carthage/Build/
+
+# fastlane
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/
+fastlane/test_output/
+
+# OS
+.DS_Store
